@@ -12,14 +12,14 @@ A real-time web application displaying geographical events on an interactive map
 | Map | MapLibre GL JS | Open-source, OSM tiles |
 | State Management | Pinia | Official Vue recommendation |
 | Backend | Node.js + Express | Lightweight API for data aggregation |
-| External Data | Multiple APIs | News, events, feeds (to be defined) |
+| External Data | External APIs | Real news/event feeds (mock-feed for testing) |
 
 ## High-Level Architecture
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────────┐
 │   Browser   │────▶│   Backend   │────▶│  External APIs  │
-│  (Vue App)  │◀────│  (Express)  │◀────│  (News, Events) │
+│  (Vue App)  │◀────│  (Express)  │◀────│  (or mock-feed)  │
 └─────────────┘     └─────────────┘     └─────────────────┘
        │                   │
        │            ┌──────┴──────┐
@@ -27,6 +27,8 @@ A real-time web application displaying geographical events on an interactive map
        │            │  (In-Memory)│
        │            └─────────────┘
 ```
+
+**Note**: `mock-feed` (port 3001) is a standalone service that simulates an external RSS feed for testing.
 
 ## Frontend Architecture
 
@@ -50,6 +52,13 @@ backend/
 │   ├── services/        # External API integrations
 │   ├── cache/           # Caching layer
 │   └── utils/           # Helpers
+├── mock-feed/           # Mock external RSS feed (for testing)
+│   ├── src/
+│   │   ├── routes/      # /feed endpoint
+│   │   └── utils/       # Generator, RSS builder
+│   ├── README.md        # End-user documentation
+│   └── AGENTS.md        # AI agent instructions
+└── .env                 # Configuration (PORT, external API URLs)
 ```
 
 ## Data Flow
@@ -73,5 +82,5 @@ backend/
 
 - Public, read-only access (no authentication)
 - Small scale (< 1000 concurrent users)
-- External API sources to be defined (news, events, etc.)
+- External API sources: mock-feed (RSS) for testing, real feeds to be added later
 - Data freshness: 60-second polling interval acceptable
