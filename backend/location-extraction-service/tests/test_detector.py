@@ -1,7 +1,3 @@
-import pytest
-from unittest.mock import patch
-
-
 class TestLanguageDetector:
     """Tests for language detection functionality."""
 

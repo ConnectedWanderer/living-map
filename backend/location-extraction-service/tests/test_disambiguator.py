@@ -1,7 +1,3 @@
-import pytest
-from unittest.mock import MagicMock
-
-
 class TestDisambiguator:
     """Tests for event location inference (disambiguation)."""
 

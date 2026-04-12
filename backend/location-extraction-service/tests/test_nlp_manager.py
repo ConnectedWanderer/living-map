@@ -1,7 +1,3 @@
-import pytest
-from unittest.mock import patch, MagicMock
-
-
 class TestNLPManager:
     """Tests for spaCy model manager."""
 

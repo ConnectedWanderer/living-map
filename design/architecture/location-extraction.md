@@ -267,7 +267,7 @@ Response: Location extraction result (see Output Format)
 | NER Models         | en/fr_core_news_trf | latest  | Best accuracy for EN/FR                |
 | Language Detection | langdetect          | latest  | Lightweight, no training needed        |
 | Geocoder           | text2geo            | latest  | Offline, fast, GeoNames-based          |
-| Runtime            | Python 3.11+        | -       | Required for spaCy                     |
+| Runtime            | Python 3.14         | latest  | Latest Python with best performance    |
 | API Server         | FastAPI             | latest  | Fast, async, auto-docs                 |
 | Container          | Docker              | -       | Isolated, reproducible                 |
 

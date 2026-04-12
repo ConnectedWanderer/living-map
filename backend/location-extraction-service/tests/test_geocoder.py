@@ -1,7 +1,3 @@
-import pytest
-from unittest.mock import MagicMock
-
-
 class TestGeocoder:
     """Tests for text2geo geocoder wrapper."""
 
