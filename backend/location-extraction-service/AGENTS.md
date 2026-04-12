@@ -12,15 +12,15 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 
 ### Components
 
-| File | Purpose |
-|------|---------|
-| `src/pipeline/detector.py` | Language detection using langdetect |
-| `src/pipeline/nlp_manager.py` | spaCy model loading and caching |
-| `src/pipeline/extractor.py` | Named Entity Recognition (GPE/LOC entities) |
-| `src/pipeline/disambiguator.py` | Event location inference and scoring |
-| `src/geocoding/geocoder.py` | text2geo wrapper for offline geocoding |
-| `src/models/schemas.py` | Pydantic request/response models |
-| `src/__main__.py` | FastAPI application entry point |
+| File                            | Purpose                                     |
+| ------------------------------- | ------------------------------------------- |
+| `src/pipeline/detector.py`      | Language detection using langdetect         |
+| `src/pipeline/nlp_manager.py`   | spaCy model loading and caching             |
+| `src/pipeline/extractor.py`     | Named Entity Recognition (GPE/LOC entities) |
+| `src/pipeline/disambiguator.py` | Event location inference and scoring        |
+| `src/geocoding/geocoder.py`     | text2geo wrapper for offline geocoding      |
+| `src/models/schemas.py`         | Pydantic request/response models            |
+| `src/__main__.py`               | FastAPI application entry point             |
 
 ## Development Setup
 
@@ -75,20 +75,8 @@ This project uses [ruff](https://docs.astral.sh/ruff/) for linting and formattin
 ### Commands
 
 ```bash
-# Check for issues (lint)
-uv run ruff check .
-
-# Format code
-uv run ruff format .
-
 # Check and format in one pass
-uv run ruff check . && uv run ruff format .
-
-# Fix auto-fixable issues
-uv run ruff check --fix .
-
-# Run with specific rule sets
-uv run ruff check --select=E,F,W .
+uv run ruff check --fix . && uv run ruff format .
 ```
 
 ### Configuration
@@ -143,16 +131,16 @@ docker-compose up --build
 
 ## Key Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| spacy | >=3.8.0 | NLP framework |
-| langdetect | >=1.0.9 | Language detection |
-| text2geo | git | Offline geocoding (GitHub) |
-| fastapi | >=0.135.0 | API server |
-| uvicorn | >=0.30.0 | ASGI server |
-| pydantic | >=2.9.0 | Data validation |
-| ruff | >=0.9.0 | Linting/formatting |
-| pytest | >=9.0.0 | Testing |
+| Package    | Version   | Purpose                    |
+| ---------- | --------- | -------------------------- |
+| spacy      | >=3.8.0   | NLP framework              |
+| langdetect | >=1.0.9   | Language detection         |
+| text2geo   | git       | Offline geocoding (GitHub) |
+| fastapi    | >=0.135.0 | API server                 |
+| uvicorn    | >=0.30.0  | ASGI server                |
+| pydantic   | >=2.9.0   | Data validation            |
+| ruff       | >=0.9.0   | Linting/formatting         |
+| pytest     | >=9.0.0   | Testing                    |
 
 ## Performance Targets
 
@@ -172,16 +160,16 @@ docker-compose up --build
 
 ## uv Commands Reference
 
-| Command | Description |
-|---------|-------------|
-| `uv sync` | Install all dependencies (including dev by default) |
-| `uv sync --dev` | Explicitly include dev dependencies |
-| `uv sync --no-dev` | Exclude dev dependencies |
-| `uv run python -m pytest` | Run pytest tests |
-| `uv run ruff check` | Lint code |
-| `uv run ruff format` | Format code |
-| `uv lock` | Update lock file |
-| `uv sync --frozen` | Install without updating lock (CI/CD) |
+| Command                   | Description                                         |
+| ------------------------- | --------------------------------------------------- |
+| `uv sync`                 | Install all dependencies (including dev by default) |
+| `uv sync --dev`           | Explicitly include dev dependencies                 |
+| `uv sync --no-dev`        | Exclude dev dependencies                            |
+| `uv run python -m pytest` | Run pytest tests                                    |
+| `uv run ruff check`       | Lint code                                           |
+| `uv run ruff format`      | Format code                                         |
+| `uv lock`                 | Update lock file                                    |
+| `uv sync --frozen`        | Install without updating lock (CI/CD)               |
 
 ## File Structure
 
