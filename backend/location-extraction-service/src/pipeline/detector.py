@@ -1,7 +1,8 @@
 import langdetect
 from langdetect import DetectorFactory, LangDetectException
 
-# Ensure deterministic language detection
+DEFAULT_LANGUAGE = "en"
+
 DetectorFactory.seed = 0
 
 
@@ -18,12 +19,12 @@ def detect_language(text: str) -> str:
         LangDetectException: When detection fails, falls back to 'en'.
     """
     if not text or not text.strip():
-        return "en"
+        return DEFAULT_LANGUAGE
 
     try:
         langs = langdetect.detect_langs(text)
         if langs:
             return langs[0].lang
-        return "en"
-    except LangDetectException, IndexError, Exception:
-        return "en"
+        return DEFAULT_LANGUAGE
+    except (LangDetectException, IndexError, Exception):
+        return DEFAULT_LANGUAGE
