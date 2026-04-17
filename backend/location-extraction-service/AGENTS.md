@@ -37,9 +37,9 @@ uv sync
 # If dev dependencies not installed, run:
 uv sync --dev
 
-# Download spaCy models
-uv run python -m spacy download en_core_web_trf
-uv run python -m spacy download fr_core_news_trf
+# Download spaCy small models
+uv run python -m spacy download en_core_web_sm
+uv run python -m spacy download fr_core_news_sm
 
 # Download GeoNames data for text2geo
 uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
@@ -56,7 +56,7 @@ uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
 
 #### Adding New Languages
 
-1. Download spaCy model: `uv run python -m spacy download {lang}_core_news_trf`
+1. Download spaCy model: `uv run python -m spacy download {lang}_core_news_sm`
 2. Update `src/pipeline/nlp_manager.py` model map
 3. Add tests for new language
 4. Update Dockerfile to download new model
@@ -86,6 +86,12 @@ Ruff is configured in `pyproject.toml`:
 - **Line length**: 100 characters
 - **Target Python**: 3.14
 - **Enabled rules**: E, W, F, I (isort), UP (pyupgrade), B (bugbear), C4 (comprehensions), RUF
+
+### Python syntax
+
+When editing Python code, follow these rules:
+
+- **Exception handling**: Use parentheses for multiple exceptions, e.g., `except (Exception1, Exception2):` - do NOT change to the old `except Exception1, Exception2:` syntax
 
 ## Testing
 
@@ -143,7 +149,7 @@ docker-compose up --build
 
 **Dependencies not found**: Run `uv sync` to install all dependencies
 
-**spaCy model not found**: Run `uv run python -m spacy download en_core_web_trf fr_core_news_trf`
+**spaCy model not found**: Run `uv run python -m spacy download en_core_web_sm fr_core_news_sm`
 
 **text2geo data missing**: Run `uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"`
 

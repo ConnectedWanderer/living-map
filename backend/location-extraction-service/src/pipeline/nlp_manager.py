@@ -1,10 +1,11 @@
+import os
 from functools import lru_cache
 
 import spacy
 
 MODEL_MAP = {
-    "en": "en_core_web_trf",
-    "fr": "fr_core_news_md",
+    "en": os.getenv("SPACY_EN_MODEL", "en_core_web_sm"),
+    "fr": os.getenv("SPACY_FR_MODEL", "fr_core_news_sm"),
 }
 
 DEFAULT_MODEL = MODEL_MAP["en"]

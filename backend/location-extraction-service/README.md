@@ -27,9 +27,9 @@ cd backend/location-extraction-service
 # Install dependencies (creates .venv automatically)
 uv sync
 
-# Download spaCy models
-uv run python -m spacy download en_core_web_trf
-uv run python -m spacy download fr_core_news_trf
+# Download spaCy small models
+uv run python -m spacy download en_core_web_sm
+uv run python -m spacy download fr_core_news_sm
 
 # Download GeoNames data
 uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
@@ -87,7 +87,7 @@ curl -X POST http://localhost:8000/api/extract-location \
   ],
   "metadata": {
     "processing_time_ms": 150,
-    "language_model": "en_core_web_trf",
+    "language_model": "en_core_web_sm",
     "entities_found": 1,
     "entities_geocoded": 1
   }
@@ -108,11 +108,13 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 
 ## Configuration
 
-| Variable    | Default   | Description   |
-| ----------- | --------- | ------------- |
-| `HOST`      | `0.0.0.0` | Server host   |
-| `PORT`      | `8000`    | Server port   |
-| `LOG_LEVEL` | `INFO`    | Logging level |
+| Variable         | Default           | Description         |
+| ---------------- | ----------------- | ------------------- |
+| `HOST`           | `0.0.0.0`         | Server host         |
+| `PORT`           | `8000`            | Server port         |
+| `LOG_LEVEL`      | `INFO`            | Logging level       |
+| `SPACY_EN_MODEL` | `en_core_web_sm`  | English spaCy model |
+| `SPACY_FR_MODEL` | `fr_core_news_sm` | French spaCy model  |
 
 ## License
 

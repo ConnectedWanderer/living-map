@@ -14,24 +14,24 @@ Living Map needs to extract geographic locations from unstructured text (news ar
 
 ### Requirements Summary
 
-| Requirement | Value |
-|-------------|-------|
-| Volume | 1000+ articles/day |
-| Latency | <1s per article |
-| Coverage | Global |
-| Cost | $0 (no external APIs) |
-| Languages | English (MVP), French (MVP), extensible |
+| Requirement    | Value                                       |
+| -------------- | ------------------------------------------- |
+| Volume         | 1000+ articles/day                          |
+| Latency        | <1s per article                             |
+| Coverage       | Global                                      |
+| Cost           | $0 (no external APIs)                       |
+| Languages      | English (MVP), French (MVP), extensible     |
 | Infrastructure | Node.js backend + Python sidecar acceptable |
 
 ### Considered Options
 
-| Option | Cost | Latency | Accuracy | Multilingual | Setup |
-|--------|------|---------|----------|--------------|-------|
-| **spaCy + text2geo** | $0 | <1s | ~85% | EN/FR (+extensible) | Easy |
-| Mordecai3 | $0 | <2s | ~95% | EN only | Complex (ES) |
-| LLM-based (GPT) | ~$2/day | >2s | ~95% | Excellent | Easy |
-| Nominatim API | $0 (1/s) | varies | Good | Limited | Easy |
-| Geoparser library | $0 | <1s | ~90% | Limited | Medium |
+| Option               | Cost     | Latency | Accuracy | Multilingual        | Setup        |
+| -------------------- | -------- | ------- | -------- | ------------------- | ------------ |
+| **spaCy + text2geo** | $0       | <1s     | ~85%     | EN/FR (+extensible) | Easy         |
+| Mordecai3            | $0       | <2s     | ~95%     | EN only             | Complex (ES) |
+| LLM-based (GPT)      | ~$2/day  | >2s     | ~95%     | Excellent           | Easy         |
+| Nominatim API        | $0 (1/s) | varies  | Good     | Limited             | Easy         |
+| Geoparser library    | $0       | <1s     | ~90%     | Limited             | Medium       |
 
 ## Decision
 
@@ -46,20 +46,20 @@ flowchart LR
     C --> D[text2geo Geocoder]
     D --> E[Event Location Inference]
     E --> F[JSON]
-    
+
     style A fill:#e1f5fe
     style F fill:#c8e6c9
 ```
 
 ### Components
 
-| Component | Technology | Notes |
-|-----------|------------|-------|
-| Language Detection | langdetect | Lightweight, no training |
-| NER | spaCy `en_core_web_trf` + `fr_core_news_trf` | Transformer-based |
-| Geocoding | text2geo | Offline, GeoNames-based |
-| API Server | FastAPI | Async, auto-generated docs |
-| Container | Docker | ~2GB image |
+| Component          | Technology                                 | Notes                      |
+| ------------------ | ------------------------------------------ | -------------------------- |
+| Language Detection | langdetect                                 | Lightweight, no training   |
+| NER                | spaCy `en_core_web_sm` + `fr_core_news_sm` | Small, fast models         |
+| Geocoding          | text2geo                                   | Offline, GeoNames-based    |
+| API Server         | FastAPI                                    | Async, auto-generated docs |
+| Container          | Docker                                     | ~2GB image                 |
 
 ### Rationale
 
@@ -72,11 +72,11 @@ flowchart LR
 
 ### Why Not Others
 
-| Option | Reason for Rejection |
-|--------|---------------------|
-| **Mordecai3** | Excellent accuracy but requires Elasticsearch (complex ops), English-only |
-| **LLM-based** | Would cost ~$2/day at volume and latency concerns |
-| **Nominatim API** | Free tier has 1 req/s limit; self-hosted requires significant resources |
+| Option                | Reason for Rejection                                                        |
+| --------------------- | --------------------------------------------------------------------------- |
+| **Mordecai3**         | Excellent accuracy but requires Elasticsearch (complex ops), English-only   |
+| **LLM-based**         | Would cost ~$2/day at volume and latency concerns                           |
+| **Nominatim API**     | Free tier has 1 req/s limit; self-hosted requires significant resources     |
 | **Geoparser library** | Viable alternative; chosen text2geo for simpler setup and worldwide dataset |
 
 ## Consequences
@@ -105,12 +105,12 @@ flowchart LR
 
 ## Accuracy Trade-offs
 
-| Scenario | Expected Behavior |
-|----------|------------------|
-| Clear location ("flood in Paris") | ✅ High accuracy (~95%) |
+| Scenario                                 | Expected Behavior                          |
+| ---------------------------------------- | ------------------------------------------ |
+| Clear location ("flood in Paris")        | ✅ High accuracy (~95%)                    |
 | Ambiguous name ("Paris" without context) | ⚠️ May resolve to Paris, France by default |
-| Small/local place names | ⚠️ Depends on GeoNames coverage |
-| Historic/archaic place names | ❌ May not resolve |
+| Small/local place names                  | ⚠️ Depends on GeoNames coverage            |
+| Historic/archaic place names             | ❌ May not resolve                         |
 
 ## Upgrade Path
 
@@ -118,7 +118,7 @@ flowchart LR
 flowchart LR
     A[spaCy + text2geo<br/>MVP] -->|"if accuracy < 80%"| B[Geoparser library<br/>Phase 2]
     B -->|"if accuracy still insufficient"| C[Mordecai3<br/>Phase 3]
-    
+
     style A fill:#c8e6c9
     style B fill:#fff9c4
     style C fill:#ffccbc
@@ -126,14 +126,15 @@ flowchart LR
 
 ### Mordecai3 Migration Effort
 
-| Aspect | Effort | Notes |
-|--------|--------|-------|
-| Elasticsearch setup | 1-2 days | Docker compose, Geonames indexing |
-| Code migration | 1-2 days | Replace `geocode()` calls with `Geoparser()` |
-| Testing | 3-5 days | Validate accuracy improvements |
-| Infrastructure | 1 week | Docker, monitoring, ES needs ~4GB RAM |
+| Aspect              | Effort   | Notes                                        |
+| ------------------- | -------- | -------------------------------------------- |
+| Elasticsearch setup | 1-2 days | Docker compose, Geonames indexing            |
+| Code migration      | 1-2 days | Replace `geocode()` calls with `Geoparser()` |
+| Testing             | 3-5 days | Validate accuracy improvements               |
+| Infrastructure      | 1 week   | Docker, monitoring, ES needs ~4GB RAM        |
 
 **Code change for Mordecai3 switch:**
+
 ```python
 # Current (text2geo)
 result = geo.geocode(mention["text"])
@@ -148,31 +149,31 @@ result = geo.geoparse_doc(text)["geolocated_ents"]
 
 ### MVP Languages
 
-| Language | Model | Coverage |
-|----------|-------|----------|
-| English | `en_core_web_trf` | Best for English text |
-| French | `fr_core_news_trf` | Best for French text |
+| Language | Model             | Coverage          |
+| -------- | ----------------- | ----------------- |
+| English  | `en_core_web_sm`  | Small, fast model |
+| French   | `fr_core_news_sm` | Small, fast model |
 
 ### Future Expansion
 
-| Phase | Languages | Notes |
-|-------|-----------|-------|
-| Phase 2 | German, Spanish, Portuguese | European coverage |
-| Phase 3 | Chinese, Japanese, Korean | Asian languages |
-| Future | Arabic, Russian, Hindi | Additional global coverage |
+| Phase   | Languages                   | Notes                      |
+| ------- | --------------------------- | -------------------------- |
+| Phase 2 | German, Spanish, Portuguese | European coverage          |
+| Phase 3 | Chinese, Japanese, Korean   | Asian languages            |
+| Future  | Arabic, Russian, Hindi      | Additional global coverage |
 
 ### Adding New Languages
 
 ```python
 # 1. Download model
-# python -m spacy download de_core_news_trf
+# python -m spacy download de_core_news_sm
 
 # 2. Update model map
 MODEL_MAP = {
-    "en": "en_core_web_trf",
-    "fr": "fr_core_news_trf",
-    "de": "de_core_news_trf",  # Add here
-    "es": "es_core_news_trf",  # Add here
+    "en": "en_core_web_sm",
+    "fr": "fr_core_news_sm",
+    "de": "de_core_news_sm",  # Add here
+    "es": "es_core_news_sm",  # Add here
 }
 
 # 3. Rebuild Docker image
@@ -181,21 +182,21 @@ MODEL_MAP = {
 
 ## Key Files for AI Agents
 
-| File | Purpose |
-|------|---------|
-| `design/architecture/location-extraction.md` | Full technical specification |
-| `backend/location-extraction-service/` | Python microservice implementation |
-| `backend/src/services/location-service.ts` | Node.js HTTP client |
-| `backend/location-extraction-service/Dockerfile` | Container configuration |
+| File                                             | Purpose                            |
+| ------------------------------------------------ | ---------------------------------- |
+| `design/architecture/location-extraction.md`     | Full technical specification       |
+| `backend/location-extraction-service/`           | Python microservice implementation |
+| `backend/src/services/location-service.ts`       | Node.js HTTP client                |
+| `backend/location-extraction-service/Dockerfile` | Container configuration            |
 
 ## Evaluation Criteria
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Location extraction rate | >90% | Articles with at least one location |
-| Location accuracy | >85% | Correct location for clear mentions |
-| Latency p95 | <1 second | Per document processing |
-| API errors | 0 | Fully offline, no external calls |
+| Metric                   | Target    | Measurement                         |
+| ------------------------ | --------- | ----------------------------------- |
+| Location extraction rate | >90%      | Articles with at least one location |
+| Location accuracy        | >85%      | Correct location for clear mentions |
+| Latency p95              | <1 second | Per document processing             |
+| API errors               | 0         | Fully offline, no external calls    |
 
 ## References
 

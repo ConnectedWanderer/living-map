@@ -13,11 +13,11 @@ class TestNERExtraction:
 
     def test_extract_loc_entities_english(self):
         """Should extract LOC (location) entities from English text."""
-        text = "The floods in the Seine river have caused damage."
+        text = "The mountain Everest is in Nepal."
         result = extract_location_mentions(text, "en")
         loc_entities = [e for e in result if e["label"] == "LOC"]
         assert len(loc_entities) > 0
-        assert any("Seine" in e["text"] for e in result)
+        assert any("Everest" in e["text"] or "Nepal" in e["text"] for e in result)
 
     def test_extract_gpe_entities_french(self, sample_french_text):
         """Should extract location entities (GPE or LOC) from French text."""

@@ -28,8 +28,8 @@ flowchart TD
     C -.-> G[(GeoNames Data)]
     D -.-> G
 
-    B -->|"en"| H["en_core_web_trf"]
-    B -->|"fr"| I["fr_core_news_trf"]
+    B -->|"en"| H["en_core_web_sm"]
+    B -->|"fr"| I["fr_core_news_sm"]
 
     style A fill:#e1f5fe
     style F fill:#c8e6c9
@@ -70,30 +70,29 @@ def detect_language(text: str) -> str:
 
 ### Stage 2: Named Entity Recognition (NER)
 
-**Technology**: spaCy with transformer-based models
+**Technology**: spaCy with small models
 
 **Function**: Identify location mentions (GPE, LOC entities) in text
 
 **Models (MVP)**:
 
-| Language | Model              | Size   | Accuracy |
-| -------- | ------------------ | ------ | -------- |
-| English  | `en_core_web_trf`  | ~500MB | Best     |
-| French   | `fr_core_news_trf` | ~500MB | Best     |
+| Language | Model             | Size  | Accuracy |
+| -------- | ----------------- | ----- | -------- |
+| English  | `en_core_web_sm`  | ~10MB | Good     |
+| French   | `fr_core_news_sm` | ~10MB | Good     |
 
 ```python
 import spacy
+import os
 from functools import lru_cache
-
-_models = {}
 
 @lru_cache(maxsize=2)
 def get_ner_model(lang: str) -> spacy.Language:
     model_map = {
-        "en": "en_core_web_trf",
-        "fr": "fr_core_news_trf"
+        "en": os.getenv("SPACY_EN_MODEL", "en_core_web_sm"),
+        "fr": os.getenv("SPACY_FR_MODEL", "fr_core_news_sm")
     }
-    model_name = model_map.get(lang, "en_core_web_trf")
+    model_name = model_map.get(lang, "en_core_web_sm")
     return spacy.load(model_name)
 
 def extract_location_mentions(text: str, lang: str) -> list[dict]:
@@ -216,7 +215,7 @@ def infer_event_location(locations: list[dict], text: str) -> dict | None:
   ],
   "metadata": {
     "processing_time_ms": 150,
-    "language_model": "fr_core_news_trf",
+    "language_model": "fr_core_news_sm",
     "entities_found": 2,
     "entities_geocoded": 2
   }
@@ -269,15 +268,15 @@ Response: Location extraction result (see Output Format)
 
 ## Technology Stack
 
-| Component          | Technology          | Version | Rationale                              |
-| ------------------ | ------------------- | ------- | -------------------------------------- |
-| NER                | spaCy               | 3.x     | Industry standard, transformer support |
-| NER Models         | en/fr_core_news_trf | latest  | Best accuracy for EN/FR                |
-| Language Detection | langdetect          | latest  | Lightweight, no training needed (seed=0 for determinism) |
-| Geocoder           | text2geo            | latest  | Offline, fast, GeoNames-based          |
-| Runtime            | Python 3.14         | latest  | Latest Python with best performance    |
-| API Server         | FastAPI             | latest  | Fast, async, auto-docs                 |
-| Container          | Docker              | -       | Isolated, reproducible                 |
+| Component          | Technology         | Version | Rationale                                                |
+| ------------------ | ------------------ | ------- | -------------------------------------------------------- |
+| NER                | spaCy              | 3.x     | Industry standard                                        |
+| NER Models         | en/fr_core_news_sm | latest  | Small models (~10MB), good accuracy for MVP              |
+| Language Detection | langdetect         | latest  | Lightweight, no training needed (seed=0 for determinism) |
+| Geocoder           | text2geo           | latest  | Offline, fast, GeoNames-based                            |
+| Runtime            | Python 3.14        | latest  | Latest Python with best performance                      |
+| API Server         | FastAPI            | latest  | Fast, async, auto-docs                                   |
+| Container          | Docker             | -       | Isolated, reproducible                                   |
 
 ## File Structure
 
@@ -310,30 +309,45 @@ backend/
 ## Dockerfile
 
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    UV_COMPILE_BYTECODE=1 \
+    SPACY_EN_MODEL=en_core_web_sm \
+    SPACY_FR_MODEL=fr_core_news_sm
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir uv
 
-# Download spaCy models
-RUN python -m spacy download en_core_web_trf && \
-    python -m spacy download fr_core_news_trf
+COPY pyproject.toml .
+RUN uv sync --frozen --no-dev
+
+# Download spaCy models (using env variables for flexibility)
+RUN --mount=type=cache,target=/root/.cache \
+    uv run python -m spacy download ${SPACY_EN_MODEL} && \
+    uv run python -m spacy download ${SPACY_FR_MODEL}
 
 # Download text2geo data
-RUN python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
+RUN --mount=type=cache,target=/root/.cache \
+    uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
 
 COPY src/ ./src/
 
 EXPOSE 8000
 
-CMD ["uvicorn", "src:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "src:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
+
+### Environment Variables
+
+| Variable         | Default           | Description               |
+| ---------------- | ----------------- | ------------------------- |
+| `SPACY_EN_MODEL` | `en_core_web_sm`  | English spaCy small model |
+| `SPACY_FR_MODEL` | `fr_core_news_sm` | French spaCy small model  |
+
+These default to small models (~10MB) for fast processing. Override at runtime if needed.
 
 ## Implementation Phases
 
