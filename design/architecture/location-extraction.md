@@ -13,6 +13,7 @@ A high-throughput, low-latency NLP service that extracts geographic locations fr
 - Global geographic coverage via GeoNames
 - Zero external API costs (fully offline)
 - Multilingual support (English, French for MVP)
+- Deterministic behavior (controlled via seed for reproducible results)
 
 ## Pipeline Architecture
 
@@ -43,13 +44,20 @@ flowchart TD
 
 ```python
 import langdetect
-from langdetect.detector import LanguageDetector
-from langdetect.lang_detect_exception import LangDetectException
+from langdetect import DetectorFactory, LangDetectException
+
+# Seed ensures deterministic results - required for production
+DetectorFactory.seed = 0
+
 
 def detect_language(text: str) -> str:
+    if not text or not text.strip():
+        return "en"
+
     try:
-        return langdetect.detect(text)
-    except LangDetectException:
+        langs = langdetect.detect_langs(text)
+        return langs[0].lang if langs else "en"
+    except (LangDetectException, Exception):
         return "en"  # Default fallback
 ```
 
@@ -265,7 +273,7 @@ Response: Location extraction result (see Output Format)
 | ------------------ | ------------------- | ------- | -------------------------------------- |
 | NER                | spaCy               | 3.x     | Industry standard, transformer support |
 | NER Models         | en/fr_core_news_trf | latest  | Best accuracy for EN/FR                |
-| Language Detection | langdetect          | latest  | Lightweight, no training needed        |
+| Language Detection | langdetect          | latest  | Lightweight, no training needed (seed=0 for determinism) |
 | Geocoder           | text2geo            | latest  | Offline, fast, GeoNames-based          |
 | Runtime            | Python 3.14         | latest  | Latest Python with best performance    |
 | API Server         | FastAPI             | latest  | Fast, async, auto-docs                 |

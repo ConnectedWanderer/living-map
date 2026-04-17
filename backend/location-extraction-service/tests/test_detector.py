@@ -1,34 +1,56 @@
+from unittest.mock import MagicMock, patch
+
+from src.pipeline.detector import detect_language
+
+
 class TestLanguageDetector:
     """Tests for language detection functionality."""
 
     def test_detect_english_text(self, sample_english_text):
         """Should detect English from English text."""
-        pass
+        result = detect_language(sample_english_text)
+        assert result == "en"
 
     def test_detect_french_text(self, sample_french_text):
         """Should detect French from French text."""
-        pass
+        result = detect_language(sample_french_text)
+        assert result == "fr"
 
-    def test_detect_mixed_text_english_heavy(self):
-        """Should detect English when text is mostly English."""
-        pass
+    def test_detect_mixed_text_returns_dominant(self, mixed_english_heavy_text):
+        """Should detect dominant language when text is mixed."""
+        result = detect_language(mixed_english_heavy_text)
+        assert result == "en"
 
-    def test_detect_mixed_text_french_heavy(self):
-        """Should detect French when text is mostly French."""
-        pass
+    def test_detect_mixed_text_french_returns_dominant(self, mixed_french_heavy_text):
+        """Should detect dominant language when text is mixed French-heavy."""
+        result = detect_language(mixed_french_heavy_text)
+        assert result == "fr"
 
     def test_fallback_to_english_on_empty_text(self):
         """Should fallback to English for empty text."""
-        pass
+        result = detect_language("")
+        assert result == "en"
+
+    def test_fallback_to_english_on_whitespace_only(self):
+        """Should fallback to English for whitespace-only text."""
+        result = detect_language("   \n\t  ")
+        assert result == "en"
 
     def test_fallback_to_english_on_exception(self):
         """Should fallback to English when detection fails."""
-        pass
+        mock_lang = MagicMock()
+        mock_lang.lang = "en"
+        with patch("src.pipeline.detector.langdetect.detect_langs", side_effect=Exception("error")):
+            result = detect_language("test text")
+            assert result == "en"
 
     def test_detect_short_text(self):
-        """Should handle short text (single word)."""
-        pass
+        """Should handle short text without crashing."""
+        result = detect_language("Paris")
+        assert isinstance(result, str)
+        assert len(result) == 2
 
     def test_language_codes(self):
-        """Should return correct language codes (en, fr)."""
-        pass
+        """Should return correct language codes for clear samples."""
+        assert detect_language("The United States announced") == "en"
+        assert detect_language("La France est un beau pays") == "fr"

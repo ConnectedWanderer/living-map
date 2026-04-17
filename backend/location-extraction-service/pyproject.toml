@@ -53,6 +53,7 @@ addopts = "-v --tb=short"
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]
+pythonpath = ["."]
 
 [tool.coverage.run]
 source = ["src"]

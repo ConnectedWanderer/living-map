@@ -90,17 +90,8 @@ Ruff is configured in `pyproject.toml`:
 ## Testing
 
 ```bash
-# Run all tests
+# Run all tests with coverage summary
 uv run python -m pytest tests/ -v
-
-# Run specific test file
-uv run python -m pytest tests/test_detector.py -v
-
-# Run with coverage
-uv run python -m pytest tests/ --cov=src --cov-report=html
-
-# Run integration tests only
-uv run python -m pytest tests/test_pipeline_integration.py -v
 ```
 
 ### Quality Check Workflow

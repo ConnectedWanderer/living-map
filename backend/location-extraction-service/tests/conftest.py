@@ -24,6 +24,16 @@ def sample_french_text():
 
 
 @pytest.fixture
+def mixed_english_heavy_text():
+    return "Bonjour ! Paris is a beautiful city in France. The Seine river flows through London and downtown."
+
+
+@pytest.fixture
+def mixed_french_heavy_text():
+    return "Hello ! La ville de Paris est magnifique le week end. La Seine traverse la France et Londres."
+
+
+@pytest.fixture
 def sample_location_mentions():
     return [
         {"text": "Paris", "label": "GPE", "start": 17, "end": 22},
