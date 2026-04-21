@@ -91,20 +91,13 @@ Ruff is configured in `pyproject.toml`:
 
 When editing Python code, follow these rules:
 
-- **Exception handling**: Use parentheses for multiple exceptions, e.g., `except (Exception1, Exception2):` - do NOT change to the old `except Exception1, Exception2:` syntax
-
-## Testing
-
-```bash
-# Run all tests with coverage summary
-uv run python -m pytest tests/ -v
-```
+- **Exception handling**: Use modern Python syntax for multiple exceptions (Python 3.14+), e.g., `except Exception1, Exception2:` (parentheses optional)
 
 ### Quality Check Workflow
 
 ```bash
-# 1. Run tests
-uv run python -m pytest tests/ -v
+# 1. Run tests with coverage
+uv run python -m pytest tests/ --cov=src --cov-report=term-missing
 
 # 2. Lint code
 uv run ruff check .

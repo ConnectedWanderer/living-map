@@ -1,7 +1,7 @@
 class TestPipelineIntegration:
     """End-to-end pipeline integration tests."""
 
-    def test_full_pipeline_english(self, sample_english_text, expected_event_location):
+    def test_full_pipeline_english(self, sample_english_text):
         """Should process English text and return event location."""
         pass
 
@@ -9,7 +9,7 @@ class TestPipelineIntegration:
         """Should process French text and return event location."""
         pass
 
-    def test_output_format_structure(self, sample_english_text, expected_output_schema):
+    def test_output_format_structure(self, sample_english_text):
         """Output should match expected JSON schema."""
         pass
 

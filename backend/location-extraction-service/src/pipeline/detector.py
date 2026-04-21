@@ -26,5 +26,5 @@ def detect_language(text: str) -> str:
         if langs:
             return langs[0].lang
         return DEFAULT_LANGUAGE
-    except (LangDetectException, IndexError, Exception):
+    except LangDetectException, IndexError, Exception:
         return DEFAULT_LANGUAGE

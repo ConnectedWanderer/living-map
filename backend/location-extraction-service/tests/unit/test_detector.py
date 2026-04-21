@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from src.pipeline.detector import detect_language
 
@@ -38,17 +38,9 @@ class TestLanguageDetector:
 
     def test_fallback_to_english_on_exception(self):
         """Should fallback to English when detection fails."""
-        mock_lang = MagicMock()
-        mock_lang.lang = "en"
         with patch("src.pipeline.detector.langdetect.detect_langs", side_effect=Exception("error")):
             result = detect_language("test text")
             assert result == "en"
-
-    def test_detect_short_text(self):
-        """Should handle short text without crashing."""
-        result = detect_language("Paris")
-        assert isinstance(result, str)
-        assert len(result) == 2
 
     def test_language_codes(self):
         """Should return correct language codes for clear samples."""

@@ -1,15 +1,15 @@
 class TestDisambiguator:
     """Tests for event location inference (disambiguation)."""
 
-    def test_first_mention_is_primary(self, geocoded_locations):
+    def test_first_mention_is_primary(self):
         """Earlier mentions should score higher."""
         pass
 
-    def test_gpe_over_loc_priority(self, geocoded_locations):
+    def test_gpe_over_loc_priority(self):
         """GPE entities should score higher than LOC."""
         pass
 
-    def test_combined_scoring(self, geocoded_locations):
+    def test_combined_scoring(self):
         """Should combine position and type scores."""
         pass
 
@@ -25,7 +25,7 @@ class TestDisambiguator:
         """Confidence score should be between 0 and 1."""
         pass
 
-    def test_return_format_includes_coordinates(self, geocoded_locations):
+    def test_return_format_includes_coordinates(self):
         """Should return lat, lon in result."""
         pass
 
