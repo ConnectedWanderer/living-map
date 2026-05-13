@@ -42,6 +42,8 @@ def evaluate_corpus(corpus_path: str) -> dict:
             "text": (text[:80] + "...") if len(text) > 80 else text,
             "expected_language": sample["language"],
             "detected_language": lang,
+            "expected_entities": sample["entities"],
+            "predicted_entities": predictions,
         })
 
         all_predictions.extend(predictions)
