@@ -236,7 +236,7 @@
       "text": "La forêt amazonienne s'étend sur neuf pays en Amérique du Sud.",
       "language": "fr",
       "entities": [
-        {"text": "Amazonie", "label": "LOC", "start": 3, "end": 11},
+        {"text": "forêt amazonienne", "label": "LOC", "start": 3, "end": 20},
         {"text": "Amérique du Sud", "label": "LOC", "start": 43, "end": 58}
       ]
     },
