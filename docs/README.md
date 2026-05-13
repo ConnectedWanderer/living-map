@@ -12,3 +12,4 @@
 | Document                                                                                     | Description                      | Status   |
 | -------------------------------------------------------------------------------------------- | -------------------------------- | -------- |
 | [ADR-001: Location Extraction Approach](./decisions/ADR-001-location-extraction-approach.md) | Decision to use spaCy + text2geo | Accepted |
+| [ADR-002: NER Evaluation Protocol](./decisions/ADR-002-ner-evaluation-protocol.md) | NER quality evaluation with entity-level exact match | Accepted |

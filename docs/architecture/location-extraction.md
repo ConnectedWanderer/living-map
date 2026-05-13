@@ -262,6 +262,35 @@ Response: Location extraction result (see Output Format)
 | Memory        | ~2GB           | spaCy models + geocoder             |
 | Accuracy      | >85%           | Correct location for clear mentions |
 
+## Evaluation Module
+
+A standalone evaluation framework for measuring NER pipeline quality (Stages 1-2: language detection + entity extraction), defined in [ADR-002](../decisions/ADR-002-ner-evaluation-protocol.md).
+
+### Approach
+
+Entity-level exact match: a prediction is correct only when `text`, `start`, `end`, and `label` all match the expected annotation exactly. No partial credit.
+
+### Metrics
+
+| Metric | Meaning |
+|--------|---------|
+| Precision | TP / (TP + FP) |
+| Recall | TP / (TP + FN) |
+| Entity F1 | Harmonic mean of precision and recall |
+
+Computed overall and per entity type (GPE, LOC).
+
+### Usage
+
+```bash
+cd backend/location-extraction-service
+uv run python -m src.evaluation tests/corpus/en_simple.json
+```
+
+### Corpus
+
+Six JSON files in `tests/corpus/` (simple, paragraphs, edge cases × EN, FR), totaling 200+ entities per language.
+
 ## Technology Stack
 
 | Component          | Technology         | Version | Rationale                                                |
@@ -292,12 +321,34 @@ backend/
 │   │   │   ├── nlp_manager.py        # spaCy model manager
 │   │   │   ├── extractor.py          # NER logic
 │   │   │   └── disambiguator.py      # Event location inference
-│   │   └── geocoding/
-│   │       └── geocoder.py          # text2geo wrapper
-│   ├── models/
-│   │   └── multilingual/             # Downloaded spaCy models
+│   │   ├── geocoding/
+│   │   │   └── geocoder.py          # text2geo wrapper
+│   │   ├── evaluation/              # NER quality evaluation
+│   │   │   ├── __init__.py
+│   │   │   ├── __main__.py          # CLI entry point
+│   │   │   └── corpus.py            # Corpus loading
+│   │   └── models/
+│   │       └── schemas.py           # Pydantic models
+│   ├── tests/
+│   │   ├── conftest.py
+│   │   ├── unit/
+│   │   │   ├── test_detector.py
+│   │   │   ├── test_extractor.py
+│   │   │   ├── test_disambiguator.py
+│   │   │   └── test_evaluation.py
+│   │   ├── integration/
+│   │   │   ├── conftest.py
+│   │   │   ├── test_nlp_manager.py
+│   │   │   └── test_pipeline_integration.py
+│   │   └── corpus/                   # Evaluation test corpora
+│   │       ├── en_simple.json
+│   │       ├── en_paragraphs.json
+│   │       ├── en_edge_cases.json
+│   │       ├── fr_simple.json
+│   │       ├── fr_paragraphs.json
+│   │       └── fr_edge_cases.json
 │   ├── Dockerfile
-│   ├── requirements.txt
+│   ├── pyproject.toml
 │   └── README.md
 └── ...
 ```
@@ -349,18 +400,25 @@ These default to small models (~10MB) for fast processing. Override at runtime i
 
 ### Phase 1: Core Pipeline (MVP)
 
-- [ ] spaCy NER integration (EN + FR)
-- [ ] Language detection
-- [ ] text2geo offline geocoding
-- [ ] Basic event location inference
-- [ ] Docker containerization
-- [ ] FastAPI server
-- [ ] HTTP API endpoint
-- [ ] Unit tests
+- [x] spaCy NER integration (EN + FR)
+- [x] Language detection
+- [x] text2geo offline geocoding
+- [x] Basic event location inference
+- [x] Docker containerization
+- [x] FastAPI server
+- [x] HTTP API endpoint
+- [x] Unit tests
+
+### Phase 1b: Evaluation Framework
+
+- [x] Entity-level exact match evaluation protocol (ADR-002)
+- [x] Evaluation corpus (EN + FR, 200+ entities per language)
+- [x] CLI runner for standalone evaluation
+- [x] Wired into NER pipeline for regression detection
 
 ### Phase 2: Accuracy Improvements
 
-- [ ] Evaluate on sample articles
+- [ ] Measure baseline accuracy on evaluation corpus
 - [ ] Fine-tune disambiguation heuristics
 - [ ] Add handling for edge cases (ambiguous names)
 - [ ] Performance optimization
