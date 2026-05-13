@@ -25,11 +25,7 @@ flowchart TD
     D --> E[Event Location Inference]
     E --> F[Output JSON]
 
-    C -.-> G[(GeoNames Data)]
-    D -.-> G
-
-    B -->|"en"| H["en_core_web_sm"]
-    B -->|"fr"| I["fr_core_news_sm"]
+    D -.-> G[(GeoNames Data)]
 
     style A fill:#e1f5fe
     style F fill:#c8e6c9
