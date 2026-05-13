@@ -22,6 +22,7 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | `src/evaluation/__init__.py`    | Evaluation logic (precision/recall/F1 computation)     |
 | `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`     |
 | `src/evaluation/corpus.py`      | Evaluation corpus schema and loading                   |
+| `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                    |
 | `src/models/schemas.py`         | Pydantic request/response models                       |
 | `src/__main__.py`               | FastAPI application entry point                        |
 
@@ -70,6 +71,16 @@ uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
 2. Add corresponding test file in `tests/`
 3. Update `src/pipeline/` to integrate new component
 4. Update integration tests
+
+## Corpus Maintenance
+
+```bash
+# Check all corpora for offset errors
+uv run python scripts/fix_corpus_offsets.py --check
+
+# Fix all offsets
+uv run python scripts/fix_corpus_offsets.py
+```
 
 ## Code Quality (ruff)
 
@@ -201,6 +212,8 @@ location-extraction-service/
 │       ├── fr_simple.json
 │       ├── fr_paragraphs.json
 │       └── fr_edge_cases.json
+├── scripts/
+│   └── fix_corpus_offsets.py    # Corpus offset fixer
 ├── Dockerfile
 ├── docker-compose.yml
 ├── pyproject.toml             # Dependencies and ruff config

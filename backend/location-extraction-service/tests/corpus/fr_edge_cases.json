@@ -19,30 +19,60 @@
       "text": "Paris Paris Paris",
       "language": "fr",
       "entities": [
-        {"text": "Paris", "label": "GPE", "start": 0, "end": 5},
-        {"text": "Paris", "label": "GPE", "start": 6, "end": 11},
-        {"text": "Paris", "label": "GPE", "start": 12, "end": 17}
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 6,
+          "end": 11
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 12,
+          "end": 17
+        }
       ]
     },
     {
       "text": "J'ai visité le fleuve.",
       "language": "fr",
       "entities": [
-        {"text": "fleuve", "label": "LOC", "start": 14, "end": 20}
+        {
+          "text": "fleuve",
+          "label": "LOC",
+          "start": 15,
+          "end": 21
+        }
       ]
     },
     {
       "text": "NEW YORK — La ville ne dort jamais.",
       "language": "fr",
       "entities": [
-        {"text": "NEW YORK", "label": "GPE", "start": 0, "end": 8}
+        {
+          "text": "NEW YORK",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        }
       ]
     },
     {
       "text": "Saint-Tropez est une destination prisée.",
       "language": "fr",
       "entities": [
-        {"text": "Saint-Tropez", "label": "GPE", "start": 0, "end": 12}
+        {
+          "text": "Saint-Tropez",
+          "label": "GPE",
+          "start": 0,
+          "end": 12
+        }
       ]
     },
     {
@@ -54,15 +84,30 @@
       "text": "Le roi d'Angleterre a visité la France en 1066.",
       "language": "fr",
       "entities": [
-        {"text": "Angleterre", "label": "GPE", "start": 10, "end": 20},
-        {"text": "France", "label": "GPE", "start": 33, "end": 39}
+        {
+          "text": "Angleterre",
+          "label": "GPE",
+          "start": 9,
+          "end": 19
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 32,
+          "end": 38
+        }
       ]
     },
     {
       "text": "La Nouvelle-Orléans est célèbre pour son jazz.",
       "language": "fr",
       "entities": [
-        {"text": "Nouvelle-Orléans", "label": "GPE", "start": 3, "end": 19}
+        {
+          "text": "Nouvelle-Orléans",
+          "label": "GPE",
+          "start": 3,
+          "end": 19
+        }
       ]
     }
   ]

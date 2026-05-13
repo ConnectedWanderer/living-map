@@ -19,31 +19,66 @@
       "text": "Paris Paris Paris",
       "language": "en",
       "entities": [
-        {"text": "Paris", "label": "GPE", "start": 0, "end": 5},
-        {"text": "Paris", "label": "GPE", "start": 6, "end": 11},
-        {"text": "Paris", "label": "GPE", "start": 12, "end": 17}
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 6,
+          "end": 11
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 12,
+          "end": 17
+        }
       ]
     },
     {
       "text": "I visited the river.",
       "language": "en",
       "entities": [
-        {"text": "river", "label": "LOC", "start": 14, "end": 19}
+        {
+          "text": "river",
+          "label": "LOC",
+          "start": 14,
+          "end": 19
+        }
       ]
     },
     {
       "text": "WASHINGTON DC — The president arrived today.",
       "language": "en",
       "entities": [
-        {"text": "WASHINGTON DC", "label": "GPE", "start": 0, "end": 13}
+        {
+          "text": "WASHINGTON DC",
+          "label": "GPE",
+          "start": 0,
+          "end": 13
+        }
       ]
     },
     {
       "text": "New York-based company expands to San Francisco.",
       "language": "en",
       "entities": [
-        {"text": "New York", "label": "GPE", "start": 0, "end": 8},
-        {"text": "San Francisco", "label": "GPE", "start": 31, "end": 44}
+        {
+          "text": "New York",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "San Francisco",
+          "label": "GPE",
+          "start": 34,
+          "end": 47
+        }
       ]
     },
     {
@@ -55,16 +90,36 @@
       "text": "St. Petersburg is a beautiful city in Florida.",
       "language": "en",
       "entities": [
-        {"text": "St. Petersburg", "label": "GPE", "start": 0, "end": 14},
-        {"text": "Florida", "label": "GPE", "start": 38, "end": 45}
+        {
+          "text": "St. Petersburg",
+          "label": "GPE",
+          "start": 0,
+          "end": 14
+        },
+        {
+          "text": "Florida",
+          "label": "GPE",
+          "start": 38,
+          "end": 45
+        }
       ]
     },
     {
       "text": "The king of England visited France in 1066.",
       "language": "en",
       "entities": [
-        {"text": "England", "label": "GPE", "start": 12, "end": 19},
-        {"text": "France", "label": "GPE", "start": 28, "end": 34}
+        {
+          "text": "England",
+          "label": "GPE",
+          "start": 12,
+          "end": 19
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 28,
+          "end": 34
+        }
       ]
     }
   ]
