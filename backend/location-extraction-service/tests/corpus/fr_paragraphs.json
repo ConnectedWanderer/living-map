@@ -148,7 +148,7 @@
       "language": "fr",
       "entities": [
         {"text": "Mékong", "label": "LOC", "start": 13, "end": 19},
-        {"text": "Asie", "label": "LOC", "start": 23, "end": 27},
+        {"text": "Asie du Sud-Est", "label": "LOC", "start": 23, "end": 39},
         {"text": "Cambodge", "label": "GPE", "start": 117, "end": 125},
         {"text": "Laos", "label": "GPE", "start": 127, "end": 131},
         {"text": "Thaïlande", "label": "GPE", "start": 138, "end": 147},
