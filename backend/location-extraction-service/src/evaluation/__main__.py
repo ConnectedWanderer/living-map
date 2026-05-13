@@ -2,17 +2,23 @@ import sys
 
 from src.evaluation import evaluate_corpus
 
+_GREEN = "\033[92m"
+_RED = "\033[91m"
+_RESET = "\033[0m"
+
 
 def _fmt(v: float) -> str:
     return f"{v:.1%}" if isinstance(v, float) else str(v)
 
 
-def _show_entities(label: str, entities: list[dict]) -> None:
+def _show_entities(label: str, entities: list[dict], match_set: set | None = None) -> None:
     if not entities:
         print(f"       {label}: (none)")
     else:
         for e in entities:
-            print(f"       {label}: {e['text']} ({e['label']}, [{e['start']}:{e['end']}])")
+            key = (e["text"], e["label"], e["start"], e["end"])
+            color = _GREEN if match_set is not None and key in match_set else _RED if match_set is not None else ""
+            print(f"       {label}: {color}{e['text']} ({e['label']}, [{e['start']}:{e['end']}]){_RESET if color else ''}")
 
 
 def main():
@@ -46,9 +52,14 @@ def main():
     print("Per-Sample Results:")
     for i, s in enumerate(result["samples"], 1):
         lang_match = "✓" if s["expected_language"] == s["detected_language"] else "✗"
-        print(f"  {i}. [{s['expected_language']}→{s['detected_language']}{lang_match}] {s['text']}")
-        _show_entities("Expected", s["expected_entities"])
-        _show_entities("Predicted", s["predicted_entities"])
+        exp_set = {(e["text"], e["label"], e["start"], e["end"]) for e in s["expected_entities"]}
+        pred_set = {(e["text"], e["label"], e["start"], e["end"]) for e in s["predicted_entities"]}
+        tp = len(exp_set & pred_set)
+        fp = len(pred_set - exp_set)
+        fn = len(exp_set - pred_set)
+        print(f"  {i}. [{s['expected_language']}→{s['detected_language']}{lang_match}] tp={tp} fp={fp} fn={fn}  {s['text']}")
+        _show_entities("Expected", s["expected_entities"], pred_set)
+        _show_entities("Predicted", s["predicted_entities"], exp_set)
 
 
 if __name__ == "__main__":
