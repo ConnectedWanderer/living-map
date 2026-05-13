@@ -19,8 +19,8 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | `src/pipeline/extractor.py`     | Named Entity Recognition (GPE/LOC entities)            |
 | `src/pipeline/disambiguator.py` | Event location inference and scoring                   |
 | `src/geocoding/geocoder.py`     | text2geo wrapper for offline geocoding                 |
-| `src/evaluation/__init__.py`    | Evaluation logic (precision/recall/F1 computation)     |
-| `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`     |
+| `src/evaluation/__init__.py`    | Evaluation logic: `evaluate()` (P/R/F1), `evaluate_corpus()` (single corpus), `evaluate_all_corpora()` (aggregate synthesis), `discover_corpora()` (file discovery) |
+| `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation` (single corpus) or no-args for aggregate synthesis of all corpora |
 | `src/evaluation/corpus.py`      | Evaluation corpus schema and loading                   |
 | `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                    |
 | `src/models/schemas.py`         | Pydantic request/response models                       |
@@ -71,6 +71,20 @@ uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
 2. Add corresponding test file in `tests/`
 3. Update `src/pipeline/` to integrate new component
 4. Update integration tests
+
+## Evaluation
+
+```bash
+# Single corpus
+uv run python -m src.evaluation tests/corpus/en_simple.json
+
+# Aggregate synthesis of all corpora
+uv run python -m src.evaluation
+
+# The synthesis prints aggregate entity-level metrics,
+# per-type breakdown, and per-corpus summary table.
+# Per-sample details are accessible via single-corpus mode.
+```
 
 ## Corpus Maintenance
 
