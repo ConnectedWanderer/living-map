@@ -40,7 +40,7 @@ Geocoding (Stage 3) and event location inference (Stage 4) will be addressed in 
 
 ### What This Means
 
-A predicted entity is counted as **correct (True Positive)** only if **all four** fields match the gold standard exactly:
+A predicted entity is counted as **correct (True Positive)** only if **all four** fields match the expected annotation exactly:
 
 | Field | Criterion |
 |-------|-----------|
@@ -85,18 +85,18 @@ Each metric is computed:
 ### Negative
 
 - Strict matching means entity-boundary edge cases (e.g., "New York" vs "New\nYork") count as wrong even when the entity type is correct
-- Small annotation errors in gold standard cause misleading scores
+- Small annotation errors in expected corpus cause misleading scores
 - Does not capture "close but wrong boundary" improvements
 
 ### Neutral
 
-- Gold standard corpus must be carefully annotated (minimal boundary ambiguity)
+- Expected corpus must be carefully annotated (minimal boundary ambiguity)
 - May want to adopt a secondary relaxed metric later if exact scores plateau
 - Future ADR will cover geocoding and event location evaluation
 
 ## Test Corpus Requirements
 
-The gold standard corpus must be:
+The evaluation corpus must be:
 - Stored in-repo at `tests/corpus/` as JSON files
 - Annotated with exact character offsets and entity types
 - Cover both English and French
@@ -149,7 +149,7 @@ uv run python -m src.evaluation
 | Abbreviation | Meaning |
 |-------------|---------|
 | **TP** | True Positive — correctly predicted entity |
-| **FP** | False Positive — predicted entity that does not exist in gold standard |
+| **FP** | False Positive — predicted entity that does not exist in expected annotations |
 | **FN** | False Negative — actual entity that was not predicted |
 | **P** | Precision — TP / (TP + FP) |
 | **R** | Recall — TP / (TP + FN) |

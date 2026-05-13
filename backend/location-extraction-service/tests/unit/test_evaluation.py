@@ -225,7 +225,7 @@ class TestEvaluateCorpus:
         for key in ("precision", "recall", "f1", "tp", "fp", "fn"):
             assert key in result["overall"]
         assert len(result["samples"]) == 1
-        assert result["samples"][0]["gold_language"] == "en"
+        assert result["samples"][0]["expected_language"] == "en"
         assert result["samples"][0]["detected_language"] == "en"
 
     def test_evaluate_corpus_aggregates_multiple_samples(self, tmp_path):

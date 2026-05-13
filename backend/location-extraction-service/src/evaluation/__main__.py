@@ -37,8 +37,8 @@ def main():
     print()
     print("Per-Sample Results:")
     for i, s in enumerate(result["samples"], 1):
-        lang_match = "✓" if s["gold_language"] == s["detected_language"] else "✗"
-        print(f"  {i}. [{s['gold_language']}→{s['detected_language']}{lang_match}] {s['text']}")
+        lang_match = "✓" if s["expected_language"] == s["detected_language"] else "✗"
+        print(f"  {i}. [{s['expected_language']}→{s['detected_language']}{lang_match}] {s['text']}")
 
 
 if __name__ == "__main__":

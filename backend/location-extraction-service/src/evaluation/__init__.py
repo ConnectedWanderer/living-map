@@ -40,7 +40,7 @@ def evaluate_corpus(corpus_path: str) -> dict:
 
         sample_results.append({
             "text": (text[:80] + "...") if len(text) > 80 else text,
-            "gold_language": sample["language"],
+            "expected_language": sample["language"],
             "detected_language": lang,
         })
 
