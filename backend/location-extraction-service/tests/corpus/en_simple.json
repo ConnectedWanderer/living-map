@@ -1,0 +1,123 @@
+{
+  "samples": [
+    {
+      "text": "The meeting in Paris was attended by officials from London.",
+      "language": "en",
+      "entities": [
+        {"text": "Paris", "label": "GPE", "start": 16, "end": 21},
+        {"text": "London", "label": "GPE", "start": 59, "end": 65}
+      ]
+    },
+    {
+      "text": "Berlin and Madrid are discussing new trade agreements.",
+      "language": "en",
+      "entities": [
+        {"text": "Berlin", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Madrid", "label": "GPE", "start": 11, "end": 17}
+      ]
+    },
+    {
+      "text": "The Seine river flows through the heart of Paris.",
+      "language": "en",
+      "entities": [
+        {"text": "Seine", "label": "LOC", "start": 4, "end": 9},
+        {"text": "Paris", "label": "GPE", "start": 36, "end": 41}
+      ]
+    },
+    {
+      "text": "Officials from Rome and Berlin will meet in Milan next week.",
+      "language": "en",
+      "entities": [
+        {"text": "Rome", "label": "GPE", "start": 15, "end": 19},
+        {"text": "Berlin", "label": "GPE", "start": 24, "end": 30},
+        {"text": "Milan", "label": "GPE", "start": 43, "end": 48}
+      ]
+    },
+    {
+      "text": "The Alps are visible from the city of Munich.",
+      "language": "en",
+      "entities": [
+        {"text": "Alps", "label": "LOC", "start": 4, "end": 8},
+        {"text": "Munich", "label": "GPE", "start": 32, "end": 38}
+      ]
+    },
+    {
+      "text": "Travel from Lyon to Marseille takes about three hours by train.",
+      "language": "en",
+      "entities": [
+        {"text": "Lyon", "label": "GPE", "start": 11, "end": 15},
+        {"text": "Marseille", "label": "GPE", "start": 19, "end": 28}
+      ]
+    },
+    {
+      "text": "The Danube river crosses Vienna before reaching the Black Sea.",
+      "language": "en",
+      "entities": [
+        {"text": "Danube", "label": "LOC", "start": 4, "end": 10},
+        {"text": "Vienna", "label": "GPE", "start": 20, "end": 26},
+        {"text": "Black Sea", "label": "LOC", "start": 44, "end": 53}
+      ]
+    },
+    {
+      "text": "Athens has announced new measures to boost tourism.",
+      "language": "en",
+      "entities": [
+        {"text": "Athens", "label": "GPE", "start": 0, "end": 6}
+      ]
+    },
+    {
+      "text": "The Rhine valley is known for its vineyards and castles.",
+      "language": "en",
+      "entities": [
+        {"text": "Rhine", "label": "LOC", "start": 4, "end": 9}
+      ]
+    },
+    {
+      "text": "Warsaw and Prague are both popular destinations for European tourists.",
+      "language": "en",
+      "entities": [
+        {"text": "Warsaw", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Prague", "label": "GPE", "start": 11, "end": 17}
+      ]
+    },
+    {
+      "text": "Hiking in the Pyrenees is a popular summer activity in Spain.",
+      "language": "en",
+      "entities": [
+        {"text": "Pyrenees", "label": "LOC", "start": 12, "end": 20},
+        {"text": "Spain", "label": "GPE", "start": 57, "end": 62}
+      ]
+    },
+    {
+      "text": "The conference in Brussels will address climate policy across Europe.",
+      "language": "en",
+      "entities": [
+        {"text": "Brussels", "label": "GPE", "start": 18, "end": 26},
+        {"text": "Europe", "label": "LOC", "start": 60, "end": 66}
+      ]
+    },
+    {
+      "text": "Stockholm is built on several islands connected by bridges.",
+      "language": "en",
+      "entities": [
+        {"text": "Stockholm", "label": "GPE", "start": 0, "end": 9}
+      ]
+    },
+    {
+      "text": "The Loire valley contains some of the finest chateaux in France.",
+      "language": "en",
+      "entities": [
+        {"text": "Loire", "label": "LOC", "start": 4, "end": 9},
+        {"text": "France", "label": "GPE", "start": 60, "end": 66}
+      ]
+    },
+    {
+      "text": "Dublin and Edinburgh are famous for their literary heritage.",
+      "language": "en",
+      "entities": [
+        {"text": "Dublin", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Edinburgh", "label": "GPE", "start": 11, "end": 20}
+      ]
+    }
+  ]
+}

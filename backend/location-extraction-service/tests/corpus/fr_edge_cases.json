@@ -1,0 +1,49 @@
+{
+  "samples": [
+    {
+      "text": "",
+      "language": "fr",
+      "entities": []
+    },
+    {
+      "text": "Cette phrase ne contient aucune mention de lieu.",
+      "language": "fr",
+      "entities": []
+    },
+    {
+      "text": "   \n\t  ",
+      "language": "fr",
+      "entities": []
+    },
+    {
+      "text": "Paris Paris Paris",
+      "language": "fr",
+      "entities": [
+        {"text": "Paris", "label": "GPE", "start": 0, "end": 5},
+        {"text": "Paris", "label": "GPE", "start": 6, "end": 11},
+        {"text": "Paris", "label": "GPE", "start": 12, "end": 17}
+      ]
+    },
+    {
+      "text": "J'ai visité le fleuve.",
+      "language": "fr",
+      "entities": [
+        {"text": "fleuve", "label": "LOC", "start": 14, "end": 20}
+      ]
+    },
+    {
+      "text": "NEW YORK — La ville ne dort jamais.",
+      "language": "fr",
+      "entities": [
+        {"text": "NEW YORK", "label": "GPE", "start": 0, "end": 8}
+      ]
+    },
+    {
+      "text": "Saint-Tropez est une destination prisée.",
+      "language": "fr",
+      "entities": [
+        {"text": "Saint-Tropez", "label": "GPE", "start": 0, "end": 12}
+      ]
+    }
+  ]
+}

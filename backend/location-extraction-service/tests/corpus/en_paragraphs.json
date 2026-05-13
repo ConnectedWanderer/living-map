@@ -1,0 +1,54 @@
+{
+  "samples": [
+    {
+      "text": "Authorities in Paris have confirmed that the summit will proceed as planned. Delegates from Berlin, Madrid, and Rome are expected to attend. The Seine river banks will be closed during the event. London has sent a delegation led by the mayor.",
+      "language": "en",
+      "entities": [
+        {"text": "Paris", "label": "GPE", "start": 17, "end": 22},
+        {"text": "Berlin", "label": "GPE", "start": 87, "end": 93},
+        {"text": "Madrid", "label": "GPE", "start": 95, "end": 101},
+        {"text": "Rome", "label": "GPE", "start": 106, "end": 110},
+        {"text": "Seine", "label": "LOC", "start": 133, "end": 138},
+        {"text": "London", "label": "GPE", "start": 168, "end": 174}
+      ]
+    },
+    {
+      "text": "The Mediterranean Sea has warmed significantly over the past decade, according to a new study from the University of Barcelona. Researchers in Marseille collected data from monitoring stations along the coast of southern France. The findings have implications for cities like Nice, Valencia, and Genoa.",
+      "language": "en",
+      "entities": [
+        {"text": "Mediterranean Sea", "label": "LOC", "start": 4, "end": 21},
+        {"text": "Barcelona", "label": "GPE", "start": 96, "end": 105},
+        {"text": "Marseille", "label": "GPE", "start": 126, "end": 135},
+        {"text": "France", "label": "GPE", "start": 199, "end": 205},
+        {"text": "Nice", "label": "GPE", "start": 253, "end": 257},
+        {"text": "Valencia", "label": "GPE", "start": 259, "end": 267},
+        {"text": "Genoa", "label": "GPE", "start": 272, "end": 277}
+      ]
+    },
+    {
+      "text": "The Amazon rainforest spans nine countries across South America. Deforestation rates in Brazil have drawn international criticism. The Amazon river basin is home to thousands of species. Indigenous communities in Peru, Colombia, and Ecuador are on the front lines of conservation efforts.",
+      "language": "en",
+      "entities": [
+        {"text": "Amazon", "label": "LOC", "start": 4, "end": 10},
+        {"text": "South America", "label": "LOC", "start": 52, "end": 65},
+        {"text": "Brazil", "label": "GPE", "start": 105, "end": 111},
+        {"text": "Amazon", "label": "LOC", "start": 158, "end": 164},
+        {"text": "Peru", "label": "GPE", "start": 256, "end": 260},
+        {"text": "Colombia", "label": "GPE", "start": 262, "end": 270},
+        {"text": "Ecuador", "label": "GPE", "start": 275, "end": 282}
+      ]
+    },
+    {
+      "text": "The Loire Valley in France is famous for its wineries and historic chateaux. Tours is the main gateway city, while smaller towns like Amboise and Chinon offer intimate experiences. The Cher river winds through the region, past villages that have stood for centuries.",
+      "language": "en",
+      "entities": [
+        {"text": "Loire Valley", "label": "LOC", "start": 4, "end": 16},
+        {"text": "France", "label": "GPE", "start": 20, "end": 26},
+        {"text": "Tours", "label": "GPE", "start": 86, "end": 91},
+        {"text": "Amboise", "label": "GPE", "start": 133, "end": 140},
+        {"text": "Chinon", "label": "GPE", "start": 145, "end": 151},
+        {"text": "Cher", "label": "LOC", "start": 169, "end": 173}
+      ]
+    }
+  ]
+}

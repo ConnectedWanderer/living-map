@@ -1,0 +1,123 @@
+{
+  "samples": [
+    {
+      "text": "La réunion à Paris a réuni des responsables de Londres.",
+      "language": "fr",
+      "entities": [
+        {"text": "Paris", "label": "GPE", "start": 14, "end": 19},
+        {"text": "Londres", "label": "GPE", "start": 51, "end": 58}
+      ]
+    },
+    {
+      "text": "Berlin et Madrid discutent de nouveaux accords commerciaux.",
+      "language": "fr",
+      "entities": [
+        {"text": "Berlin", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Madrid", "label": "GPE", "start": 11, "end": 17}
+      ]
+    },
+    {
+      "text": "Le Rhône traverse Lyon avant de se jeter dans la mer.",
+      "language": "fr",
+      "entities": [
+        {"text": "Rhône", "label": "LOC", "start": 3, "end": 8},
+        {"text": "Lyon", "label": "GPE", "start": 18, "end": 22}
+      ]
+    },
+    {
+      "text": "Des responsables de Rome et Berlin se rencontreront à Milan.",
+      "language": "fr",
+      "entities": [
+        {"text": "Rome", "label": "GPE", "start": 22, "end": 26},
+        {"text": "Berlin", "label": "GPE", "start": 31, "end": 37},
+        {"text": "Milan", "label": "GPE", "start": 56, "end": 61}
+      ]
+    },
+    {
+      "text": "Les Alpes sont visibles depuis la ville de Munich.",
+      "language": "fr",
+      "entities": [
+        {"text": "Alpes", "label": "LOC", "start": 4, "end": 9},
+        {"text": "Munich", "label": "GPE", "start": 40, "end": 46}
+      ]
+    },
+    {
+      "text": "Le voyage de Lyon à Marseille dure environ trois heures en train.",
+      "language": "fr",
+      "entities": [
+        {"text": "Lyon", "label": "GPE", "start": 14, "end": 18},
+        {"text": "Marseille", "label": "GPE", "start": 22, "end": 31}
+      ]
+    },
+    {
+      "text": "Le Danube traverse Vienne avant d'atteindre la mer Noire.",
+      "language": "fr",
+      "entities": [
+        {"text": "Danube", "label": "LOC", "start": 3, "end": 9},
+        {"text": "Vienne", "label": "GPE", "start": 19, "end": 25},
+        {"text": "mer Noire", "label": "LOC", "start": 52, "end": 61}
+      ]
+    },
+    {
+      "text": "Athènes a annoncé de nouvelles mesures pour stimuler le tourisme.",
+      "language": "fr",
+      "entities": [
+        {"text": "Athènes", "label": "GPE", "start": 0, "end": 7}
+      ]
+    },
+    {
+      "text": "La vallée du Rhin est connue pour ses vignobles et ses châteaux.",
+      "language": "fr",
+      "entities": [
+        {"text": "Rhin", "label": "LOC", "start": 12, "end": 16}
+      ]
+    },
+    {
+      "text": "Varsovie et Prague sont des destinations populaires pour les touristes européens.",
+      "language": "fr",
+      "entities": [
+        {"text": "Varsovie", "label": "GPE", "start": 0, "end": 8},
+        {"text": "Prague", "label": "GPE", "start": 13, "end": 19}
+      ]
+    },
+    {
+      "text": "La randonnée dans les Pyrénées est une activité estivale populaire en Espagne.",
+      "language": "fr",
+      "entities": [
+        {"text": "Pyrénées", "label": "LOC", "start": 21, "end": 29},
+        {"text": "Espagne", "label": "GPE", "start": 75, "end": 82}
+      ]
+    },
+    {
+      "text": "La conférence à Bruxelles abordera la politique climatique à travers l'Europe.",
+      "language": "fr",
+      "entities": [
+        {"text": "Bruxelles", "label": "GPE", "start": 18, "end": 27},
+        {"text": "Europe", "label": "LOC", "start": 79, "end": 85}
+      ]
+    },
+    {
+      "text": "Stockholm est construite sur plusieurs îles reliées par des ponts.",
+      "language": "fr",
+      "entities": [
+        {"text": "Stockholm", "label": "GPE", "start": 0, "end": 9}
+      ]
+    },
+    {
+      "text": "La vallée de la Loire contient certains des plus beaux châteaux de France.",
+      "language": "fr",
+      "entities": [
+        {"text": "Loire", "label": "LOC", "start": 15, "end": 20},
+        {"text": "France", "label": "GPE", "start": 72, "end": 78}
+      ]
+    },
+    {
+      "text": "Dublin et Édimbourg sont célèbres pour leur héritage littéraire.",
+      "language": "fr",
+      "entities": [
+        {"text": "Dublin", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Édimbourg", "label": "GPE", "start": 11, "end": 21}
+      ]
+    }
+  ]
+}
