@@ -118,6 +118,246 @@
         {"text": "Dublin", "label": "GPE", "start": 0, "end": 6},
         {"text": "Édimbourg", "label": "GPE", "start": 11, "end": 21}
       ]
+    },
+    {
+      "text": "Le vol du Caire à Nairobi a été retardé de six heures.",
+      "language": "fr",
+      "entities": [
+        {"text": "Caire", "label": "GPE", "start": 11, "end": 16},
+        {"text": "Nairobi", "label": "GPE", "start": 20, "end": 27}
+      ]
+    },
+    {
+      "text": "Lagos et Johannesburg sont des pôles économiques majeurs en Afrique.",
+      "language": "fr",
+      "entities": [
+        {"text": "Lagos", "label": "GPE", "start": 0, "end": 5},
+        {"text": "Johannesburg", "label": "GPE", "start": 10, "end": 22},
+        {"text": "Afrique", "label": "LOC", "start": 53, "end": 60}
+      ]
+    },
+    {
+      "text": "Marrakech est une destination touristique populaire pour ses marchés.",
+      "language": "fr",
+      "entities": [
+        {"text": "Marrakech", "label": "GPE", "start": 0, "end": 9}
+      ]
+    },
+    {
+      "text": "Le désert du Sahara s'étend à travers le nord de l'Afrique.",
+      "language": "fr",
+      "entities": [
+        {"text": "Sahara", "label": "LOC", "start": 13, "end": 19},
+        {"text": "Afrique", "label": "LOC", "start": 50, "end": 57}
+      ]
+    },
+    {
+      "text": "Le Kilimandjaro est le plus haut sommet d'Afrique.",
+      "language": "fr",
+      "entities": [
+        {"text": "Kilimandjaro", "label": "LOC", "start": 3, "end": 15},
+        {"text": "Afrique", "label": "LOC", "start": 39, "end": 46}
+      ]
+    },
+    {
+      "text": "Le Nil traverse l'Égypte et le Soudan.",
+      "language": "fr",
+      "entities": [
+        {"text": "Nil", "label": "LOC", "start": 3, "end": 6},
+        {"text": "Égypte", "label": "GPE", "start": 18, "end": 24},
+        {"text": "Soudan", "label": "GPE", "start": 29, "end": 35}
+      ]
+    },
+    {
+      "text": "Tokyo et Séoul sont reliées par des vols directs.",
+      "language": "fr",
+      "entities": [
+        {"text": "Tokyo", "label": "GPE", "start": 0, "end": 5},
+        {"text": "Séoul", "label": "GPE", "start": 10, "end": 15}
+      ]
+    },
+    {
+      "text": "Les marchés à Shanghai et à Hong Kong attirent les investisseurs.",
+      "language": "fr",
+      "entities": [
+        {"text": "Shanghai", "label": "GPE", "start": 14, "end": 22},
+        {"text": "Hong Kong", "label": "GPE", "start": 27, "end": 36}
+      ]
+    },
+    {
+      "text": "Mumbai est la capitale financière de l'Inde.",
+      "language": "fr",
+      "entities": [
+        {"text": "Mumbai", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Inde", "label": "GPE", "start": 36, "end": 40}
+      ]
+    },
+    {
+      "text": "Singapour et Dubaï sont des plaques tournantes du commerce international.",
+      "language": "fr",
+      "entities": [
+        {"text": "Singapour", "label": "GPE", "start": 0, "end": 9},
+        {"text": "Dubaï", "label": "GPE", "start": 14, "end": 19}
+      ]
+    },
+    {
+      "text": "La Grande Muraille de Chine est visible depuis l'espace selon la légende.",
+      "language": "fr",
+      "entities": [
+        {"text": "Grande Muraille de Chine", "label": "LOC", "start": 3, "end": 26}
+      ]
+    },
+    {
+      "text": "Bangkok et Singapour sont les villes les plus visitées d'Asie du Sud-Est.",
+      "language": "fr",
+      "entities": [
+        {"text": "Bangkok", "label": "GPE", "start": 0, "end": 7},
+        {"text": "Singapour", "label": "GPE", "start": 12, "end": 21},
+        {"text": "Asie", "label": "LOC", "start": 64, "end": 68}
+      ]
+    },
+    {
+      "text": "Pékin et New Delhi ont tous deux investi massivement dans les énergies renouvelables.",
+      "language": "fr",
+      "entities": [
+        {"text": "Pékin", "label": "GPE", "start": 0, "end": 5},
+        {"text": "New Delhi", "label": "GPE", "start": 10, "end": 19}
+      ]
+    },
+    {
+      "text": "L'Himalaya sépare le sous-continent indien du plateau tibétain.",
+      "language": "fr",
+      "entities": [
+        {"text": "Himalaya", "label": "LOC", "start": 2, "end": 10}
+      ]
+    },
+    {
+      "text": "Le Yangtsé est le plus long fleuve d'Asie.",
+      "language": "fr",
+      "entities": [
+        {"text": "Yangtsé", "label": "LOC", "start": 3, "end": 10},
+        {"text": "Asie", "label": "LOC", "start": 34, "end": 38}
+      ]
+    },
+    {
+      "text": "New York et Chicago sont reliées par le rail et les airs.",
+      "language": "fr",
+      "entities": [
+        {"text": "New York", "label": "GPE", "start": 0, "end": 8},
+        {"text": "Chicago", "label": "GPE", "start": 13, "end": 20}
+      ]
+    },
+    {
+      "text": "La forêt amazonienne s'étend sur neuf pays en Amérique du Sud.",
+      "language": "fr",
+      "entities": [
+        {"text": "Amazonie", "label": "LOC", "start": 3, "end": 11},
+        {"text": "Amérique du Sud", "label": "LOC", "start": 43, "end": 58}
+      ]
+    },
+    {
+      "text": "Buenos Aires et Rio de Janeiro sont célèbres pour leur culture vibrante.",
+      "language": "fr",
+      "entities": [
+        {"text": "Buenos Aires", "label": "GPE", "start": 0, "end": 12},
+        {"text": "Rio de Janeiro", "label": "GPE", "start": 17, "end": 31}
+      ]
+    },
+    {
+      "text": "Mexico et Lima ont de riches traditions culinaires.",
+      "language": "fr",
+      "entities": [
+        {"text": "Mexico", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Lima", "label": "GPE", "start": 11, "end": 15}
+      ]
+    },
+    {
+      "text": "Santiago est la capitale du Chili.",
+      "language": "fr",
+      "entities": [
+        {"text": "Santiago", "label": "GPE", "start": 0, "end": 8},
+        {"text": "Chili", "label": "GPE", "start": 25, "end": 30}
+      ]
+    },
+    {
+      "text": "Le Mississippi est une voie navigable majeure aux États-Unis.",
+      "language": "fr",
+      "entities": [
+        {"text": "Mississippi", "label": "LOC", "start": 3, "end": 14},
+        {"text": "États-Unis", "label": "GPE", "start": 47, "end": 57}
+      ]
+    },
+    {
+      "text": "Toronto est la plus grande ville du Canada.",
+      "language": "fr",
+      "entities": [
+        {"text": "Toronto", "label": "GPE", "start": 0, "end": 7},
+        {"text": "Canada", "label": "GPE", "start": 32, "end": 38}
+      ]
+    },
+    {
+      "text": "La cordillère des Andes longe la côte ouest de l'Amérique du Sud.",
+      "language": "fr",
+      "entities": [
+        {"text": "Andes", "label": "LOC", "start": 18, "end": 23},
+        {"text": "Amérique du Sud", "label": "LOC", "start": 57, "end": 72}
+      ]
+    },
+    {
+      "text": "Sydney et Melbourne sont les plus grandes villes d'Australie.",
+      "language": "fr",
+      "entities": [
+        {"text": "Sydney", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Melbourne", "label": "GPE", "start": 11, "end": 20},
+        {"text": "Australie", "label": "GPE", "start": 48, "end": 57}
+      ]
+    },
+    {
+      "text": "Auckland est la porte d'entrée de la Nouvelle-Zélande.",
+      "language": "fr",
+      "entities": [
+        {"text": "Auckland", "label": "GPE", "start": 0, "end": 8},
+        {"text": "Nouvelle-Zélande", "label": "GPE", "start": 35, "end": 50}
+      ]
+    },
+    {
+      "text": "La Grande Barrière de Corail est l'une des merveilles naturelles du monde.",
+      "language": "fr",
+      "entities": [
+        {"text": "Grande Barrière de Corail", "label": "LOC", "start": 3, "end": 28}
+      ]
+    },
+    {
+      "text": "Jakarta et Manille sont des villes en pleine croissance en Asie du Sud-Est.",
+      "language": "fr",
+      "entities": [
+        {"text": "Jakarta", "label": "GPE", "start": 0, "end": 7},
+        {"text": "Manille", "label": "GPE", "start": 12, "end": 19},
+        {"text": "Asie", "label": "LOC", "start": 61, "end": 65}
+      ]
+    },
+    {
+      "text": "Los Angeles et San Francisco sont sur la côte ouest des États-Unis.",
+      "language": "fr",
+      "entities": [
+        {"text": "Los Angeles", "label": "GPE", "start": 0, "end": 11},
+        {"text": "San Francisco", "label": "GPE", "start": 16, "end": 29},
+        {"text": "États-Unis", "label": "GPE", "start": 63, "end": 73}
+      ]
+    },
+    {
+      "text": "Le Cap est connu pour son littoral magnifique et sa montagne de la Table.",
+      "language": "fr",
+      "entities": [
+        {"text": "Le Cap", "label": "GPE", "start": 0, "end": 6}
+      ]
+    },
+    {
+      "text": "Le désert de Gobi connaît des températures extrêmes entre l'été et l'hiver.",
+      "language": "fr",
+      "entities": [
+        {"text": "Gobi", "label": "LOC", "start": 13, "end": 17}
+      ]
     }
   ]
 }

@@ -49,6 +49,146 @@
         {"text": "Chinon", "label": "GPE", "start": 145, "end": 151},
         {"text": "Cher", "label": "LOC", "start": 169, "end": 173}
       ]
+    },
+    {
+      "text": "Diplomats from Japan, South Korea, and China met in Tokyo to discuss regional security. The talks covered trade agreements, maritime boundaries in the East China Sea, and joint responses to natural disasters. Delegates praised the constructive atmosphere throughout the three-day summit.",
+      "language": "en",
+      "entities": [
+        {"text": "Japan", "label": "GPE", "start": 18, "end": 23},
+        {"text": "South Korea", "label": "GPE", "start": 25, "end": 36},
+        {"text": "China", "label": "GPE", "start": 41, "end": 46},
+        {"text": "Tokyo", "label": "GPE", "start": 59, "end": 64},
+        {"text": "East China Sea", "label": "LOC", "start": 138, "end": 152}
+      ]
+    },
+    {
+      "text": "The Indian city of Mumbai has been hit by severe monsoon flooding, disrupting transportation and daily life. Authorities in Delhi and Kolkata are on high alert as the storm system moves eastward. The Ganges river is approaching dangerous levels in several districts of Uttar Pradesh.",
+      "language": "en",
+      "entities": [
+        {"text": "India", "label": "GPE", "start": 4, "end": 9},
+        {"text": "Mumbai", "label": "GPE", "start": 18, "end": 24},
+        {"text": "Delhi", "label": "GPE", "start": 109, "end": 114},
+        {"text": "Kolkata", "label": "GPE", "start": 119, "end": 126},
+        {"text": "Ganges", "label": "LOC", "start": 168, "end": 174},
+        {"text": "Uttar Pradesh", "label": "GPE", "start": 218, "end": 232}
+      ]
+    },
+    {
+      "text": "African leaders gathered in Nairobi for a summit on sustainable development. Presidents from Kenya, Nigeria, and South Africa signed a joint declaration. The Sahara region was highlighted as a priority area for renewable energy investment, with Morocco and Algeria leading several initiatives.",
+      "language": "en",
+      "entities": [
+        {"text": "Nairobi", "label": "GPE", "start": 26, "end": 33},
+        {"text": "Kenya", "label": "GPE", "start": 91, "end": 96},
+        {"text": "Nigeria", "label": "GPE", "start": 98, "end": 105},
+        {"text": "South Africa", "label": "GPE", "start": 110, "end": 122},
+        {"text": "Sahara", "label": "LOC", "start": 147, "end": 153},
+        {"text": "Morocco", "label": "GPE", "start": 228, "end": 235},
+        {"text": "Algeria", "label": "GPE", "start": 240, "end": 247}
+      ]
+    },
+    {
+      "text": "Archaeologists working near Cairo have uncovered a significant ancient tomb in the Nile delta. The Egyptian Ministry of Tourism expects the discovery to boost visitor numbers to Luxor and the Valley of the Kings. Tourism remains a vital sector for Egypt's economy.",
+      "language": "en",
+      "entities": [
+        {"text": "Cairo", "label": "GPE", "start": 29, "end": 34},
+        {"text": "Nile", "label": "LOC", "start": 75, "end": 79},
+        {"text": "Luxor", "label": "GPE", "start": 182, "end": 187},
+        {"text": "Valley of the Kings", "label": "LOC", "start": 192, "end": 211},
+        {"text": "Egypt", "label": "GPE", "start": 247, "end": 252}
+      ]
+    },
+    {
+      "text": "Australia is experiencing a surge in international tourism, with Sydney and Melbourne reporting record visitor numbers. Tourists are flocking to the Great Barrier Reef in Queensland and the outback of Northern Territory. New Zealand has also seen a rise in arrivals from Asia and the United States.",
+      "language": "en",
+      "entities": [
+        {"text": "Australia", "label": "GPE", "start": 0, "end": 9},
+        {"text": "Sydney", "label": "GPE", "start": 63, "end": 69},
+        {"text": "Melbourne", "label": "GPE", "start": 74, "end": 83},
+        {"text": "Great Barrier Reef", "label": "LOC", "start": 130, "end": 148},
+        {"text": "Queensland", "label": "GPE", "start": 152, "end": 162},
+        {"text": "Northern Territory", "label": "GPE", "start": 182, "end": 200},
+        {"text": "New Zealand", "label": "GPE", "start": 218, "end": 229},
+        {"text": "Asia", "label": "LOC", "start": 266, "end": 270},
+        {"text": "United States", "label": "GPE", "start": 275, "end": 288}
+      ]
+    },
+    {
+      "text": "The Panama Canal is facing reduced traffic due to drought conditions in Panama. Ships traveling between the Atlantic and Pacific Oceans are being forced to take longer routes around Cape Horn. The situation has disrupted supply chains for ports in the United States and Europe.",
+      "language": "en",
+      "entities": [
+        {"text": "Panama Canal", "label": "LOC", "start": 4, "end": 16},
+        {"text": "Panama", "label": "GPE", "start": 63, "end": 69},
+        {"text": "Atlantic", "label": "LOC", "start": 103, "end": 111},
+        {"text": "Pacific", "label": "LOC", "start": 116, "end": 123},
+        {"text": "Cape Horn", "label": "LOC", "start": 173, "end": 181},
+        {"text": "United States", "label": "GPE", "start": 226, "end": 239},
+        {"text": "Europe", "label": "LOC", "start": 244, "end": 250}
+      ]
+    },
+    {
+      "text": "A new high-speed rail line connecting Mexico City to Guadalajara has been announced. The project is expected to cut travel time by half and boost commerce between central Mexico and the Pacific coast. Engineers from Spain and Japan have been contracted to assist with the design.",
+      "language": "en",
+      "entities": [
+        {"text": "Mexico City", "label": "GPE", "start": 37, "end": 48},
+        {"text": "Guadalajara", "label": "GPE", "start": 52, "end": 63},
+        {"text": "Mexico", "label": "GPE", "start": 154, "end": 160},
+        {"text": "Pacific", "label": "LOC", "start": 177, "end": 184},
+        {"text": "Spain", "label": "GPE", "start": 217, "end": 222},
+        {"text": "Japan", "label": "GPE", "start": 227, "end": 232}
+      ]
+    },
+    {
+      "text": "Tech companies in Silicon Valley are increasingly looking to hire engineers from Bangalore and Hyderabad. The shift reflects the growing importance of India's technology sector in the global market. Companies like Google and Microsoft have expanded their campuses in Bengaluru and Gurgaon.",
+      "language": "en",
+      "entities": [
+        {"text": "Silicon Valley", "label": "LOC", "start": 18, "end": 31},
+        {"text": "Bangalore", "label": "GPE", "start": 79, "end": 88},
+        {"text": "Hyderabad", "label": "GPE", "start": 93, "end": 102},
+        {"text": "India", "label": "GPE", "start": 148, "end": 153},
+        {"text": "Bengaluru", "label": "GPE", "start": 238, "end": 247},
+        {"text": "Gurgaon", "label": "GPE", "start": 252, "end": 259}
+      ]
+    },
+    {
+      "text": "The Mekong river basin in Southeast Asia faces environmental challenges from dam construction. Countries including Cambodia, Laos, Thailand, and Vietnam have conflicting interests over water management. The Mekong River Commission has called for greater cooperation between member states.",
+      "language": "en",
+      "entities": [
+        {"text": "Mekong", "label": "LOC", "start": 4, "end": 10},
+        {"text": "Asia", "label": "LOC", "start": 33, "end": 37},
+        {"text": "Cambodia", "label": "GPE", "start": 105, "end": 113},
+        {"text": "Laos", "label": "GPE", "start": 115, "end": 119},
+        {"text": "Thailand", "label": "GPE", "start": 121, "end": 129},
+        {"text": "Vietnam", "label": "GPE", "start": 134, "end": 141},
+        {"text": "Mekong River Commission", "label": "LOC", "start": 198, "end": 221}
+      ]
+    },
+    {
+      "text": "The Middle East is seeing a tourism boom, with Dubai and Abu Dhabi leading the recovery. Visitors from Europe and Asia are drawn to the region's shopping, cuisine, and desert landscapes. Saudi Arabia has opened its borders to international tourists, promoting destinations like Riyadh and Jeddah.",
+      "language": "en",
+      "entities": [
+        {"text": "Middle East", "label": "LOC", "start": 4, "end": 15},
+        {"text": "Dubai", "label": "GPE", "start": 46, "end": 51},
+        {"text": "Abu Dhabi", "label": "GPE", "start": 56, "end": 65},
+        {"text": "Europe", "label": "LOC", "start": 95, "end": 101},
+        {"text": "Asia", "label": "LOC", "start": 106, "end": 110},
+        {"text": "Saudi Arabia", "label": "GPE", "start": 183, "end": 196},
+        {"text": "Riyadh", "label": "GPE", "start": 245, "end": 251},
+        {"text": "Jeddah", "label": "GPE", "start": 256, "end": 262}
+      ]
+    },
+    {
+      "text": "A severe winter storm has blanketed much of Canada and the northern United States. Cities like Toronto, Montreal, and Chicago have issued travel advisories. The Rocky Mountains region has received record snowfall, creating ideal conditions for ski resorts in British Columbia and Alberta.",
+      "language": "en",
+      "entities": [
+        {"text": "Canada", "label": "GPE", "start": 49, "end": 55},
+        {"text": "United States", "label": "GPE", "start": 72, "end": 85},
+        {"text": "Toronto", "label": "GPE", "start": 104, "end": 111},
+        {"text": "Montreal", "label": "GPE", "start": 113, "end": 121},
+        {"text": "Chicago", "label": "GPE", "start": 126, "end": 133},
+        {"text": "Rocky Mountains", "label": "LOC", "start": 169, "end": 183},
+        {"text": "British Columbia", "label": "GPE", "start": 247, "end": 264},
+        {"text": "Alberta", "label": "GPE", "start": 269, "end": 276}
+      ]
     }
   ]
 }

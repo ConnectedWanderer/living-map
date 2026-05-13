@@ -118,6 +118,246 @@
         {"text": "Dublin", "label": "GPE", "start": 0, "end": 6},
         {"text": "Edinburgh", "label": "GPE", "start": 11, "end": 20}
       ]
+    },
+    {
+      "text": "The flight from Cairo to Nairobi was delayed by six hours.",
+      "language": "en",
+      "entities": [
+        {"text": "Cairo", "label": "GPE", "start": 18, "end": 23},
+        {"text": "Nairobi", "label": "GPE", "start": 27, "end": 34}
+      ]
+    },
+    {
+      "text": "Lagos and Johannesburg are major economic hubs in Africa.",
+      "language": "en",
+      "entities": [
+        {"text": "Lagos", "label": "GPE", "start": 0, "end": 5},
+        {"text": "Johannesburg", "label": "GPE", "start": 10, "end": 22},
+        {"text": "Africa", "label": "LOC", "start": 49, "end": 55}
+      ]
+    },
+    {
+      "text": "Marrakech is a popular tourist destination known for its markets.",
+      "language": "en",
+      "entities": [
+        {"text": "Marrakech", "label": "GPE", "start": 0, "end": 9}
+      ]
+    },
+    {
+      "text": "The Sahara desert stretches across northern Africa.",
+      "language": "en",
+      "entities": [
+        {"text": "Sahara", "label": "LOC", "start": 4, "end": 10},
+        {"text": "Africa", "label": "LOC", "start": 44, "end": 50}
+      ]
+    },
+    {
+      "text": "Mount Kilimanjaro is the highest peak in Africa.",
+      "language": "en",
+      "entities": [
+        {"text": "Kilimanjaro", "label": "LOC", "start": 6, "end": 17},
+        {"text": "Africa", "label": "LOC", "start": 42, "end": 48}
+      ]
+    },
+    {
+      "text": "The Nile river flows through Egypt and Sudan.",
+      "language": "en",
+      "entities": [
+        {"text": "Nile", "label": "LOC", "start": 4, "end": 8},
+        {"text": "Egypt", "label": "GPE", "start": 27, "end": 32},
+        {"text": "Sudan", "label": "GPE", "start": 37, "end": 42}
+      ]
+    },
+    {
+      "text": "Tokyo and Seoul are connected by direct flights.",
+      "language": "en",
+      "entities": [
+        {"text": "Tokyo", "label": "GPE", "start": 0, "end": 5},
+        {"text": "Seoul", "label": "GPE", "start": 10, "end": 15}
+      ]
+    },
+    {
+      "text": "The markets in Shanghai and Hong Kong attract investors from around the world.",
+      "language": "en",
+      "entities": [
+        {"text": "Shanghai", "label": "GPE", "start": 15, "end": 23},
+        {"text": "Hong Kong", "label": "GPE", "start": 28, "end": 37}
+      ]
+    },
+    {
+      "text": "Mumbai is the financial capital of India.",
+      "language": "en",
+      "entities": [
+        {"text": "Mumbai", "label": "GPE", "start": 0, "end": 6},
+        {"text": "India", "label": "GPE", "start": 34, "end": 39}
+      ]
+    },
+    {
+      "text": "Singapore and Dubai are both major hubs for international trade.",
+      "language": "en",
+      "entities": [
+        {"text": "Singapore", "label": "GPE", "start": 0, "end": 9},
+        {"text": "Dubai", "label": "GPE", "start": 14, "end": 19}
+      ]
+    },
+    {
+      "text": "The Great Wall of China is visible from space according to legend.",
+      "language": "en",
+      "entities": [
+        {"text": "Great Wall of China", "label": "LOC", "start": 4, "end": 22}
+      ]
+    },
+    {
+      "text": "Bangkok and Singapore are the most visited cities in Southeast Asia.",
+      "language": "en",
+      "entities": [
+        {"text": "Bangkok", "label": "GPE", "start": 0, "end": 7},
+        {"text": "Singapore", "label": "GPE", "start": 12, "end": 21},
+        {"text": "Asia", "label": "LOC", "start": 58, "end": 62}
+      ]
+    },
+    {
+      "text": "Beijing and Delhi have both invested heavily in renewable energy.",
+      "language": "en",
+      "entities": [
+        {"text": "Beijing", "label": "GPE", "start": 0, "end": 7},
+        {"text": "Delhi", "label": "GPE", "start": 12, "end": 17}
+      ]
+    },
+    {
+      "text": "The Himalayas separate the Indian subcontinent from the Tibetan plateau.",
+      "language": "en",
+      "entities": [
+        {"text": "Himalayas", "label": "LOC", "start": 4, "end": 13}
+      ]
+    },
+    {
+      "text": "The Yangtze river is the longest in Asia.",
+      "language": "en",
+      "entities": [
+        {"text": "Yangtze", "label": "LOC", "start": 4, "end": 11},
+        {"text": "Asia", "label": "LOC", "start": 33, "end": 37}
+      ]
+    },
+    {
+      "text": "New York and Chicago are linked by rail and air.",
+      "language": "en",
+      "entities": [
+        {"text": "New York", "label": "GPE", "start": 0, "end": 8},
+        {"text": "Chicago", "label": "GPE", "start": 13, "end": 20}
+      ]
+    },
+    {
+      "text": "The Amazon rainforest spans nine countries in South America.",
+      "language": "en",
+      "entities": [
+        {"text": "Amazon", "label": "LOC", "start": 4, "end": 10},
+        {"text": "South America", "label": "LOC", "start": 42, "end": 55}
+      ]
+    },
+    {
+      "text": "Buenos Aires and Rio de Janeiro are famous for their vibrant culture.",
+      "language": "en",
+      "entities": [
+        {"text": "Buenos Aires", "label": "GPE", "start": 0, "end": 12},
+        {"text": "Rio de Janeiro", "label": "GPE", "start": 17, "end": 31}
+      ]
+    },
+    {
+      "text": "Mexico City and Lima have rich culinary traditions.",
+      "language": "en",
+      "entities": [
+        {"text": "Mexico City", "label": "GPE", "start": 0, "end": 11},
+        {"text": "Lima", "label": "GPE", "start": 16, "end": 20}
+      ]
+    },
+    {
+      "text": "Santiago is the capital of Chile.",
+      "language": "en",
+      "entities": [
+        {"text": "Santiago", "label": "GPE", "start": 0, "end": 8},
+        {"text": "Chile", "label": "GPE", "start": 25, "end": 30}
+      ]
+    },
+    {
+      "text": "The Mississippi river is a major waterway in the United States.",
+      "language": "en",
+      "entities": [
+        {"text": "Mississippi", "label": "LOC", "start": 4, "end": 15},
+        {"text": "United States", "label": "GPE", "start": 43, "end": 56}
+      ]
+    },
+    {
+      "text": "Toronto is the largest city in Canada.",
+      "language": "en",
+      "entities": [
+        {"text": "Toronto", "label": "GPE", "start": 0, "end": 7},
+        {"text": "Canada", "label": "GPE", "start": 28, "end": 34}
+      ]
+    },
+    {
+      "text": "The Andes mountain range runs along the western edge of South America.",
+      "language": "en",
+      "entities": [
+        {"text": "Andes", "label": "LOC", "start": 4, "end": 9},
+        {"text": "South America", "label": "LOC", "start": 56, "end": 69}
+      ]
+    },
+    {
+      "text": "Sydney and Melbourne are the largest cities in Australia.",
+      "language": "en",
+      "entities": [
+        {"text": "Sydney", "label": "GPE", "start": 0, "end": 6},
+        {"text": "Melbourne", "label": "GPE", "start": 11, "end": 20},
+        {"text": "Australia", "label": "GPE", "start": 44, "end": 53}
+      ]
+    },
+    {
+      "text": "Auckland is the gateway to New Zealand.",
+      "language": "en",
+      "entities": [
+        {"text": "Auckland", "label": "GPE", "start": 0, "end": 8},
+        {"text": "New Zealand", "label": "GPE", "start": 25, "end": 36}
+      ]
+    },
+    {
+      "text": "The Great Barrier Reef is one of the natural wonders of the world.",
+      "language": "en",
+      "entities": [
+        {"text": "Great Barrier Reef", "label": "LOC", "start": 4, "end": 22}
+      ]
+    },
+    {
+      "text": "Jakarta and Manila are rapidly growing cities in Southeast Asia.",
+      "language": "en",
+      "entities": [
+        {"text": "Jakarta", "label": "GPE", "start": 0, "end": 7},
+        {"text": "Manila", "label": "GPE", "start": 12, "end": 18},
+        {"text": "Asia", "label": "LOC", "start": 56, "end": 60}
+      ]
+    },
+    {
+      "text": "Los Angeles and San Francisco are on the west coast of the United States.",
+      "language": "en",
+      "entities": [
+        {"text": "Los Angeles", "label": "GPE", "start": 0, "end": 11},
+        {"text": "San Francisco", "label": "GPE", "start": 16, "end": 29},
+        {"text": "United States", "label": "GPE", "start": 59, "end": 72}
+      ]
+    },
+    {
+      "text": "Cape Town is known for its stunning coastline and Table Mountain.",
+      "language": "en",
+      "entities": [
+        {"text": "Cape Town", "label": "GPE", "start": 0, "end": 9}
+      ]
+    },
+    {
+      "text": "The Gobi desert experiences extreme temperatures between summer and winter.",
+      "language": "en",
+      "entities": [
+        {"text": "Gobi", "label": "LOC", "start": 4, "end": 8}
+      ]
     }
   ]
 }

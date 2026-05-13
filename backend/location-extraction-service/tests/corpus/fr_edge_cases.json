@@ -44,6 +44,26 @@
       "entities": [
         {"text": "Saint-Tropez", "label": "GPE", "start": 0, "end": 12}
       ]
+    },
+    {
+      "text": "BIENVENUE À L'ÉVÉNEMENT",
+      "language": "fr",
+      "entities": []
+    },
+    {
+      "text": "Le roi d'Angleterre a visité la France en 1066.",
+      "language": "fr",
+      "entities": [
+        {"text": "Angleterre", "label": "GPE", "start": 10, "end": 20},
+        {"text": "France", "label": "GPE", "start": 33, "end": 39}
+      ]
+    },
+    {
+      "text": "La Nouvelle-Orléans est célèbre pour son jazz.",
+      "language": "fr",
+      "entities": [
+        {"text": "Nouvelle-Orléans", "label": "GPE", "start": 3, "end": 19}
+      ]
     }
   ]
 }

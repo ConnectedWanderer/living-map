@@ -29,12 +29,12 @@
       "text": "La forêt amazonienne s'étend sur neuf pays d'Amérique du Sud. Les taux de déforestation au Brésil ont suscité des critiques internationales. Le bassin du fleuve Amazone abrite des milliers d'espèces. Les communautés autochtones du Pérou, de la Colombie et de l'Équateur sont en première ligne des efforts de conservation.",
       "language": "fr",
       "entities": [
-        {"text": "Amérique du Sud", "label": "LOC", "start": 53, "end": 68},
-        {"text": "Brésil", "label": "GPE", "start": 117, "end": 123},
-        {"text": "Amazone", "label": "LOC", "start": 152, "end": 159},
-        {"text": "Pérou", "label": "GPE", "start": 263, "end": 268},
-        {"text": "Colombie", "label": "GPE", "start": 274, "end": 282},
-        {"text": "Équateur", "label": "GPE", "start": 287, "end": 295}
+        {"text": "Amérique du Sud", "label": "LOC", "start": 44, "end": 59},
+        {"text": "Brésil", "label": "GPE", "start": 108, "end": 114},
+        {"text": "Amazone", "label": "LOC", "start": 143, "end": 150},
+        {"text": "Pérou", "label": "GPE", "start": 254, "end": 259},
+        {"text": "Colombie", "label": "GPE", "start": 265, "end": 273},
+        {"text": "Équateur", "label": "GPE", "start": 278, "end": 286}
       ]
     },
     {
@@ -47,6 +47,141 @@
         {"text": "Amboise", "label": "GPE", "start": 154, "end": 161},
         {"text": "Chinon", "label": "GPE", "start": 166, "end": 172},
         {"text": "Cher", "label": "LOC", "start": 195, "end": 199}
+      ]
+    },
+    {
+      "text": "Des diplomates du Japon, de la Corée du Sud et de la Chine se sont réunis à Tokyo pour discuter de la sécurité régionale. Les entretiens ont porté sur les accords commerciaux, les frontières maritimes en mer de Chine orientale et les réponses conjointes aux catastrophes naturelles.",
+      "language": "fr",
+      "entities": [
+        {"text": "Japon", "label": "GPE", "start": 22, "end": 27},
+        {"text": "Corée du Sud", "label": "GPE", "start": 32, "end": 45},
+        {"text": "Chine", "label": "GPE", "start": 54, "end": 59},
+        {"text": "Tokyo", "label": "GPE", "start": 74, "end": 79},
+        {"text": "mer de Chine orientale", "label": "LOC", "start": 179, "end": 202}
+      ]
+    },
+    {
+      "text": "La ville indienne de Mumbai a été frappée par de graves inondations de mousson, perturbant les transports et la vie quotidienne. Les autorités à Delhi et à Kolkata sont en état d'alerte alors que le système orageux se déplace vers l'est. Le Gange atteint des niveaux dangereux dans plusieurs districts de l'Uttar Pradesh.",
+      "language": "fr",
+      "entities": [
+        {"text": "Mumbai", "label": "GPE", "start": 21, "end": 27},
+        {"text": "Delhi", "label": "GPE", "start": 131, "end": 136},
+        {"text": "Kolkata", "label": "GPE", "start": 141, "end": 148},
+        {"text": "Gange", "label": "LOC", "start": 213, "end": 218},
+        {"text": "Uttar Pradesh", "label": "GPE", "start": 267, "end": 281}
+      ]
+    },
+    {
+      "text": "Les dirigeants africains se sont réunis à Nairobi pour un sommet sur le développement durable. Les présidents du Kenya, du Nigeria et de l'Afrique du Sud ont signé une déclaration commune. La région du Sahara a été identifiée comme prioritaire pour l'investissement dans les énergies renouvelables.",
+      "language": "fr",
+      "entities": [
+        {"text": "Nairobi", "label": "GPE", "start": 37, "end": 44},
+        {"text": "Kenya", "label": "GPE", "start": 102, "end": 107},
+        {"text": "Nigeria", "label": "GPE", "start": 112, "end": 119},
+        {"text": "Afrique du Sud", "label": "GPE", "start": 128, "end": 143},
+        {"text": "Sahara", "label": "LOC", "start": 178, "end": 184}
+      ]
+    },
+    {
+      "text": "Des archéologues travaillant près du Caire ont découvert une tombe antique importante dans le delta du Nil. Le ministère égyptien du Tourisme s'attend à ce que cette découverte stimule le nombre de visiteurs à Louxor et dans la Vallée des Rois. Le tourisme reste un secteur vital pour l'économie égyptienne.",
+      "language": "fr",
+      "entities": [
+        {"text": "Caire", "label": "GPE", "start": 37, "end": 42},
+        {"text": "Nil", "label": "LOC", "start": 88, "end": 91},
+        {"text": "Louxor", "label": "GPE", "start": 192, "end": 198},
+        {"text": "Vallée des Rois", "label": "LOC", "start": 203, "end": 218}
+      ]
+    },
+    {
+      "text": "L'Australie connaît un essor du tourisme international, avec Sydney et Melbourne enregistrant des nombres record de visiteurs. Les touristes affluent vers la Grande Barrière de Corail au Queensland et l'outback du Territoire du Nord. La Nouvelle-Zélande a également vu une augmentation des arrivées en provenance d'Asie et des États-Unis.",
+      "language": "fr",
+      "entities": [
+        {"text": "Australie", "label": "GPE", "start": 3, "end": 12},
+        {"text": "Sydney", "label": "GPE", "start": 54, "end": 60},
+        {"text": "Melbourne", "label": "GPE", "start": 65, "end": 74},
+        {"text": "Grande Barrière de Corail", "label": "LOC", "start": 139, "end": 164},
+        {"text": "Queensland", "label": "GPE", "start": 168, "end": 178},
+        {"text": "Territoire du Nord", "label": "GPE", "start": 199, "end": 217},
+        {"text": "Nouvelle-Zélande", "label": "GPE", "start": 235, "end": 250},
+        {"text": "Asie", "label": "LOC", "start": 299, "end": 303},
+        {"text": "États-Unis", "label": "GPE", "start": 308, "end": 318}
+      ]
+    },
+    {
+      "text": "Le canal de Panama fait face à une réduction du trafic en raison de la sécheresse au Panama. Les navires voyageant entre l'océan Atlantique et l'océan Pacifique sont obligés de prendre des routes plus longues autour du cap Horn. La situation a perturbé les chaînes d'approvisionnement pour les ports des États-Unis et d'Europe.",
+      "language": "fr",
+      "entities": [
+        {"text": "canal de Panama", "label": "LOC", "start": 3, "end": 18},
+        {"text": "Panama", "label": "GPE", "start": 75, "end": 81},
+        {"text": "Atlantique", "label": "LOC", "start": 112, "end": 122},
+        {"text": "Pacifique", "label": "LOC", "start": 133, "end": 142},
+        {"text": "cap Horn", "label": "LOC", "start": 199, "end": 207},
+        {"text": "États-Unis", "label": "GPE", "start": 268, "end": 278},
+        {"text": "Europe", "label": "LOC", "start": 283, "end": 289}
+      ]
+    },
+    {
+      "text": "Une nouvelle ligne ferroviaire à grande vitesse reliant Mexico à Guadalajara a été annoncée. Le projet devrait réduire de moitié le temps de trajet et stimuler le commerce entre le centre du Mexique et la côte Pacifique. Des ingénieurs d'Espagne et du Japon ont été engagés pour la conception.",
+      "language": "fr",
+      "entities": [
+        {"text": "Mexico", "label": "GPE", "start": 52, "end": 58},
+        {"text": "Guadalajara", "label": "GPE", "start": 62, "end": 73},
+        {"text": "Mexique", "label": "GPE", "start": 170, "end": 177},
+        {"text": "Pacifique", "label": "LOC", "start": 194, "end": 203},
+        {"text": "Espagne", "label": "GPE", "start": 222, "end": 229},
+        {"text": "Japon", "label": "GPE", "start": 238, "end": 243}
+      ]
+    },
+    {
+      "text": "Les entreprises technologiques de la Silicon Valley recrutent de plus en plus d'ingénieurs de Bangalore et d'Hyderabad. Cette évolution reflète l'importance croissante du secteur technologique indien sur le marché mondial. Google et Microsoft ont agrandi leurs campus à Bengaluru et Gurgaon.",
+      "language": "fr",
+      "entities": [
+        {"text": "Silicon Valley", "label": "LOC", "start": 38, "end": 51},
+        {"text": "Bangalore", "label": "GPE", "start": 92, "end": 101},
+        {"text": "Hyderabad", "label": "GPE", "start": 106, "end": 115},
+        {"text": "Bengaluru", "label": "GPE", "start": 253, "end": 262},
+        {"text": "Gurgaon", "label": "GPE", "start": 267, "end": 274}
+      ]
+    },
+    {
+      "text": "Le bassin du Mékong en Asie du Sud-Est est confronté à des défis environnementaux liés à la construction de barrages. Les pays comme le Cambodge, le Laos, la Thaïlande et le Viêt Nam ont des intérêts contradictoires concernant la gestion de l'eau. La Commission du Mékong a appelé à une plus grande coopération entre les États membres.",
+      "language": "fr",
+      "entities": [
+        {"text": "Mékong", "label": "LOC", "start": 13, "end": 19},
+        {"text": "Asie", "label": "LOC", "start": 23, "end": 27},
+        {"text": "Cambodge", "label": "GPE", "start": 117, "end": 125},
+        {"text": "Laos", "label": "GPE", "start": 127, "end": 131},
+        {"text": "Thaïlande", "label": "GPE", "start": 138, "end": 147},
+        {"text": "Viêt Nam", "label": "GPE", "start": 152, "end": 160},
+        {"text": "Commission du Mékong", "label": "LOC", "start": 242, "end": 262}
+      ]
+    },
+    {
+      "text": "Le Moyen-Orient connaît un essor touristique, avec Dubaï et Abou Dabi en tête de la reprise. Les visiteurs d'Europe et d'Asie sont attirés par les centres commerciaux, la cuisine et les paysages désertiques de la région. L'Arabie saoudite a ouvert ses frontières aux touristes internationaux, promouvant des destinations comme Riyad et Djeddah.",
+      "language": "fr",
+      "entities": [
+        {"text": "Moyen-Orient", "label": "LOC", "start": 4, "end": 16},
+        {"text": "Dubaï", "label": "GPE", "start": 50, "end": 55},
+        {"text": "Abou Dabi", "label": "GPE", "start": 60, "end": 69},
+        {"text": "Europe", "label": "LOC", "start": 101, "end": 107},
+        {"text": "Asie", "label": "LOC", "start": 112, "end": 116},
+        {"text": "Arabie saoudite", "label": "GPE", "start": 211, "end": 226},
+        {"text": "Riyad", "label": "GPE", "start": 279, "end": 284},
+        {"text": "Djeddah", "label": "GPE", "start": 289, "end": 296}
+      ]
+    },
+    {
+      "text": "Une violente tempête hivernale a recouvert une grande partie du Canada et du nord des États-Unis. Des villes comme Toronto, Montréal et Vancouver ont émis des avertissements de voyage. La région des Rocheuses a reçu des chutes de neige records, créant des conditions idéales pour les stations de ski en Colombie-Britannique et en Alberta.",
+      "language": "fr",
+      "entities": [
+        {"text": "Canada", "label": "GPE", "start": 48, "end": 54},
+        {"text": "États-Unis", "label": "GPE", "start": 75, "end": 85},
+        {"text": "Toronto", "label": "GPE", "start": 106, "end": 113},
+        {"text": "Montréal", "label": "GPE", "start": 115, "end": 123},
+        {"text": "Vancouver", "label": "GPE", "start": 128, "end": 137},
+        {"text": "Rocheuses", "label": "LOC", "start": 186, "end": 195},
+        {"text": "Colombie-Britannique", "label": "GPE", "start": 279, "end": 299},
+        {"text": "Alberta", "label": "GPE", "start": 304, "end": 311}
       ]
     }
   ]

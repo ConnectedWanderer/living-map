@@ -21,3 +21,38 @@ def evaluate(predictions: list[dict], expected: list[dict]) -> dict:
         )
 
     return {"overall": overall, "per_type": per_type}
+
+
+def evaluate_corpus(corpus_path: str) -> dict:
+    from src.evaluation.corpus import load_corpus
+    from src.pipeline.detector import detect_language
+    from src.pipeline.extractor import extract_location_mentions
+
+    samples = load_corpus(corpus_path)
+    all_predictions = []
+    all_expected = []
+    sample_results = []
+
+    for sample in samples:
+        text = sample["text"]
+        lang = detect_language(text)
+        predictions = extract_location_mentions(text, lang)
+
+        sample_results.append({
+            "text": (text[:80] + "...") if len(text) > 80 else text,
+            "gold_language": sample["language"],
+            "detected_language": lang,
+        })
+
+        all_predictions.extend(predictions)
+        all_expected.extend(sample["entities"])
+
+    metrics = evaluate(all_predictions, all_expected)
+
+    return {
+        "corpus_path": corpus_path,
+        "sample_count": len(samples),
+        "overall": metrics["overall"],
+        "per_type": metrics["per_type"],
+        "samples": sample_results,
+    }

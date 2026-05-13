@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from src.evaluation import evaluate
+from src.evaluation import evaluate, evaluate_corpus
 from src.evaluation.corpus import load_corpus
 
 
@@ -198,6 +198,64 @@ class TestEvaluate:
         )
         assert "GPE" in result["per_type"]
         assert "LOC" not in result["per_type"]
+
+
+class TestEvaluateCorpus:
+    def test_evaluate_corpus_returns_expected_structure(self, tmp_path):
+        corpus_file = tmp_path / "test_corpus.json"
+        corpus_file.write_text("""
+        {
+            "samples": [
+                {
+                    "text": "The meeting in Paris.",
+                    "language": "en",
+                    "entities": [
+                        {"text": "Paris", "label": "GPE", "start": 16, "end": 21}
+                    ]
+                }
+            ]
+        }
+        """)
+        result = evaluate_corpus(str(corpus_file))
+        assert result["corpus_path"] == str(corpus_file)
+        assert result["sample_count"] == 1
+        assert "overall" in result
+        assert "per_type" in result
+        assert "samples" in result
+        for key in ("precision", "recall", "f1", "tp", "fp", "fn"):
+            assert key in result["overall"]
+        assert len(result["samples"]) == 1
+        assert result["samples"][0]["gold_language"] == "en"
+        assert result["samples"][0]["detected_language"] == "en"
+
+    def test_evaluate_corpus_aggregates_multiple_samples(self, tmp_path):
+        corpus_file = tmp_path / "multi.json"
+        corpus_file.write_text("""
+        {
+            "samples": [
+                {
+                    "text": "Paris is in France.",
+                    "language": "en",
+                    "entities": [
+                        {"text": "Paris", "label": "GPE", "start": 0, "end": 5},
+                        {"text": "France", "label": "GPE", "start": 13, "end": 19}
+                    ]
+                },
+                {
+                    "text": "London is in the UK.",
+                    "language": "en",
+                    "entities": [
+                        {"text": "London", "label": "GPE", "start": 0, "end": 6}
+                    ]
+                }
+            ]
+        }
+        """)
+        result = evaluate_corpus(str(corpus_file))
+        assert result["sample_count"] == 2
+        assert result["overall"]["tp"] >= 0
+        assert result["overall"]["fp"] >= 0
+        assert result["overall"]["fn"] >= 0
 
 
 class TestLoadCorpus:

@@ -45,6 +45,27 @@
         {"text": "New York", "label": "GPE", "start": 0, "end": 8},
         {"text": "San Francisco", "label": "GPE", "start": 31, "end": 44}
       ]
+    },
+    {
+      "text": "WELCOME TO THE EVENT",
+      "language": "en",
+      "entities": []
+    },
+    {
+      "text": "St. Petersburg is a beautiful city in Florida.",
+      "language": "en",
+      "entities": [
+        {"text": "St. Petersburg", "label": "GPE", "start": 0, "end": 14},
+        {"text": "Florida", "label": "GPE", "start": 38, "end": 45}
+      ]
+    },
+    {
+      "text": "The king of England visited France in 1066.",
+      "language": "en",
+      "entities": [
+        {"text": "England", "label": "GPE", "start": 12, "end": 19},
+        {"text": "France", "label": "GPE", "start": 28, "end": 34}
+      ]
     }
   ]
 }
