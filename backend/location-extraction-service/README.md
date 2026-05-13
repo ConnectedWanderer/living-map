@@ -28,8 +28,7 @@ cd backend/location-extraction-service
 uv sync
 
 # Download spaCy small models
-uv run python -m spacy download en_core_web_sm
-uv run python -m spacy download fr_core_news_sm
+uv run python -m spacy download en_core_web_sm fr_core_news_sm
 
 # Download GeoNames data
 uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
