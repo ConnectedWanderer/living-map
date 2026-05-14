@@ -51,3 +51,70 @@ def _sum_metrics(metrics_list: list[dict]) -> dict:
         sum(m["fp"] for m in metrics_list),
         sum(m["fn"] for m in metrics_list),
     )
+
+
+def evaluate_geocoding(predictions: list[dict], expected: list[dict]) -> dict:
+    """Evaluate geocoding accuracy against expected locations.
+
+    Compares predicted geocoded locations (from the pipeline output) against
+    expected locations (from corpus annotations). Matches by place name text.
+
+    Args:
+        predictions: List of predicted location dicts with 'text' and 'country'.
+        expected: List of expected location dicts with 'text' and 'country'.
+
+    Returns:
+        Dict with geocoding_rate, country_accuracy, total_expected, geocoded,
+        and country_matches.
+
+    """
+    pred_by_text = {p["text"]: p for p in predictions}
+
+    total = len(expected)
+    geocoded = 0
+    country_checkable = 0
+    country_matches = 0
+
+    for exp in expected:
+        text = exp["text"]
+        pred = pred_by_text.get(text)
+        if pred is not None:
+            geocoded += 1
+            if "country" in exp:
+                country_checkable += 1
+                if pred.get("country") == exp["country"]:
+                    country_matches += 1
+
+    return {
+        "geocoding_rate": geocoded / total if total > 0 else 0.0,
+        "country_accuracy": country_matches / country_checkable if country_checkable > 0 else 1.0,
+        "total_expected": total,
+        "geocoded": geocoded,
+        "country_matches": country_matches,
+    }
+
+
+def evaluate_event_location(predicted: dict | None, expected: dict | None) -> dict:
+    """Evaluate event location inference accuracy.
+
+    Args:
+        predicted: Predicted event location dict with 'text', 'country' or None.
+        expected: Expected event location dict with 'text', 'country' or None.
+
+    Returns:
+        Dict with expected (bool), correct (bool or None), text_match, and
+        country_match.
+
+    """
+    if expected is None:
+        return {"expected": False, "correct": None, "text_match": None, "country_match": None}
+
+    text_match = predicted is not None and predicted.get("text") == expected.get("text")
+    country_match = predicted is not None and predicted.get("country") == expected.get("country")
+
+    return {
+        "expected": True,
+        "correct": text_match and country_match,
+        "text_match": text_match,
+        "country_match": country_match,
+    }

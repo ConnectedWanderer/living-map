@@ -18,9 +18,6 @@ RUN --mount=type=cache,target=/root/.cache \
     uv run python -m spacy download ${SPACY_EN_MODEL} && \
     uv run python -m spacy download ${SPACY_FR_MODEL}
 
-RUN --mount=type=cache,target=/root/.cache \
-    uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
-
 COPY src/ ./src/
 
 EXPOSE 8000

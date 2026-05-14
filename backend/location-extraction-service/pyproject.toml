@@ -9,7 +9,7 @@ dependencies = [
     "pydantic>=2.9.0",
     "spacy>=3.8.0",
     "langdetect>=1.0.9",
-    "text2geo @ git+https://github.com/charonviz/text2geo.git",
+    "geonamescache>=3.0.1",
     "python-dotenv>=1.0.0",
     "pycountry>=26.2.16",
 ]

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Deprecated — `text2geo` has been replaced by `geonamescache` per [ADR-007](ADR-007-replace-text2geo-with-geonamescache.md). The NaN bug is no longer relevant since geonamescache ships data bundled with the pip package (no CSV download at build time).
 
 ## Date
 

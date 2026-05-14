@@ -24,9 +24,6 @@ fi
 echo "=== Download spaCy models ==="
 uv run python -m spacy download en_core_web_sm fr_core_news_sm
 
-echo "=== Download text2geo data (optional) ==="
-uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')" || echo "Warning: text2geo data download failed (known upstream bug — see docs/decisions/ADR-005-text2geo-nan-bug.md). Geocoding tests mock the dependency, so this is non-critical."
-
 echo "=== Run full test suite ==="
 uv run python -m pytest --cov=src --cov-report=term-missing
 

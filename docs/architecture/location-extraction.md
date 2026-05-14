@@ -21,7 +21,7 @@ A high-throughput, low-latency NLP service that extracts geographic locations fr
 flowchart TD
     A[Input Text] --> B[Language Detection]
     B --> C[spaCy NER]
-    C --> D[text2geo Geocoder]
+    C --> D[geonamescache Geocoder]
     D --> E[Event Location Inference]
     E --> F[Output JSON]
 
@@ -113,58 +113,90 @@ def extract_location_mentions(text: str, lang: str) -> list[dict]:
 
 ### Stage 3: Toponym Resolution (Geocoding)
 
-**Technology**: `text2geo`
+**Technology**: `geonamescache`
 
 **Function**: Convert place names to coordinates using GeoNames data
 
 **Features**:
 
-- Offline operation (no API calls)
-- 140,000+ cities worldwide
-- Fuzzy matching for misspellings
-- Multi-language place name support
+- Offline operation (no API calls) — data ships with the pip package
+- 200,000+ cities worldwide (configurable population threshold)
+- Case-insensitive exact matching on name + all alternate names
+- Highest-population disambiguation on name collisions
 
 ```python
+from collections import defaultdict
 from dataclasses import dataclass, field
-from text2geo import Geocoder
+
+import geonamescache
+
+from src.models import EntityMention, GeocodedLocation
 
 
-_geocoder: Geocoder | None = None
+_NAME_INDEX: dict[str, list[dict]] | None = None
 
 
-def _get_geocoder() -> Geocoder:
-    if _geocoder is None:
-        _geocoder = Geocoder(dataset="world")
-    return _geocoder
+def _build_index() -> dict[str, list[dict]]:
+    gc = geonamescache.GeonamesCache(min_city_population=500)
+    cities = gc.get_cities()
+    index: dict[str, list[dict]] = defaultdict(list)
+    for city in cities.values():
+        name: str = city["name"]
+        if name:
+            index[name.lower()].append(city)
+        alternates: list[str] = city.get("alternatenames") or []
+        for alt in alternates:
+            if alt:
+                index[alt.lower()].append(city)
+    return dict(index)
 
 
-def _geocode(text: str) -> dict | None:
-    geo = _get_geocoder()
-    result = geo.geocode(text)
-    if result:
-        return {"lat": result["lat"], "lon": result["lon"], "name": result["name"], "country": result["country"]}
-    return None
+def _get_index() -> dict[str, list[dict]]:
+    global _NAME_INDEX
+    if _NAME_INDEX is None:
+        _NAME_INDEX = _build_index()
+    return _NAME_INDEX
+
+
+def _geocode(text: str) -> GeocodedLocation | None:
+    index = _get_index()
+    candidates = index.get(text.lower())
+    if not candidates:
+        return None
+    best = max(candidates, key=lambda c: c.get("population") or 0)
+    return GeocodedLocation(
+        lat=best["latitude"],
+        lon=best["longitude"],
+        text=text,
+        country=best["countrycode"],
+    )
 
 
 @dataclass
 class GeoResult:
-    locations: list[dict]
+    locations: list[GeocodedLocation] = field(default_factory=list)
 
 
 class GeoPipeline:
-    """Geocodes NER entity mentions to geographic coordinates via text2geo."""
+    """Geocodes NER entity mentions via geonamescache with injectable geocode fn."""
 
-    def run(self, entities: list[dict]) -> GeoResult:
+    def __init__(self, geocode_fn=None):
+        self._geocode_fn = geocode_fn or _geocode
+
+    def run(self, entities: list[EntityMention]) -> GeoResult:
         locations = []
         for entity in entities:
-            result = _geocode(entity["text"])
+            result = self._geocode_fn(entity.text)
             if result is not None:
-                locations.append({
-                    "text": entity["text"],
-                    "lat": result["lat"],
-                    "lon": result["lon"],
-                    "country": result["country"],
-                })
+                locations.append(
+                    GeocodedLocation(
+                        text=entity.text,
+                        lat=result.lat,
+                        lon=result.lon,
+                        country=result.country,
+                        type=entity.label,
+                    )
+                )
         return GeoResult(locations=locations)
 ```
 
@@ -205,9 +237,33 @@ def infer_event_location(locations: list[dict], text: str) -> dict | None:
 
 ## Output Format
 
+`LocationPipeline.run(text)` returns a `LocationResult` dataclass:
+
+| Field                | Type                    | Description                              |
+| -------------------- | ----------------------- | ---------------------------------------- |
+| `detected_language`  | `str`                   | Detected language code (e.g. 'en', 'fr') |
+| `model_name`         | `str \| None`           | spaCy model used for NER                 |
+| `event_location`     | `EventLocation \| None` | Best-guess event location or null        |
+| `all_locations`      | `list[ScoredLocation]`  | All scored locations with scores         |
+| `entities_found`     | `int`                   | Number of NER entities extracted         |
+| `entities_geocoded`  | `int`                   | Number successfully geocoded             |
+| `processing_time_ms` | `float`                 | Total pipeline time in milliseconds      |
+
+### Typed Intermediate Records
+
+All pipeline stages exchange typed dataclasses rather than raw dicts:
+
+| Record             | Fields                                                            |
+| ------------------ | ----------------------------------------------------------------- |
+| `EntityMention`    | `text`, `label`, `start`, `end`                                   |
+| `GeocodedLocation` | `text`, `lat`, `lon`, `country`, `type?`                          |
+| `ScoredLocation`   | `text`, `lat`, `lon`, `country`, `country_name`, `type?`, `score` |
+| `EventLocation`    | `text`, `lat`, `lon`, `country`, `country_name`, `confidence`     |
+
 ```json
 {
   "detected_language": "fr",
+  "model_name": "fr_core_news_sm",
   "event_location": {
     "text": "Paris",
     "lat": 48.8566,
@@ -221,24 +277,15 @@ def infer_event_location(locations: list[dict], text: str) -> dict | None:
       "text": "Paris",
       "lat": 48.8566,
       "lon": 2.3522,
-      "name": "Paris",
       "country": "FR",
-      "type": "GPE"
-    },
-    {
-      "text": "Seine",
-      "lat": 49.0,
-      "lon": 2.5,
-      "name": "Seine",
-      "type": "LOC"
+      "country_name": "France",
+      "type": "GPE",
+      "score": 2.17
     }
   ],
-  "metadata": {
-    "processing_time_ms": 150,
-    "language_model": "fr_core_news_sm",
-    "entities_found": 2,
-    "entities_geocoded": 2
-  }
+  "entities_found": 2,
+  "entities_geocoded": 2,
+  "processing_time_ms": 150.0
 }
 ```
 
@@ -253,7 +300,7 @@ flowchart LR
     subgraph LocationService["Location Extraction Service"]
         B --> C[FastAPI Server]
         C --> D[spaCy NER]
-        C --> E[text2geo]
+        C --> E[geonamescache]
         D --> F[(GeoNames DB)]
         E --> F
     end
@@ -288,13 +335,15 @@ Response: Location extraction result (see Output Format)
 
 ## Evaluation Module
 
-A standalone evaluation framework for measuring NER pipeline quality (Stages 1-2: language detection + entity extraction), defined in [ADR-002](../decisions/ADR-002-ner-evaluation-protocol.md).
+Evaluation framework for measuring pipeline quality. Covers both NER (Stages 1-2) and geocoding + event location (Stages 3-4).
 
-### Approach
+### Stages 1-2: NER Evaluation (Precision/Recall/F1)
 
-Entity-level exact match: a prediction is correct only when `text`, `start`, `end`, and `label` all match the expected annotation exactly. No partial credit.
+Defined in [ADR-002](../decisions/ADR-002-ner-evaluation-protocol.md).
 
-### Metrics
+**Approach**: Entity-level exact match — a prediction is correct only when `text`, `start`, `end`, and `label` all match the expected annotation exactly. No partial credit.
+
+**Metrics** computed overall and per entity type (GPE, LOC):
 
 | Metric    | Meaning                               |
 | --------- | ------------------------------------- |
@@ -302,18 +351,43 @@ Entity-level exact match: a prediction is correct only when `text`, `start`, `en
 | Recall    | TP / (TP + FN)                        |
 | Entity F1 | Harmonic mean of precision and recall |
 
-Computed overall and per entity type (GPE, LOC).
+The pipeline runner was split in [ADR-006](../decisions/ADR-006-pipeline-architectural-improvements.md): `run_pipeline_on_corpus()` handles orchestration, `evaluate_corpus()` is a thin composition.
+
+### Stages 3-4: Geocoding and Event Location Evaluation
+
+**Geocoding Metrics**:
+
+| Metric           | Meaning                                              |
+| ---------------- | ---------------------------------------------------- |
+| Geocoding Rate   | Fraction of expected locations successfully geocoded |
+| Country Accuracy | Among geocoded, fraction with correct country code   |
+
+**Event Location Metrics**:
+
+| Metric   | Meaning                                                         |
+| -------- | --------------------------------------------------------------- |
+| Accuracy | Fraction of expected event locations where text + country match |
+
+Corpus samples can include optional `expected_geocoded_locations` and `expected_event_location` fields. When present, `evaluate_geocoding_corpus()` and `evaluate_geocoding_all_corpora()` compute geocoding metrics.
 
 ### Usage
 
 ```bash
 cd backend/location-extraction-service
+# NER evaluation (single corpus)
 uv run python -m src.evaluation tests/corpus/en_simple.json
+# NER evaluation (all corpora)
+uv run python -m src.evaluation
+# Stages 3-4 evaluation (single corpus)
+uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json
+
+# Geocoding evaluation (all corpora)
+uv run python -m src.evaluation --geocoding
 ```
 
 ### Corpus
 
-Six JSON files in `tests/corpus/` (simple, paragraphs, edge cases × EN, FR), totaling 200+ entities per language.
+Six JSON files in `tests/corpus/` (simple, paragraphs, edge cases × EN, FR), totaling 200+ entities per language. Corpus samples optionally include `expected_geocoded_locations` (list of `{text, country}`) and `expected_event_location` (`{text, country}`) for geocoding evaluation.
 
 ## Technology Stack
 
@@ -322,7 +396,7 @@ Six JSON files in `tests/corpus/` (simple, paragraphs, edge cases × EN, FR), to
 | NER                | spaCy              | 3.x     | Industry standard                                        |
 | NER Models         | en/fr_core_news_sm | latest  | Small models (~10MB), good accuracy for MVP              |
 | Language Detection | langdetect         | latest  | Lightweight, no training needed (seed=0 for determinism) |
-| Geocoder           | text2geo           | latest  | Offline, fast, GeoNames-based                            |
+| Geocoder           | geonamescache      | 3.0.1   | Offline, GeoNames data bundled with pip package          |
 | Runtime            | Python 3.14        | latest  | Latest Python with best performance                      |
 | API Server         | FastAPI            | latest  | Fast, async, auto-docs                                   |
 | Container          | Docker             | -       | Isolated, reproducible                                   |
@@ -339,12 +413,15 @@ backend/
 │   └── ...
 ├── location-extraction-service/     # Python microservice
 │   ├── src/
+│   │   ├── models.py                # Typed dataclasses: EntityMention, GeocodedLocation, LocationResult, etc.
 │   │   ├── pipeline.py              # NerPipeline + NerResult + internal detection/NER/model
-│   │   ├── geocoding.py             # GeoPipeline + GeoResult + internal text2geo wrapper
-│   │   ├── evaluation/              # NER quality evaluation
-│   │   │   ├── __init__.py          # Pure evaluation computation
-│   │   │   ├── runner.py            # Pipeline orchestration + corpus loading
-│   │   │   └── __main__.py          # CLI entry point
+│   │   ├── geocoding.py             # GeoPipeline + GeoResult + internal geonamescache wrapper (injectable)
+│   │   ├── disambiguator.py         # DisambiguatePipeline + event location inference (Stage 4)
+│   │   ├── orchestrator.py          # LocationPipeline: composes all 4 stages into single .run()
+│   │   ├── evaluation/              # Pipeline quality evaluation
+│   │   │   ├── __init__.py          # Pure evaluation computation (NER, geocoding, event location)
+│   │   │   ├── runner.py            # Pipeline orchestration + corpus loading + multi-corpus aggregation
+│   │   │   └── __main__.py          # CLI entry point (supports --geocoding flag)
 │   ├── tests/
 │   │   ├── conftest.py
 │   │   ├── unit/
@@ -393,9 +470,6 @@ RUN --mount=type=cache,target=/root/.cache \
     uv run python -m spacy download ${SPACY_EN_MODEL} && \
     uv run python -m spacy download ${SPACY_FR_MODEL}
 
-# Download text2geo data
-RUN --mount=type=cache,target=/root/.cache \
-    uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
 
 COPY src/ ./src/
 
@@ -419,7 +493,7 @@ These default to small models (~10MB) for fast processing. Override at runtime i
 
 - [x] spaCy NER integration (EN + FR)
 - [x] Language detection
-- [x] text2geo offline geocoding
+- [x] geonamescache offline geocoding
 - [x] Basic event location inference
 - [x] Docker containerization
 - [x] FastAPI server
@@ -462,7 +536,7 @@ These default to small models (~10MB) for fast processing. Override at runtime i
 
 If accuracy is insufficient, upgrade path to Mordecai3:
 
-- Replace text2geo with Mordecai3.Geoparser()
+- Replace geonamescache with Mordecai3.Geoparser()
 - Add Elasticsearch container (~4GB RAM)
 - Neural disambiguation model (auto-downloads)
 - Expected accuracy improvement: 85% → 95%
@@ -471,7 +545,8 @@ If accuracy is insufficient, upgrade path to Mordecai3:
 
 - [spaCy](https://spacy.io/)
 - [spaCy Models](https://spacy.io/models)
-- [text2geo](https://github.com/charonviz/text2geo)
+- [text2geo](https://github.com/charonviz/text2geo) (replaced by `geonamescache` per ADR-007)
+- [geonamescache](https://pypi.org/project/geonamescache/)
 - [whereabouts](https://github.com/ajl2718/whereabouts)
 - [GeoNames](https://www.geonames.org/)
 - [Mordecai3](https://github.com/ahalterman/mordecai3)

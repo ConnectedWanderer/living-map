@@ -16,16 +16,16 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 
 ### Source Files
 
-| Component                  | File                         | Status     | Lines | Notes                                                                                |
-| -------------------------- | ---------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------ |
-| Pipeline (consolidated)    | `src/pipeline.py`            | ✅ Done    | 88    | Single module: `NerPipeline` + `NerResult` + internal detection/NER/model caching    |
-| Evaluation — Pure Compute  | `src/evaluation/__init__.py` | ✅ Done    | 34    | `evaluate()` (precision, recall, harmonic mean (F1)), no I/O or pipeline imports     |
-| Evaluation — Orchestration | `src/evaluation/runner.py`   | ✅ Done    | 114   | `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
-| Evaluation — CLI           | `src/evaluation/__main__.py` | ✅ Done    | 115   | CLI entry point, imports from `runner.py`                                            |
-| Geocoding                  | `src/geocoding.py`           | ✅ Done    | 47    | `GeoPipeline` + `GeoResult` + internal text2geo wrapper, mocked tests                |
-| Event Location Inference   | `src/disambiguator.py`       | ✅ Done    | 83    | `DisambiguatePipeline` + `DisambiguateResult` + position/type/preposition scoring    |
-| Pydantic Schemas           | future                       | ❌ Missing | —     | Request/response models                                                              |
-| FastAPI Entry Point        | future                       | ❌ Missing | —     | App, routes, startup, health check                                                   |
+| Component                  | File                         | Status     | Lines | Notes                                                                                      |
+| -------------------------- | ---------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------------ |
+| Pipeline (consolidated)    | `src/pipeline.py`            | ✅ Done    | 88    | Single module: `NerPipeline` + `NerResult` + internal detection/NER/model caching          |
+| Evaluation — Pure Compute  | `src/evaluation/__init__.py` | ✅ Done    | 34    | `evaluate()` (precision, recall, harmonic mean (F1)), no I/O or pipeline imports           |
+| Evaluation — Orchestration | `src/evaluation/runner.py`   | ✅ Done    | 114   | `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()`       |
+| Evaluation — CLI           | `src/evaluation/__main__.py` | ✅ Done    | 115   | CLI entry point, imports from `runner.py`                                                  |
+| Geocoding                  | `src/geocoding.py`           | ✅ Done    | 48    | `GeoPipeline` + `GeoResult` + internal geonamescache wrapper, mocked tests                 |
+| Event Location Inference   | `src/disambiguator.py`       | ✅ Done    | 83    | `DisambiguatePipeline` + `DisambiguateResult` + position/type/preposition scoring          |
+| Pydantic Schemas           | future                       | ❌ Missing | —     | Request/response models                                                                    |
+| FastAPI Entry Point        | future                       | ❌ Missing | —     | App, routes, startup, health check                                                         |
 
 ### Current State Diagram
 
@@ -97,7 +97,7 @@ flowchart LR
 | pydantic             | >=2.9.0                    | Data validation         |
 | spacy                | >=3.8.0                    | NLP framework           |
 | langdetect           | >=1.0.9                    | Language detection      |
-| text2geo             | git (`charonviz/text2geo`) | Offline geocoding       |
+| geonamescache        | >=3.0.1                    | Offline geocoding       |
 | pycountry            | >=26.2.16                  | ISO country name lookup |
 | python-dotenv        | >=1.0.0                    | Env var loading         |
 | pytest (dev)         | >=9.0.0                    | Testing                 |

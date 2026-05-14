@@ -30,8 +30,7 @@ uv sync
 # Download spaCy small models
 uv run python -m spacy download en_core_web_sm fr_core_news_sm
 
-# Download GeoNames data
-uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
+# (No separate geocoder data download needed — geonamescache ships data with the package)
 
 # Run the server
 uv run uvicorn src:app --host 0.0.0.0 --port 8000 --reload
@@ -102,7 +101,7 @@ curl http://localhost:8000/health
 ## Architecture
 
 ```
-Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event Location Inference → JSON
+Input Text → Language Detection → spaCy NER → geonamescache Geocoder → Event Location Inference → JSON
 ```
 
 ## Configuration

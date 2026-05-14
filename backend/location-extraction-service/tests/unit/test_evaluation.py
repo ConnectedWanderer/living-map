@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from src.evaluation import evaluate
+from src.evaluation import evaluate, evaluate_event_location, evaluate_geocoding
 from src.evaluation.runner import discover_corpora, load_corpus
 
 
@@ -272,3 +272,116 @@ class TestDiscoverCorpora:
 
     def test_empty_directory_returns_empty_list(self, tmp_path):
         assert discover_corpora(str(tmp_path)) == []
+
+
+class TestEvaluateGeocoding:
+    def test_all_expected_geocoded_country_match(self):
+        predictions = [
+            {"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"},
+            {"text": "London", "lat": 51.5074, "lon": -0.1278, "country": "GB"},
+        ]
+        expected = [
+            {"text": "Paris", "country": "FR"},
+            {"text": "London", "country": "GB"},
+        ]
+        result = evaluate_geocoding(predictions, expected)
+        assert result["geocoding_rate"] == 1.0
+        assert result["country_accuracy"] == 1.0
+        assert result["total_expected"] == 2
+        assert result["geocoded"] == 2
+        assert result["country_matches"] == 2
+
+    def test_partial_geocoding(self):
+        predictions = [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"}]
+        expected = [
+            {"text": "Paris", "country": "FR"},
+            {"text": "Berlin", "country": "DE"},
+        ]
+        result = evaluate_geocoding(predictions, expected)
+        assert result["geocoding_rate"] == 0.5
+        assert result["country_accuracy"] == 1.0
+        assert result["total_expected"] == 2
+        assert result["geocoded"] == 1
+        assert result["country_matches"] == 1
+
+    def test_country_mismatch(self):
+        predictions = [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "DE"}]
+        expected = [{"text": "Paris", "country": "FR"}]
+        result = evaluate_geocoding(predictions, expected)
+        assert result["geocoding_rate"] == 1.0
+        assert result["country_accuracy"] == 0.0
+        assert result["country_matches"] == 0
+
+    def test_no_expected_locations(self):
+        result = evaluate_geocoding([{"text": "Paris", "country": "FR"}], [])
+        assert result["geocoding_rate"] == 0.0
+        assert result["country_accuracy"] == 1.0
+        assert result["total_expected"] == 0
+
+    def test_no_predictions(self):
+        result = evaluate_geocoding([], [{"text": "Paris", "country": "FR"}])
+        assert result["geocoding_rate"] == 0.0
+        assert result["country_accuracy"] == 1.0
+        assert result["geocoded"] == 0
+
+    def test_both_empty(self):
+        result = evaluate_geocoding([], [])
+        assert result["geocoding_rate"] == 0.0
+        assert result["total_expected"] == 0
+
+    def test_expected_without_country_skips_country_check(self):
+        predictions = [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"}]
+        expected = [{"text": "Paris"}]
+        result = evaluate_geocoding(predictions, expected)
+        assert result["geocoding_rate"] == 1.0
+        assert result["country_accuracy"] == 1.0
+        assert result["country_matches"] == 0
+
+
+class TestEvaluateEventLocation:
+    def test_exact_match(self):
+        result = evaluate_event_location(
+            {"text": "Paris", "country": "FR", "confidence": 0.8},
+            {"text": "Paris", "country": "FR"},
+        )
+        assert result["expected"] is True
+        assert result["correct"] is True
+        assert result["text_match"] is True
+        assert result["country_match"] is True
+
+    def test_text_mismatch(self):
+        result = evaluate_event_location(
+            {"text": "London", "country": "GB", "confidence": 0.6},
+            {"text": "Paris", "country": "FR"},
+        )
+        assert result["correct"] is False
+        assert result["text_match"] is False
+        assert result["country_match"] is False
+
+    def test_country_mismatch(self):
+        result = evaluate_event_location(
+            {"text": "Paris", "country": "DE", "confidence": 0.8},
+            {"text": "Paris", "country": "FR"},
+        )
+        assert result["correct"] is False
+        assert result["text_match"] is True
+        assert result["country_match"] is False
+
+    def test_no_prediction(self):
+        result = evaluate_event_location(None, {"text": "Paris", "country": "FR"})
+        assert result["correct"] is False
+        assert result["text_match"] is False
+        assert result["country_match"] is False
+
+    def test_no_expected(self):
+        result = evaluate_event_location(
+            {"text": "Paris", "country": "FR", "confidence": 0.8},
+            None,
+        )
+        assert result["expected"] is False
+        assert result["correct"] is None
+
+    def test_both_none(self):
+        result = evaluate_event_location(None, None)
+        assert result["expected"] is False
+        assert result["correct"] is None

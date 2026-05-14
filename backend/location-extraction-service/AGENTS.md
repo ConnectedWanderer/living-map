@@ -12,16 +12,18 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 
 ### Components
 
-| File                            | Purpose                                                                                             |
-| ------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `src/pipeline.py`               | `NerPipeline` class + `NerResult` dataclass + internal detection/NER/model logic                    |
-| `src/geocoding.py`              | `GeoPipeline` class + `GeoResult` dataclass + internal text2geo wrapper                             |
-| `src/disambiguator.py`          | `DisambiguatePipeline` class + `DisambiguateResult` dataclass + event location inference (Stage 4)  |
-| `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()` (precision, recall, harmonic mean (P/R/F1))               |
-| `src/evaluation/runner.py`      | Orchestration: `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
-| `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`                                                  |
-| `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                                                                 |
-| `scripts/ci.sh`                 | CI entry point: `--fast` for unit-only, otherwise downloads models + full suite                     |
+| File                            | Purpose                                                                                                                                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/models.py`                 | Typed dataclasses: EntityMention, GeocodedLocation, ScoredLocation, EventLocation, LocationResult                                                                                            |
+| `src/pipeline.py`               | `NerPipeline` class + `NerResult` dataclass + internal detection/NER/model logic                                                                                                             |
+| `src/geocoding.py`              | `GeoPipeline` class + `GeoResult` dataclass + internal text2geo wrapper (injectable geocode_fn)                                                                                              |
+| `src/disambiguator.py`          | `DisambiguatePipeline` class + `DisambiguateResult` dataclass + event location inference (Stage 4)                                                                                           |
+| `src/orchestrator.py`           | `LocationPipeline` class composing all 4 stages into a single `.run(text) -> LocationResult` seam                                                                                            |
+| `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()`, `evaluate_geocoding()`, `evaluate_event_location()`                                                                                               |
+| `src/evaluation/runner.py`      | Orchestration: `run_pipeline_on_corpus()`, `evaluate_corpus()`, `evaluate_all_corpora()`, `run_full_pipeline_on_corpus()`, `evaluate_geocoding_corpus()`, `evaluate_geocoding_all_corpora()` |
+| `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation` (supports `--geocoding` flag)                                                                                                             |
+| `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                                                                                                                                                          |
+| `scripts/ci.sh`                 | CI entry point: `--fast` for unit-only, otherwise downloads models + full suite                                                                                                              |
 
 ## Development Setup
 
@@ -42,8 +44,7 @@ uv sync --dev
 uv run python -m spacy download en_core_web_sm
 uv run python -m spacy download fr_core_news_sm
 
-# Download GeoNames data for text2geo
-uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
+# (No geocoder data download needed — geonamescache ships data with the package)
 ```
 
 ### Development Workflow
@@ -72,15 +73,19 @@ uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
 ## Evaluation
 
 ```bash
-# Single corpus
-uv run python -m src.evaluation tests/corpus/en_simple.json
+# NER evaluation (Stages 1-2)
+uv run python -m src.evaluation tests/corpus/en_simple.json   # Single corpus
+uv run python -m src.evaluation                                 # Aggregate synthesis of all corpora
 
-# Aggregate synthesis of all corpora
-uv run python -m src.evaluation
+# Stages 3-4 evaluation (Geocoding + Event Location)
+uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json   # Single corpus
+uv run python -m src.evaluation --geocoding                                 # Aggregate synthesis of all corpora
 
-# The synthesis prints aggregate entity-level metrics,
+# NER synthesis prints aggregate entity-level metrics (precision/recall/F1),
 # per-type breakdown, and per-corpus summary table.
-# Per-sample details are accessible via single-corpus mode.
+# Geocoding synthesis prints geocoding rate, country accuracy, and event
+# location accuracy. Corpus samples can include optional
+# expected_geocoded_locations and expected_event_location fields.
 ```
 
 ## Corpus Maintenance
@@ -156,12 +161,12 @@ docker-compose up --build
 
 ## Key Dependencies
 
-| Package    | Version   | Purpose                    |
-| ---------- | --------- | -------------------------- |
-| spacy      | >=3.8.0   | NLP framework              |
-| langdetect | >=1.0.9   | Language detection         |
-| text2geo   | git       | Offline geocoding (GitHub) |
-| pycountry  | >=26.2.16 | ISO country name lookup    |
+| Package       | Version    | Purpose                    |
+| ------------- | ---------- | -------------------------- |
+| spacy         | >=3.8.0    | NLP framework              |
+| langdetect    | >=1.0.9    | Language detection         |
+| geonamescache | >=3.0.1    | Offline geocoding (PyPI)   |
+| pycountry     | >=26.2.16  | ISO country name lookup    |
 | fastapi    | >=0.135.0 | API server                 |
 | uvicorn    | >=0.30.0  | ASGI server                |
 | pydantic   | >=2.9.0   | Data validation            |
@@ -180,13 +185,9 @@ docker-compose up --build
 
 **spaCy model not found**: Run `uv run python -m spacy download en_core_web_sm fr_core_news_sm`
 
-**text2geo data missing**: Run `uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"`
-
 **Slow startup**: Models are cached after first load. Subsequent startups are faster.
 
 **CI fails with missing model error**: Run `bash scripts/ci.sh` which downloads models before testing. Use `bash scripts/ci.sh --fast` for a quick unit-only pass. If integration tests are skipped with `pytest.exit`, models are missing — run the download commands above.
-
-**text2geo data download fails**: See [ADR-005](../../docs/decisions/ADR-005-text2geo-nan-bug.md) — known upstream `NaN` bug in text2geo. `scripts/ci.sh` tolerates this failure with a warning.
 
 ## uv Commands Reference
 
@@ -207,13 +208,15 @@ docker-compose up --build
 ```
 location-extraction-service/
 ├── src/
-│   ├── pipeline.py            # NerPipeline + NerResult + internal detection/NER/model
-│   ├── geocoding.py           # GeoPipeline + GeoResult + internal text2geo wrapper
-│   ├── disambiguator.py       # DisambiguatePipeline + DisambiguateResult + event location inference
+│   ├── models.py             # Typed dataclasses (EntityMention, GeocodedLocation, LocationResult, etc.)
+│   ├── pipeline.py           # NerPipeline + NerResult + internal detection/NER/model
+│   ├── geocoding.py          # GeoPipeline + GeoResult + internal text2geo wrapper (injectable)
+│   ├── disambiguator.py      # DisambiguatePipeline + DisambiguateResult + event location inference
+│   ├── orchestrator.py       # LocationPipeline composing all 4 stages
 │   ├── evaluation/
-│   │   ├── __init__.py       # Pure evaluation computation (evaluate)
-│   │   ├── runner.py         # Pipeline orchestration + corpus loading
-│   │   └── __main__.py       # CLI runner
+│   │   ├── __init__.py       # Pure evaluation (evaluate, evaluate_geocoding, evaluate_event_location)
+│   │   ├── runner.py         # Pipeline orchestration + corpus loading + geocoding evaluation
+│   │   └── __main__.py       # CLI runner (supports --geocoding)
 ├── tests/
 │   ├── conftest.py
 │   ├── unit/
@@ -251,7 +254,8 @@ location-extraction-service/
 - [ADR-002](../../docs/decisions/ADR-002-ner-evaluation-protocol.md)
 - [ADR-003](../../docs/decisions/ADR-003-ner-pipeline-seam.md)
 - [ADR-004](../../docs/decisions/ADR-004-consolidate-pipeline-module.md)
-- [ADR-005](../../docs/decisions/ADR-005-text2geo-nan-bug.md)
+- [ADR-005](../../docs/decisions/ADR-005-text2geo-nan-bug.md) (deprecated — `text2geo` replaced by `geonamescache` per [ADR-007](../../docs/decisions/ADR-007-replace-text2geo-with-geonamescache.md))
+- [ADR-006](../../docs/decisions/ADR-006-pipeline-architectural-improvements.md)
 - [spaCy Documentation](https://spacy.io/)
 - [text2geo](https://github.com/charonviz/text2geo)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
