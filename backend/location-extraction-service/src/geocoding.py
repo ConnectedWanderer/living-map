@@ -4,17 +4,19 @@ from dataclasses import dataclass, field
 
 from text2geo import Geocoder
 
+from src.models import EntityMention, GeocodedLocation
+
 
 @dataclass
 class GeoResult:
     """Result of running Stage 3 (geocoding) of the location extraction pipeline.
 
     Attributes:
-        locations: Geocoded location dicts, each with text, lat, lon, country.
+        locations: Geocoded locations as GeocodedLocation records.
 
     """
 
-    locations: list[dict] = field(default_factory=list)
+    locations: list[GeocodedLocation] = field(default_factory=list)
 
 
 _geocoder: Geocoder | None = None
@@ -28,25 +30,25 @@ def _get_geocoder() -> Geocoder:
     return _geocoder
 
 
-def _geocode(text: str) -> dict | None:
+def _geocode(text: str) -> GeocodedLocation | None:
     """Geocode a single place name via text2geo.
 
     Args:
         text: Place name to geocode.
 
     Returns:
-        Dict with lat, lon, name, country, or None if unresolvable.
+        GeocodedLocation with lat, lon, country, or None if unresolvable.
 
     """
     geo = _get_geocoder()
     result = geo.geocode(text)
     if result:
-        return {
-            "lat": result["lat"],
-            "lon": result["lon"],
-            "name": result["name"],
-            "country": result["country"],
-        }
+        return GeocodedLocation(
+            lat=result["lat"],
+            lon=result["lon"],
+            text=text,
+            country=result["country"],
+        )
     return None
 
 
@@ -59,26 +61,27 @@ class GeoPipeline:
     offline text2geo geocoder with GeoNames data.
     """
 
-    def run(self, entities: list[dict]) -> GeoResult:
+    def run(self, entities: list[EntityMention]) -> GeoResult:
         """Geocode a list of NER entity mentions to geographic coordinates.
 
         Args:
-            entities: List of entity dicts, each with at least a 'text' key.
+            entities: EntityMention records with at least 'text' and 'label'.
 
         Returns:
-            GeoResult containing geocoded locations with text, lat, lon, country.
+            GeoResult containing GeocodedLocation records.
 
         """
         locations = []
         for entity in entities:
-            result = _geocode(entity["text"])
+            result = _geocode(entity.text)
             if result is not None:
                 locations.append(
-                    {
-                        "text": entity["text"],
-                        "lat": result["lat"],
-                        "lon": result["lon"],
-                        "country": result["country"],
-                    }
+                    GeocodedLocation(
+                        text=entity.text,
+                        lat=result.lat,
+                        lon=result.lon,
+                        country=result.country,
+                        type=entity.label,
+                    )
                 )
         return GeoResult(locations=locations)

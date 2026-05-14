@@ -1,5 +1,6 @@
 """Evaluation orchestration, corpus loading, and multi-corpus aggregation."""
 
+import dataclasses
 import glob
 import json
 import os
@@ -66,7 +67,7 @@ def evaluate_corpus(corpus_path: str, pipeline: NerPipeline | None = None) -> di
     for sample in samples:
         text = sample["text"]
         result = pipeline.run(text)
-        predictions = result.entities
+        predictions = [dataclasses.asdict(e) for e in result.entities]
 
         sample_results.append(
             {

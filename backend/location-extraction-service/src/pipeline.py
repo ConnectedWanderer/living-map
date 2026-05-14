@@ -8,6 +8,8 @@ import langdetect
 import spacy
 from langdetect import DetectorFactory, LangDetectException
 
+from src.models import EntityMention
+
 DetectorFactory.seed = 0
 
 _DEFAULT_LANGUAGE = "en"
@@ -48,7 +50,7 @@ def _get_ner_model(lang: str) -> spacy.Language:
         return spacy.load(_DEFAULT_MODEL)
 
 
-def _extract_location_mentions(text: str, lang: str) -> list[dict]:
+def _extract_location_mentions(text: str, lang: str) -> list[EntityMention]:
     if not text or not text.strip():
         return []
 
@@ -58,12 +60,12 @@ def _extract_location_mentions(text: str, lang: str) -> list[dict]:
     for ent in doc.ents:
         if ent.label_ in _LOCATION_LABELS:
             locations.append(
-                {
-                    "text": ent.text,
-                    "label": ent.label_,
-                    "start": ent.start_char,
-                    "end": ent.end_char,
-                }
+                EntityMention(
+                    text=ent.text,
+                    label=ent.label_,
+                    start=ent.start_char,
+                    end=ent.end_char,
+                )
             )
     return locations
 
@@ -74,13 +76,13 @@ class NerResult:
 
     Attributes:
         language: Detected language code (e.g. 'en', 'fr').
-        entities: Extracted location entities, each with text, label, start, end.
+        entities: Extracted location entities as EntityMention records.
         model_name: Name of the spaCy model used for NER, if available.
 
     """
 
     language: str
-    entities: list[dict]
+    entities: list[EntityMention]
     model_name: str | None = None
 
 

@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 
 import pycountry
 
+from src.models import EventLocation, GeocodedLocation, ScoredLocation
+
 _BOOST_PREPOSITIONS = frozenset({"in", "at", "near"})
 _PREPOSITION_BOOST = 1.3
 
@@ -14,14 +16,13 @@ class DisambiguateResult:
     """Result of running Stage 4 (event location inference).
 
     Attributes:
-        event_location: The best-guess event location with coordinates and
-            confidence, or None if no location could be determined.
-        all_locations: All scored locations with their attributes.
+        event_location: The best-guess event location or None.
+        all_locations: All scored locations as ScoredLocation records.
 
     """
 
-    event_location: dict | None = None
-    all_locations: list[dict] = field(default_factory=list)
+    event_location: EventLocation | None = None
+    all_locations: list[ScoredLocation] = field(default_factory=list)
 
 
 def _country_name(code: str) -> str:
@@ -56,11 +57,11 @@ class DisambiguatePipeline:
     locations. This is Stage 4 of the location extraction pipeline.
     """
 
-    def run(self, locations: list[dict], text: str) -> DisambiguateResult:
+    def run(self, locations: list[GeocodedLocation], text: str) -> DisambiguateResult:
         """Score locations and return the best-guess event location.
 
         Args:
-            locations: Geocoded location dicts with text, lat, lon, country.
+            locations: GeocodedLocation records with text, lat, lon, country.
             text: Original input text for preposition context analysis.
 
         Returns:
@@ -68,38 +69,37 @@ class DisambiguatePipeline:
             locations.
 
         """
-        geocoded = [loc for loc in locations if "lat" in loc and "lon" in loc]
-        if not geocoded:
+        if not locations:
             return DisambiguateResult()
 
         scored = []
-        for i, loc in enumerate(geocoded):
+        for i, loc in enumerate(locations):
             position_score = 1.0 / (i + 1)
-            type_multiplier = 2.5 if loc.get("type") == "GPE" else 1.0
-            boost = _preposition_boost(loc["text"], text)
+            type_multiplier = 2.5 if loc.type == "GPE" else 1.0
+            boost = _preposition_boost(loc.text, text)
             final_score = position_score * type_multiplier * boost
 
             scored.append(
-                {
-                    "text": loc["text"],
-                    "lat": loc["lat"],
-                    "lon": loc["lon"],
-                    "country": loc["country"],
-                    "country_name": _country_name(loc["country"]),
-                    "type": loc.get("type"),
-                    "score": final_score,
-                }
+                ScoredLocation(
+                    text=loc.text,
+                    lat=loc.lat,
+                    lon=loc.lon,
+                    country=loc.country,
+                    country_name=_country_name(loc.country),
+                    type=loc.type,
+                    score=final_score,
+                )
             )
 
-        best = max(scored, key=lambda x: x["score"])
+        best = max(scored, key=lambda x: x.score)
         return DisambiguateResult(
-            event_location={
-                "text": best["text"],
-                "lat": best["lat"],
-                "lon": best["lon"],
-                "country": best["country"],
-                "country_name": best["country_name"],
-                "confidence": min(best["score"] * 0.5, 1.0),
-            },
+            event_location=EventLocation(
+                text=best.text,
+                lat=best.lat,
+                lon=best.lon,
+                country=best.country,
+                country_name=best.country_name,
+                confidence=min(best.score * 0.5, 1.0),
+            ),
             all_locations=scored,
         )

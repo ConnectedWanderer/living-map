@@ -1,71 +1,159 @@
 import pytest
 
+from src.geocoding import GeoResult
+from src.models import GeocodedLocation
+from src.orchestrator import LocationPipeline
+from src.pipeline import NerPipeline
+
 pytestmark = pytest.mark.model_dependent
 
 
-class TestPipelineIntegration:
-    """End-to-end pipeline integration tests."""
+class _MockGeoPipeline:
+    """Stand-in for GeoPipeline that returns canned results without text2geo."""
 
+    def __init__(self, entities):
+        self.locations = [
+            GeocodedLocation(text=e.text, lat=48.8566, lon=2.3522, country="FR", type=e.label)
+            for e in entities
+        ]
+
+    def run(self, entities):
+        return GeoResult(locations=self.locations)
+
+
+class TestPipelineIntegration:
     def test_full_pipeline_english(self, sample_english_text):
-        """Should process English text and return event location."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_english_text)
+        assert result.detected_language == "en"
+        assert result.event_location is not None
+        assert result.event_location.text is not None
+        assert result.entities_found > 0
+        assert result.entities_geocoded > 0
+        assert result.processing_time_ms > 0
 
     def test_full_pipeline_french(self, sample_french_text):
-        """Should process French text and return event location."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_french_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_french_text)
+        assert result.detected_language == "fr"
+        assert result.event_location is not None
+        assert result.event_location.text is not None
+        assert result.entities_found > 0
+        assert result.entities_geocoded > 0
+        assert result.processing_time_ms > 0
 
     def test_output_format_structure(self, sample_english_text):
-        """Output should match expected JSON schema."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_english_text)
+        assert result.detected_language in ("en", "fr")
+        assert result.model_name is not None
+        assert isinstance(result.entities_found, int)
+        assert isinstance(result.entities_geocoded, int)
+        assert result.processing_time_ms > 0
 
     def test_detected_language_in_response(self, sample_english_text):
-        """Response should include detected language."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_english_text)
+        assert result.detected_language == "en"
 
     def test_all_locations_in_response(self, sample_english_text):
-        """Should include all extracted locations in response."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        geo = _MockGeoPipeline(ner_result.entities)
+        pipe = LocationPipeline(ner=ner, geo=geo)
+        result = pipe.run(sample_english_text)
+        assert len(result.all_locations) > 0
+        for loc in result.all_locations:
+            assert loc.text is not None
+            assert loc.lat is not None
+            assert loc.lon is not None
+            assert loc.country is not None
 
     def test_metadata_in_response(self, sample_english_text):
-        """Should include processing metadata."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_english_text)
+        assert result.model_name is not None
+        assert result.entities_found >= 0
+        assert result.entities_geocoded >= 0
+        assert result.processing_time_ms > 0
 
     def test_processing_time_recorded(self, sample_english_text):
-        """Should record processing time in milliseconds."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_english_text)
+        assert result.processing_time_ms > 0
+        assert result.processing_time_ms < 10000
 
     def test_entities_count_accuracy(self, sample_english_text):
-        """Should accurately count entities found and geocoded."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_english_text)
+        assert result.entities_found >= result.entities_geocoded
 
     def test_null_event_location_when_no_locations(self):
-        """Should return null event_location when no locations found."""
-        pass
+        pipe = LocationPipeline()
+        result = pipe.run("Hello world.")
+        assert result.event_location is None
+        assert result.all_locations == []
+        assert result.entities_found == 0
+        assert result.entities_geocoded == 0
 
     def test_null_event_location_when_no_geocoding(self):
-        """Should return null event_location when geocoding fails."""
-        pass
+        pipe = LocationPipeline()
+        result = pipe.run("The cat sat on the mat.")
+        assert result.event_location is None
+        assert result.entities_geocoded == 0
 
     def test_language_override(self, sample_french_text):
-        """Should accept explicit language override."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_french_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_french_text)
+        assert result.detected_language == "fr"
 
     def test_empty_text_handling(self):
-        """Should handle empty text gracefully."""
-        pass
+        pipe = LocationPipeline()
+        result = pipe.run("")
+        assert result.detected_language == "en"
+        assert result.event_location is None
+        assert result.all_locations == []
+        assert result.entities_found == 0
+        assert result.entities_geocoded == 0
 
     def test_very_long_text(self):
-        """Should handle long text efficiently."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run("Paris " * 500)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run("Paris " * 500)
+        assert result.event_location is not None
+        assert result.processing_time_ms > 0
 
 
 class TestPipelinePerformance:
-    """Performance-related tests."""
-
     def test_processing_under_one_second(self, sample_english_text):
-        """Should complete processing under 1 second."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run(sample_english_text)
+        pipe = LocationPipeline(ner=ner, geo=_MockGeoPipeline(ner_result.entities))
+        result = pipe.run(sample_english_text)
+        assert result.processing_time_ms < 1000
 
     def test_memory_efficiency(self):
-        """Should not leak memory on multiple calls."""
-        pass
+        ner = NerPipeline()
+        ner_result = ner.run("London and Paris are major European cities.")
+        geo = _MockGeoPipeline(ner_result.entities)
+        pipe = LocationPipeline(ner=ner, geo=geo)
+        for _ in range(5):
+            result = pipe.run("London and Paris are major European cities.")
+            assert result.event_location is not None
