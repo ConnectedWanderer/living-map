@@ -2,8 +2,12 @@
 
 ## Status
 
-Accepted — Candidate 1 (Composed Pipeline Orchestrator) implemented.
-Candidate 2 (Geocoder Dependency Injection), Candidate 3 (Typed Intermediate Records), Candidate 4 (Split evaluate_corpus), and Candidate 5 (Stages 3-4 Evaluation) remain Proposed.
+Accepted — Candidates 1-2 implemented.
+
+- Candidate 1 (Composed Pipeline Orchestrator)
+- Candidate 2 (Geocoder Dependency Injection)
+
+Candidate 3 (Typed Intermediate Records), Candidate 4 (Split evaluate_corpus), and Candidate 5 (Stages 3-4 Evaluation) remain Proposed.
 
 ## Date
 

@@ -59,7 +59,21 @@ class GeoPipeline:
     mentions produced by NerPipeline (stages 1-2) and resolves them to
     lat/lon coordinates, country codes, and canonical names using the
     offline text2geo geocoder with GeoNames data.
+
+    The geocode function is injectable for testing.  By default it uses
+    the module-level _geocode backed by a cached text2geo Geocoder.
     """
+
+    def __init__(self, geocode_fn=None):
+        """Initialize GeoPipeline.
+
+        Args:
+            geocode_fn: Optional callable accepting a place name string
+                and returning GeocodedLocation | None.  Defaults to the
+                module-level _geocode function backed by text2geo.
+
+        """
+        self._geocode_fn = geocode_fn or _geocode
 
     def run(self, entities: list[EntityMention]) -> GeoResult:
         """Geocode a list of NER entity mentions to geographic coordinates.
@@ -73,7 +87,7 @@ class GeoPipeline:
         """
         locations = []
         for entity in entities:
-            result = _geocode(entity.text)
+            result = self._geocode_fn(entity.text)
             if result is not None:
                 locations.append(
                     GeocodedLocation(
