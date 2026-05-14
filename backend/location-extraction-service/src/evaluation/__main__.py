@@ -1,7 +1,7 @@
 import os
 import sys
 
-from src.evaluation import DEFAULT_CORPUS_DIR, evaluate_all_corpora, evaluate_corpus
+from src.evaluation.runner import DEFAULT_CORPUS_DIR, evaluate_all_corpora, evaluate_corpus
 
 _GREEN = "\033[92m"
 _RED = "\033[91m"
@@ -98,7 +98,9 @@ def _print_synthesis(result: dict) -> None:
             f"  {os.path.basename(c['corpus_path']):30s}  {c['sample_count']:3d} samples    P={_fmt(o['precision'])}  R={_fmt(o['recall'])}  F1={_fmt(o['f1'])}"
         )
     print()
-    print("Per-sample details available via: uv run python -m src.evaluation tests/corpus/<name>.json")
+    print(
+        "Per-sample details available via: uv run python -m src.evaluation tests/corpus/<name>.json"
+    )
 
 
 def main():

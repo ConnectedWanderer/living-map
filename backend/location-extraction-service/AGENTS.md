@@ -12,19 +12,16 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 
 ### Components
 
-| File                            | Purpose                                                |
-| ------------------------------- | ------------------------------------------------------ |
-| `src/pipeline/detector.py`      | Language detection using langdetect                    |
-| `src/pipeline/nlp_manager.py`   | spaCy model loading and caching                        |
-| `src/pipeline/extractor.py`     | Named Entity Recognition (GPE/LOC entities)            |
-| `src/pipeline/disambiguator.py` | Event location inference and scoring                   |
-| `src/geocoding/geocoder.py`     | text2geo wrapper for offline geocoding                 |
-| `src/evaluation/__init__.py`    | Evaluation logic: `evaluate()` (P/R/F1), `evaluate_corpus()` (single corpus), `evaluate_all_corpora()` (aggregate synthesis), `discover_corpora()` (file discovery) |
-| `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation` (single corpus) or no-args for aggregate synthesis of all corpora |
-| `src/evaluation/corpus.py`      | Evaluation corpus schema and loading                   |
-| `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                    |
-| `src/models/schemas.py`         | Pydantic request/response models                       |
-| `src/__main__.py`               | FastAPI application entry point                        |
+| File                            | Purpose                                                                                             |
+| ------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `src/pipeline/__init__.py`      | `NerPipeline` class + `NerResult` dataclass (public API)                                            |
+| `src/pipeline/detector.py`      | Language detection using langdetect (internal)                                                      |
+| `src/pipeline/nlp_manager.py`   | spaCy model loading and caching (internal)                                                          |
+| `src/pipeline/extractor.py`     | Named Entity Recognition (GPE/LOC entities, internal)                                               |
+| `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()` (precision, recall, harmonic mean (P/R/F1))                                                  |
+| `src/evaluation/runner.py`      | Orchestration: `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
+| `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`                                                  |
+| `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                                                                 |
 
 ## Development Setup
 
@@ -194,20 +191,15 @@ docker-compose up --build
 ```
 location-extraction-service/
 ├── src/
-│   ├── __main__.py           # FastAPI entry point
 │   ├── pipeline/
-│   │   ├── detector.py       # Language detection
-│   │   ├── nlp_manager.py    # spaCy model manager
-│   │   ├── extractor.py      # NER extraction
-│   │   └── disambiguator.py  # Event location inference
-│   ├── geocoding/
-│   │   └── geocoder.py       # text2geo wrapper
+│   │   ├── __init__.py       # NerPipeline + NerResult (public API)
+│   │   ├── detector.py       # Language detection (internal)
+│   │   ├── nlp_manager.py    # spaCy model manager (internal)
+│   │   └── extractor.py      # NER extraction (internal)
 │   ├── evaluation/
-│   │   ├── __init__.py       # Evaluation logic (precision/recall/F1)
-│   │   ├── __main__.py       # CLI runner
-│   │   └── corpus.py         # Corpus loading
-│   └── models/
-│       └── schemas.py        # Pydantic models
+│   │   ├── __init__.py       # Pure evaluation computation (evaluate)
+│   │   ├── runner.py         # Pipeline orchestration + corpus loading
+│   │   └── __main__.py       # CLI runner
 ├── tests/
 │   ├── conftest.py
 │   ├── unit/
@@ -241,6 +233,7 @@ location-extraction-service/
 - [Architecture](../../docs/architecture/location-extraction.md)
 - [ADR-001](../../docs/decisions/ADR-001-location-extraction-approach.md)
 - [ADR-002](../../docs/decisions/ADR-002-ner-evaluation-protocol.md)
+- [ADR-003](../../docs/decisions/ADR-003-ner-pipeline-seam.md)
 - [spaCy Documentation](https://spacy.io/)
 - [text2geo](https://github.com/charonviz/text2geo)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)

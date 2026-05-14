@@ -272,10 +272,10 @@ Entity-level exact match: a prediction is correct only when `text`, `start`, `en
 
 ### Metrics
 
-| Metric | Meaning |
-|--------|---------|
-| Precision | TP / (TP + FP) |
-| Recall | TP / (TP + FN) |
+| Metric    | Meaning                               |
+| --------- | ------------------------------------- |
+| Precision | TP / (TP + FP)                        |
+| Recall    | TP / (TP + FN)                        |
 | Entity F1 | Harmonic mean of precision and recall |
 
 Computed overall and per entity type (GPE, LOC).
@@ -315,20 +315,15 @@ backend/
 │   └── ...
 ├── location-extraction-service/     # Python microservice
 │   ├── src/
-│   │   ├── __main__.py              # FastAPI application
 │   │   ├── pipeline/
-│   │   │   ├── detector.py           # Language detection
-│   │   │   ├── nlp_manager.py        # spaCy model manager
-│   │   │   ├── extractor.py          # NER logic
-│   │   │   └── disambiguator.py      # Event location inference
-│   │   ├── geocoding/
-│   │   │   └── geocoder.py          # text2geo wrapper
+│   │   │   ├── __init__.py          # NerPipeline + NerResult (public API)
+│   │   │   ├── detector.py          # Language detection (internal)
+│   │   │   ├── nlp_manager.py       # spaCy model manager (internal)
+│   │   │   └── extractor.py         # NER logic (internal)
 │   │   ├── evaluation/              # NER quality evaluation
-│   │   │   ├── __init__.py
-│   │   │   ├── __main__.py          # CLI entry point
-│   │   │   └── corpus.py            # Corpus loading
-│   │   └── models/
-│   │       └── schemas.py           # Pydantic models
+│   │   │   ├── __init__.py          # Pure evaluation computation
+│   │   │   ├── runner.py            # Pipeline orchestration + corpus loading
+│   │   │   └── __main__.py          # CLI entry point
 │   ├── tests/
 │   │   ├── conftest.py
 │   │   ├── unit/
@@ -459,3 +454,4 @@ If accuracy is insufficient, upgrade path to Mordecai3:
 - [GeoNames](https://www.geonames.org/)
 - [Mordecai3](https://github.com/ahalterman/mordecai3)
 - [FastAPI](https://fastapi.tiangolo.com/)
+- [ADR-003: NER Pipeline Seam](../decisions/ADR-003-ner-pipeline-seam.md)

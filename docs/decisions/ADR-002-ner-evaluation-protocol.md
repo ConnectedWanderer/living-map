@@ -113,7 +113,7 @@ The evaluation corpus must be:
 | **Total** | **40 docs (~150 entities)** | **40 docs (~150 entities)** | |
 
 **~150 entities per language** balances annotation effort against statistical reliability:
-- 50 entities → F1 is ±~7% (too noisy)
+- 50 entities → harmonic mean (F1) is ±~7% (too noisy)
 - 150 entities → F1 is ±~4% (acceptable for MVP)
 - 500+ entities → F1 is ±~2% (robust)
 

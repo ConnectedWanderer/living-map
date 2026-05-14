@@ -4,8 +4,13 @@ import sys
 
 import pytest
 
-from src.evaluation import discover_corpora, evaluate, evaluate_all_corpora, evaluate_corpus
-from src.evaluation.corpus import load_corpus
+from src.evaluation import evaluate
+from src.evaluation.runner import (
+    discover_corpora,
+    evaluate_all_corpora,
+    evaluate_corpus,
+    load_corpus,
+)
 
 
 class TestEvaluate:
