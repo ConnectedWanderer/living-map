@@ -21,6 +21,7 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | `src/evaluation/runner.py`      | Orchestration: `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
 | `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`                                                  |
 | `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                                                                 |
+| `scripts/ci.sh`                 | CI entry point: `--fast` for unit-only, otherwise downloads models + full suite                     |
 
 ## Development Setup
 
@@ -57,7 +58,7 @@ uv run python -c "from text2geo import Geocoder; Geocoder(dataset='world')"
 #### Adding New Languages
 
 1. Download spaCy model: `uv run python -m spacy download {lang}_core_news_sm`
-2. Update `src/pipeline/nlp_manager.py` model map
+2. Update `_MODEL_MAP` in `src/pipeline.py`
 3. Add tests for new language
 4. Update Dockerfile to download new model
 
@@ -121,8 +122,17 @@ When editing Python code, follow these rules:
 ### Quality Check Workflow
 
 ```bash
-# 1. Run tests with coverage
-uv run python -m pytest tests/ --cov=src --cov-report=term-missing
+# Fast path (unit tests only, no model downloads needed):
+uv run python -m pytest -m "not model_dependent" --cov=src --cov-report=term-missing
+
+# Full suite (requires spaCy models + text2geo data):
+uv run python -m pytest --cov=src --cov-report=term-missing
+
+# CI entry point (downloads models, runs full suite):
+bash scripts/ci.sh
+
+# CI fast path (unit tests only):
+bash scripts/ci.sh --fast
 
 # 2. Lint code
 uv run ruff check .
@@ -151,7 +161,7 @@ docker-compose up --build
 | spacy      | >=3.8.0   | NLP framework              |
 | langdetect | >=1.0.9   | Language detection         |
 | text2geo   | git       | Offline geocoding (GitHub) |
-| pycountry  | >=26.2.16   | ISO country name lookup    |
+| pycountry  | >=26.2.16 | ISO country name lookup    |
 | fastapi    | >=0.135.0 | API server                 |
 | uvicorn    | >=0.30.0  | ASGI server                |
 | pydantic   | >=2.9.0   | Data validation            |
@@ -174,18 +184,23 @@ docker-compose up --build
 
 **Slow startup**: Models are cached after first load. Subsequent startups are faster.
 
+**CI fails with missing model error**: Run `bash scripts/ci.sh` which downloads models before testing. Use `bash scripts/ci.sh --fast` for a quick unit-only pass. If integration tests are skipped with `pytest.exit`, models are missing — run the download commands above.
+
+**text2geo data download fails**: See [ADR-005](../../docs/decisions/ADR-005-text2geo-nan-bug.md) — known upstream `NaN` bug in text2geo. `scripts/ci.sh` tolerates this failure with a warning.
+
 ## uv Commands Reference
 
-| Command                   | Description                                         |
-| ------------------------- | --------------------------------------------------- |
-| `uv sync`                 | Install all dependencies (including dev by default) |
-| `uv sync --dev`           | Explicitly include dev dependencies                 |
-| `uv sync --no-dev`        | Exclude dev dependencies                            |
-| `uv run python -m pytest` | Run pytest tests                                    |
-| `uv run ruff check`       | Lint code                                           |
-| `uv run ruff format`      | Format code                                         |
-| `uv lock`                 | Update lock file                                    |
-| `uv sync --frozen`        | Install without updating lock (CI/CD)               |
+| Command                                            | Description                                         |
+| -------------------------------------------------- | --------------------------------------------------- |
+| `uv sync`                                          | Install all dependencies (including dev by default) |
+| `uv sync --dev`                                    | Explicitly include dev dependencies                 |
+| `uv sync --no-dev`                                 | Exclude dev dependencies                            |
+| `uv run python -m pytest`                          | Run pytest tests (full suite, requires models)      |
+| `uv run python -m pytest -m "not model_dependent"` | Run unit tests only (no model downloads needed)     |
+| `uv run ruff check`                                | Lint code                                           |
+| `uv run ruff format`                               | Format code                                         |
+| `uv lock`                                          | Update lock file                                    |
+| `uv sync --frozen`                                 | Install without updating lock (CI/CD)               |
 
 ## File Structure
 
@@ -209,7 +224,8 @@ location-extraction-service/
 │   ├── integration/
 │   │   ├── conftest.py
 │   │   ├── test_nlp_manager.py
-│   │   └── test_pipeline_integration.py
+│   │   ├── test_pipeline_integration.py
+│   │   └── test_evaluation_integration.py
 │   └── corpus/               # Evaluation corpora (EN + FR)
 │       ├── en_simple.json
 │       ├── en_paragraphs.json
@@ -218,7 +234,8 @@ location-extraction-service/
 │       ├── fr_paragraphs.json
 │       └── fr_edge_cases.json
 ├── scripts/
-│   └── fix_corpus_offsets.py    # Corpus offset fixer
+│   ├── fix_corpus_offsets.py    # Corpus offset fixer
+│   └── ci.sh                    # CI entry point (--fast for unit-only)
 ├── Dockerfile
 ├── docker-compose.yml
 ├── pyproject.toml             # Dependencies and ruff config
@@ -233,6 +250,8 @@ location-extraction-service/
 - [ADR-001](../../docs/decisions/ADR-001-location-extraction-approach.md)
 - [ADR-002](../../docs/decisions/ADR-002-ner-evaluation-protocol.md)
 - [ADR-003](../../docs/decisions/ADR-003-ner-pipeline-seam.md)
+- [ADR-004](../../docs/decisions/ADR-004-consolidate-pipeline-module.md)
+- [ADR-005](../../docs/decisions/ADR-005-text2geo-nan-bug.md)
 - [spaCy Documentation](https://spacy.io/)
 - [text2geo](https://github.com/charonviz/text2geo)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)

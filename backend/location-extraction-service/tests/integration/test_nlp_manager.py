@@ -1,4 +1,8 @@
+import pytest
+
 from src.pipeline import _get_ner_model
+
+pytestmark = pytest.mark.model_dependent
 
 
 class TestNLPManager:

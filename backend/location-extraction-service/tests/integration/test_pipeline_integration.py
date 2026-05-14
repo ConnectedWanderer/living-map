@@ -1,3 +1,8 @@
+import pytest
+
+pytestmark = pytest.mark.model_dependent
+
+
 class TestPipelineIntegration:
     """End-to-end pipeline integration tests."""
 
