@@ -1,3 +1,5 @@
+"""CLI entry point for NER evaluation."""
+
 import os
 import sys
 
@@ -104,6 +106,7 @@ def _print_synthesis(result: dict) -> None:
 
 
 def main():
+    """CLI entry point for NER evaluation (single corpus or full aggregation)."""
     if len(sys.argv) < 2:
         result = evaluate_all_corpora()
         _print_synthesis(result)

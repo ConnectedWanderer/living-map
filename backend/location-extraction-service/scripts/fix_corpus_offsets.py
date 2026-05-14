@@ -1,3 +1,5 @@
+"""Corpus offset validation and repair tools for NER evaluation corpora."""
+
 import json
 import os
 import sys
@@ -17,6 +19,16 @@ DEFAULT_FILES = [
 
 
 def find_entity_positions(text: str, entity_text: str) -> list[tuple[int, int]]:
+    """Find all (start, end) positions of entity_text in the given text.
+
+    Args:
+        text: The text to search within.
+        entity_text: The substring to locate.
+
+    Returns:
+        List of (start, end) position tuples for each occurrence.
+
+    """
     positions = []
     start = 0
     while True:
@@ -29,6 +41,16 @@ def find_entity_positions(text: str, entity_text: str) -> list[tuple[int, int]]:
 
 
 def fix_corpus(path: str, dry_run: bool = False) -> dict:
+    """Fix entity offset mismatches in a corpus JSON file.
+
+    Args:
+        path: Path to corpus JSON file.
+        dry_run: If True, report fixes without writing.
+
+    Returns:
+        Dict with sample/entity/fixed/error counts and warnings.
+
+    """
     with open(path) as f:
         data = json.load(f)
 
@@ -84,6 +106,15 @@ def fix_corpus(path: str, dry_run: bool = False) -> dict:
 
 
 def check_corpus(path: str) -> dict:
+    """Check entity offset correctness in a corpus file.
+
+    Args:
+        path: Path to corpus JSON file.
+
+    Returns:
+        Dict with entity/correct/wrong counts and per-sample details.
+
+    """
     with open(path) as f:
         data = json.load(f)
 
@@ -105,6 +136,7 @@ def check_corpus(path: str) -> dict:
 
 
 def main():
+    """CLI entry point for fixing or checking corpus offsets."""
     import argparse
 
     parser = argparse.ArgumentParser(description="Fix entity offsets in evaluation corpus files.")

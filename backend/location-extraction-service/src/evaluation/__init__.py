@@ -1,3 +1,6 @@
+"""NER quality metrics: precision, recall, F1 computation."""
+
+
 def _compute_rates(tp: int, fp: int, fn: int) -> dict:
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
@@ -17,6 +20,7 @@ def evaluate(predictions: list[dict], expected: list[dict]) -> dict:
 
     Returns:
         Dict with 'overall' metrics and 'per_type' breakdown keyed by label.
+
     """
 
     def _metrics(pred_list, exp_list):

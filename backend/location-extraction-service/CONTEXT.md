@@ -22,7 +22,7 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | Evaluation — Pure Compute  | `src/evaluation/__init__.py` | ✅ Done    | 34    | `evaluate()` (precision, recall, harmonic mean (F1)), no I/O or pipeline imports     |
 | Evaluation — Orchestration | `src/evaluation/runner.py`   | ✅ Done    | 114   | `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
 | Evaluation — CLI           | `src/evaluation/__main__.py` | ✅ Done    | 115   | CLI entry point, imports from `runner.py`                                            |
-| Geocoding                  | future                       | ❌ Missing | —     | text2geo wrapper; awaits `GeoPipeline` on other side of seam                         |
+| Geocoding                  | `src/geocoding.py`           | ✅ Done    | 47    | `GeoPipeline` + `GeoResult` + internal text2geo wrapper, mocked tests                |
 | Event Location Inference   | future                       | ❌ Missing | —     | Scoring/location disambiguation; awaits `DisambiguatePipeline`                       |
 | Pydantic Schemas           | future                       | ❌ Missing | —     | Request/response models                                                              |
 | FastAPI Entry Point        | future                       | ❌ Missing | —     | App, routes, startup, health check                                                   |
@@ -34,9 +34,9 @@ flowchart LR
     subgraph Implemented
         A[Language Detection]
         B[spaCy NER]
+        C[text2geo Geocoding]
     end
     subgraph Missing
-        C[text2geo Geocoding]
         D[Event Location Inference]
         E[Pydantic Schemas]
         F[FastAPI Entry Point]
@@ -45,7 +45,7 @@ flowchart LR
     E --> F
     style A fill:#c8e6c9
     style B fill:#c8e6c9
-    style C fill:#ffccbc
+    style C fill:#c8e6c9
     style D fill:#ffccbc
     style E fill:#ffccbc
     style F fill:#ffccbc
@@ -60,6 +60,7 @@ flowchart LR
 | `tests/unit/test_extractor.py`                   | ⚠️ Partial | 2 tests — only empty/whitespace input checked                                                                            |
 | `tests/unit/test_disambiguator.py`               | ⚠️ Stubs   | 9 test functions, all `pass`                                                                                             |
 | `tests/integration/test_pipeline_integration.py` | ⚠️ Stubs   | 14 functional + 2 perf tests, all `pass`                                                                                 |
+| `tests/unit/test_geocoding.py`                   | ✅ Done    | 8 tests, covers single/multiple/partial/none/empty geocoding, original text preserved, no name/type in output            |
 | `tests/unit/test_evaluation.py`                  | ✅ Done    | 22 tests, covers `evaluate()`, `evaluate_corpus()`, `load_corpus()`, `discover_corpora()`, `evaluate_all_corpora()`, CLI |
 | `tests/conftest.py`                              | ✅ Done    | Shared fixtures (sample EN/FR/mixed texts)                                                                               |
 | `tests/integration/conftest.py`                  | ✅ Done    | Session-scoped spaCy model env setup                                                                                     |
@@ -116,18 +117,17 @@ flowchart LR
 
 ## Known Gaps
 
-1. **No geocoding** — text2geo wrapper missing; pipeline stops after NER
-2. **No disambiguation** — event location inference missing
-3. **No API server** — FastAPI app, routes, health check not implemented
-4. **No request/response models** — Pydantic schemas missing
-5. **No `[project.scripts]` entry point** in pyproject.toml
-6. **Extractor test coverage sparse** — only checks empty input
-7. **Disambiguator + pipeline integration tests are stubs** — all `pass` only
+1. **No disambiguation** — event location inference missing
+2. **No API server** — FastAPI app, routes, health check not implemented
+3. **No request/response models** — Pydantic schemas missing
+4. **No `[project.scripts]` entry point** in pyproject.toml
+5. **Extractor test coverage sparse** — only checks empty input
+6. **Disambiguator + pipeline integration tests are stubs** — all `pass` only
 
 ## Recommended Build Order
 
 1. `src/models/schemas.py` — Pydantic models (foundation for everything)
-2. `src/geocoding/__init__.py` + `src/geocoding/geocoder.py` — text2geo wrapper as `GeoPipeline` (pipeline Stage 3)
-3. `src/pipeline/disambiguator.py` — Event location inference (pipeline Stage 4)
+2. ✅ `src/geocoding.py` — text2geo wrapper as `GeoPipeline` (pipeline Stage 3) — **DONE**
+3. `src/disambiguator.py` — Event location inference (pipeline Stage 4)
 4. `src/__main__.py` — FastAPI app (wires pipeline + schemas into runnable server)
 5. Fill in test stubs — `test_extractor.py`, `test_disambiguator.py`, `test_pipeline_integration.py`

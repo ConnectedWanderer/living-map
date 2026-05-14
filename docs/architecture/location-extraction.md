@@ -125,23 +125,47 @@ def extract_location_mentions(text: str, lang: str) -> list[dict]:
 - Multi-language place name support
 
 ```python
+from dataclasses import dataclass, field
 from text2geo import Geocoder
 
-geo = Geocoder(dataset="world")
 
-def geocode_locations(mentions: list[dict]) -> list[dict]:
-    results = []
-    for mention in mentions:
-        result = geo.geocode(mention["text"])
-        if result:
-            results.append({
-                "text": mention["text"],
-                "lat": result["lat"],
-                "lon": result["lon"],
-                "name": result["name"],
-                "country": result["country"]
-            })
-    return results
+_geocoder: Geocoder | None = None
+
+
+def _get_geocoder() -> Geocoder:
+    if _geocoder is None:
+        _geocoder = Geocoder(dataset="world")
+    return _geocoder
+
+
+def _geocode(text: str) -> dict | None:
+    geo = _get_geocoder()
+    result = geo.geocode(text)
+    if result:
+        return {"lat": result["lat"], "lon": result["lon"], "name": result["name"], "country": result["country"]}
+    return None
+
+
+@dataclass
+class GeoResult:
+    locations: list[dict]
+
+
+class GeoPipeline:
+    """Geocodes NER entity mentions to geographic coordinates via text2geo."""
+
+    def run(self, entities: list[dict]) -> GeoResult:
+        locations = []
+        for entity in entities:
+            result = _geocode(entity["text"])
+            if result is not None:
+                locations.append({
+                    "text": entity["text"],
+                    "lat": result["lat"],
+                    "lon": result["lon"],
+                    "country": result["country"],
+                })
+        return GeoResult(locations=locations)
 ```
 
 ### Stage 4: Event Location Inference
@@ -316,6 +340,7 @@ backend/
 ├── location-extraction-service/     # Python microservice
 │   ├── src/
 │   │   ├── pipeline.py              # NerPipeline + NerResult + internal detection/NER/model
+│   │   ├── geocoding.py             # GeoPipeline + GeoResult + internal text2geo wrapper
 │   │   ├── evaluation/              # NER quality evaluation
 │   │   │   ├── __init__.py          # Pure evaluation computation
 │   │   │   ├── runner.py            # Pipeline orchestration + corpus loading
@@ -326,6 +351,7 @@ backend/
 │   │   │   ├── test_detector.py
 │   │   │   ├── test_extractor.py
 │   │   │   ├── test_disambiguator.py
+│   │   │   ├── test_geocoding.py
 │   │   │   └── test_evaluation.py
 │   │   ├── integration/
 │   │   │   ├── conftest.py

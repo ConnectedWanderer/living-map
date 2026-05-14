@@ -1,3 +1,5 @@
+"""Evaluation orchestration, corpus loading, and multi-corpus aggregation."""
+
 import glob
 import json
 import os
@@ -20,6 +22,7 @@ def load_corpus(path: str) -> list[dict]:
     Raises:
         FileNotFoundError: If the file does not exist.
         json.JSONDecodeError: If the file is not valid JSON.
+
     """
     with open(path) as f:
         data = json.load(f)
@@ -34,6 +37,7 @@ def discover_corpora(corpus_dir: str = DEFAULT_CORPUS_DIR) -> list[str]:
 
     Returns:
         Sorted list of absolute paths to .json files.
+
     """
     return sorted(glob.glob(os.path.join(corpus_dir, "*.json")))
 
@@ -51,6 +55,7 @@ def evaluate_corpus(corpus_path: str, pipeline: NerPipeline | None = None) -> di
     Returns:
         Dict with corpus_path, sample_count, overall metrics, per_type metrics,
         and per-sample results including expected vs predicted entities.
+
     """
     pipeline = pipeline or NerPipeline()
     samples = load_corpus(corpus_path)
@@ -99,6 +104,7 @@ def evaluate_all_corpora(corpus_dir: str = DEFAULT_CORPUS_DIR) -> dict:
     Returns:
         Dict with aggregate overall/per_type metrics, per-corpus results,
         and merged_samples with source_corpus metadata.
+
     """
     corpus_paths = discover_corpora(corpus_dir)
     corpora = []

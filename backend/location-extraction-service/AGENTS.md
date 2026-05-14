@@ -15,6 +15,7 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | File                            | Purpose                                                                                             |
 | ------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `src/pipeline.py`               | `NerPipeline` class + `NerResult` dataclass + internal detection/NER/model logic                    |
+| `src/geocoding.py`              | `GeoPipeline` class + `GeoResult` dataclass + internal text2geo wrapper                             |
 | `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()` (precision, recall, harmonic mean (P/R/F1))               |
 | `src/evaluation/runner.py`      | Orchestration: `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
 | `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`                                                  |
@@ -114,6 +115,7 @@ Ruff is configured in `pyproject.toml`:
 When editing Python code, follow these rules:
 
 - **Exception handling**: Use modern Python syntax for multiple exceptions (Python 3.14+), e.g., `except Exception1, Exception2:` (parentheses optional)
+- **Docstrings**: Google-style docstrings on all public classes and methods. Module-level docstrings describe the file's purpose in one line. Private functions (`_`-prefixed) do not require docstrings (enforced by ruff rule `D`).
 
 ### Quality Check Workflow
 
@@ -189,6 +191,7 @@ docker-compose up --build
 location-extraction-service/
 ├── src/
 │   ├── pipeline.py            # NerPipeline + NerResult + internal detection/NER/model
+│   ├── geocoding.py           # GeoPipeline + GeoResult + internal text2geo wrapper
 │   ├── evaluation/
 │   │   ├── __init__.py       # Pure evaluation computation (evaluate)
 │   │   ├── runner.py         # Pipeline orchestration + corpus loading

@@ -1,3 +1,5 @@
+"""Stages 1-2: Language detection and NER location extraction via spaCy."""
+
 import os
 from dataclasses import dataclass
 from functools import lru_cache
@@ -74,6 +76,7 @@ class NerResult:
         language: Detected language code (e.g. 'en', 'fr').
         entities: Extracted location entities, each with text, label, start, end.
         model_name: Name of the spaCy model used for NER, if available.
+
     """
 
     language: str
@@ -97,6 +100,7 @@ class NerPipeline:
 
         Returns:
             NerResult containing detected language and extracted entities.
+
         """
         lang = _detect_language(text)
         ents = _extract_location_mentions(text, lang)

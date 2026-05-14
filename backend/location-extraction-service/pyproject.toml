@@ -36,10 +36,15 @@ select = [
     "B",
     "C4",
     "RUF",
+    "D",
 ]
 ignore = [
     "E501",
+    "D107",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]
