@@ -16,6 +16,7 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | ------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `src/pipeline.py`               | `NerPipeline` class + `NerResult` dataclass + internal detection/NER/model logic                    |
 | `src/geocoding.py`              | `GeoPipeline` class + `GeoResult` dataclass + internal text2geo wrapper                             |
+| `src/disambiguator.py`          | `DisambiguatePipeline` class + `DisambiguateResult` dataclass + event location inference (Stage 4)  |
 | `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()` (precision, recall, harmonic mean (P/R/F1))               |
 | `src/evaluation/runner.py`      | Orchestration: `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
 | `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`                                                  |
@@ -150,6 +151,7 @@ docker-compose up --build
 | spacy      | >=3.8.0   | NLP framework              |
 | langdetect | >=1.0.9   | Language detection         |
 | text2geo   | git       | Offline geocoding (GitHub) |
+| pycountry  | >=26.2.16   | ISO country name lookup    |
 | fastapi    | >=0.135.0 | API server                 |
 | uvicorn    | >=0.30.0  | ASGI server                |
 | pydantic   | >=2.9.0   | Data validation            |
@@ -192,6 +194,7 @@ location-extraction-service/
 ├── src/
 │   ├── pipeline.py            # NerPipeline + NerResult + internal detection/NER/model
 │   ├── geocoding.py           # GeoPipeline + GeoResult + internal text2geo wrapper
+│   ├── disambiguator.py       # DisambiguatePipeline + DisambiguateResult + event location inference
 │   ├── evaluation/
 │   │   ├── __init__.py       # Pure evaluation computation (evaluate)
 │   │   ├── runner.py         # Pipeline orchestration + corpus loading

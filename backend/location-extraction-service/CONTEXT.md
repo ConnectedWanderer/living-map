@@ -23,7 +23,7 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | Evaluation — Orchestration | `src/evaluation/runner.py`   | ✅ Done    | 114   | `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
 | Evaluation — CLI           | `src/evaluation/__main__.py` | ✅ Done    | 115   | CLI entry point, imports from `runner.py`                                            |
 | Geocoding                  | `src/geocoding.py`           | ✅ Done    | 47    | `GeoPipeline` + `GeoResult` + internal text2geo wrapper, mocked tests                |
-| Event Location Inference   | future                       | ❌ Missing | —     | Scoring/location disambiguation; awaits `DisambiguatePipeline`                       |
+| Event Location Inference   | `src/disambiguator.py`       | ✅ Done    | 83    | `DisambiguatePipeline` + `DisambiguateResult` + position/type/preposition scoring    |
 | Pydantic Schemas           | future                       | ❌ Missing | —     | Request/response models                                                              |
 | FastAPI Entry Point        | future                       | ❌ Missing | —     | App, routes, startup, health check                                                   |
 
@@ -35,9 +35,9 @@ flowchart LR
         A[Language Detection]
         B[spaCy NER]
         C[text2geo Geocoding]
+        D[Event Location Inference]
     end
     subgraph Missing
-        D[Event Location Inference]
         E[Pydantic Schemas]
         F[FastAPI Entry Point]
     end
@@ -46,7 +46,7 @@ flowchart LR
     style A fill:#c8e6c9
     style B fill:#c8e6c9
     style C fill:#c8e6c9
-    style D fill:#ffccbc
+    style D fill:#c8e6c9
     style E fill:#ffccbc
     style F fill:#ffccbc
 ```
@@ -58,7 +58,7 @@ flowchart LR
 | `tests/unit/test_detector.py`                    | ✅ Done    | 8 tests, covers EN/FR detection, empty input, exception fallback                                                         |
 | `tests/integration/test_nlp_manager.py`          | ✅ Done    | 5 tests, covers model loading, caching, fallback, concurrency                                                            |
 | `tests/unit/test_extractor.py`                   | ⚠️ Partial | 2 tests — only empty/whitespace input checked                                                                            |
-| `tests/unit/test_disambiguator.py`               | ⚠️ Stubs   | 9 test functions, all `pass`                                                                                             |
+| `tests/unit/test_disambiguator.py`               | ✅ Done    | 9 tests, covers position/type scoring, empty input, confidence, ungeocoded skip, country_name, preposition boosting      |
 | `tests/integration/test_pipeline_integration.py` | ⚠️ Stubs   | 14 functional + 2 perf tests, all `pass`                                                                                 |
 | `tests/unit/test_geocoding.py`                   | ✅ Done    | 8 tests, covers single/multiple/partial/none/empty geocoding, original text preserved, no name/type in output            |
 | `tests/unit/test_evaluation.py`                  | ✅ Done    | 22 tests, covers `evaluate()`, `evaluate_corpus()`, `load_corpus()`, `discover_corpora()`, `evaluate_all_corpora()`, CLI |
@@ -90,20 +90,21 @@ flowchart LR
 
 ### Dependency Versions
 
-| Package              | Version                    | Purpose            |
-| -------------------- | -------------------------- | ------------------ |
-| fastapi              | >=0.135.0                  | API server         |
-| uvicorn              | >=0.30.0                   | ASGI server        |
-| pydantic             | >=2.9.0                    | Data validation    |
-| spacy                | >=3.8.0                    | NLP framework      |
-| langdetect           | >=1.0.9                    | Language detection |
-| text2geo             | git (`charonviz/text2geo`) | Offline geocoding  |
-| python-dotenv        | >=1.0.0                    | Env var loading    |
-| pytest (dev)         | >=9.0.0                    | Testing            |
-| pytest-asyncio (dev) | >=0.24.0                   | Async test support |
-| pytest-cov (dev)     | >=6.0.0                    | Coverage reports   |
-| httpx (dev)          | >=0.28.0                   | HTTP test client   |
-| ruff (dev)           | >=0.9.0                    | Linting/formatting |
+| Package              | Version                    | Purpose                 |
+| -------------------- | -------------------------- | ----------------------- |
+| fastapi              | >=0.135.0                  | API server              |
+| uvicorn              | >=0.30.0                   | ASGI server             |
+| pydantic             | >=2.9.0                    | Data validation         |
+| spacy                | >=3.8.0                    | NLP framework           |
+| langdetect           | >=1.0.9                    | Language detection      |
+| text2geo             | git (`charonviz/text2geo`) | Offline geocoding       |
+| pycountry            | >=26.2.16                  | ISO country name lookup |
+| python-dotenv        | >=1.0.0                    | Env var loading         |
+| pytest (dev)         | >=9.0.0                    | Testing                 |
+| pytest-asyncio (dev) | >=0.24.0                   | Async test support      |
+| pytest-cov (dev)     | >=6.0.0                    | Coverage reports        |
+| httpx (dev)          | >=0.28.0                   | HTTP test client        |
+| ruff (dev)           | >=0.9.0                    | Linting/formatting      |
 
 ### Performance Targets (from ADR)
 
@@ -117,17 +118,16 @@ flowchart LR
 
 ## Known Gaps
 
-1. **No disambiguation** — event location inference missing
-2. **No API server** — FastAPI app, routes, health check not implemented
-3. **No request/response models** — Pydantic schemas missing
-4. **No `[project.scripts]` entry point** in pyproject.toml
-5. **Extractor test coverage sparse** — only checks empty input
-6. **Disambiguator + pipeline integration tests are stubs** — all `pass` only
+1. **No API server** — FastAPI app, routes, health check not implemented
+2. **No request/response models** — Pydantic schemas missing
+3. **No `[project.scripts]` entry point** in pyproject.toml
+4. **Extractor test coverage sparse** — only checks empty input
+5. **Pipeline integration tests are stubs** — all `pass` only
 
 ## Recommended Build Order
 
 1. `src/models/schemas.py` — Pydantic models (foundation for everything)
 2. ✅ `src/geocoding.py` — text2geo wrapper as `GeoPipeline` (pipeline Stage 3) — **DONE**
-3. `src/disambiguator.py` — Event location inference (pipeline Stage 4)
+3. ✅ `src/disambiguator.py` — Event location inference (pipeline Stage 4) — **DONE**
 4. `src/__main__.py` — FastAPI app (wires pipeline + schemas into runnable server)
-5. Fill in test stubs — `test_extractor.py`, `test_disambiguator.py`, `test_pipeline_integration.py`
+5. Fill in test stubs — `test_extractor.py`, `test_pipeline_integration.py`
