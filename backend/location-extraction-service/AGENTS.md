@@ -14,11 +14,8 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 
 | File                            | Purpose                                                                                             |
 | ------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `src/pipeline/__init__.py`      | `NerPipeline` class + `NerResult` dataclass (public API)                                            |
-| `src/pipeline/detector.py`      | Language detection using langdetect (internal)                                                      |
-| `src/pipeline/nlp_manager.py`   | spaCy model loading and caching (internal)                                                          |
-| `src/pipeline/extractor.py`     | Named Entity Recognition (GPE/LOC entities, internal)                                               |
-| `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()` (precision, recall, harmonic mean (P/R/F1))                                                  |
+| `src/pipeline.py`               | `NerPipeline` class + `NerResult` dataclass + internal detection/NER/model logic                    |
+| `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()` (precision, recall, harmonic mean (P/R/F1))               |
 | `src/evaluation/runner.py`      | Orchestration: `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
 | `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation`                                                  |
 | `scripts/fix_corpus_offsets.py` | Corpus offset validation and repair                                                                 |
@@ -191,11 +188,7 @@ docker-compose up --build
 ```
 location-extraction-service/
 ├── src/
-│   ├── pipeline/
-│   │   ├── __init__.py       # NerPipeline + NerResult (public API)
-│   │   ├── detector.py       # Language detection (internal)
-│   │   ├── nlp_manager.py    # spaCy model manager (internal)
-│   │   └── extractor.py      # NER extraction (internal)
+│   ├── pipeline.py            # NerPipeline + NerResult + internal detection/NER/model
 │   ├── evaluation/
 │   │   ├── __init__.py       # Pure evaluation computation (evaluate)
 │   │   ├── runner.py         # Pipeline orchestration + corpus loading

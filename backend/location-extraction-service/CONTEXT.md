@@ -16,19 +16,16 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 
 ### Source Files
 
-| Component                  | File                          | Status     | Lines | Notes                                                                                |
-| -------------------------- | ----------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------ |
-| Pipeline — Orchestration   | `src/pipeline/__init__.py`    | ✅ Done    | 16    | `NerPipeline` class + `NerResult` dataclass                                          |
-| Language Detection         | `src/pipeline/detector.py`    | ✅ Done    | 30    | langdetect, EN/FR, fallback to "en" (internal)                                       |
-| NER — Model Manager        | `src/pipeline/nlp_manager.py` | ✅ Done    | 36    | spaCy LRU cache (maxsize=2), EN/FR (internal)                                        |
-| NER — Entity Extraction    | `src/pipeline/extractor.py`   | ✅ Done    | 32    | GPE/LOC extraction (internal)                                                        |
-| Evaluation — Pure Compute  | `src/evaluation/__init__.py`  | ✅ Done    | 34    | `evaluate()` (precision, recall, harmonic mean (F1)), no I/O or pipeline imports                                    |
-| Evaluation — Orchestration | `src/evaluation/runner.py`    | ✅ Done    | 114   | `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
-| Evaluation — CLI           | `src/evaluation/__main__.py`  | ✅ Done    | 115   | CLI entry point, imports from `runner.py`                                            |
-| Geocoding                  | future                        | ❌ Missing | —     | text2geo wrapper; awaits `GeoPipeline` on other side of seam                         |
-| Event Location Inference   | future                        | ❌ Missing | —     | Scoring/location disambiguation; awaits `DisambiguatePipeline`                       |
-| Pydantic Schemas           | future                        | ❌ Missing | —     | Request/response models                                                              |
-| FastAPI Entry Point        | future                        | ❌ Missing | —     | App, routes, startup, health check                                                   |
+| Component                  | File                         | Status     | Lines | Notes                                                                                |
+| -------------------------- | ---------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------ |
+| Pipeline (consolidated)    | `src/pipeline.py`            | ✅ Done    | 88    | Single module: `NerPipeline` + `NerResult` + internal detection/NER/model caching    |
+| Evaluation — Pure Compute  | `src/evaluation/__init__.py` | ✅ Done    | 34    | `evaluate()` (precision, recall, harmonic mean (F1)), no I/O or pipeline imports     |
+| Evaluation — Orchestration | `src/evaluation/runner.py`   | ✅ Done    | 114   | `evaluate_corpus()`, `evaluate_all_corpora()`, `discover_corpora()`, `load_corpus()` |
+| Evaluation — CLI           | `src/evaluation/__main__.py` | ✅ Done    | 115   | CLI entry point, imports from `runner.py`                                            |
+| Geocoding                  | future                       | ❌ Missing | —     | text2geo wrapper; awaits `GeoPipeline` on other side of seam                         |
+| Event Location Inference   | future                       | ❌ Missing | —     | Scoring/location disambiguation; awaits `DisambiguatePipeline`                       |
+| Pydantic Schemas           | future                       | ❌ Missing | —     | Request/response models                                                              |
+| FastAPI Entry Point        | future                       | ❌ Missing | —     | App, routes, startup, health check                                                   |
 
 ### Current State Diagram
 

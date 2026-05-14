@@ -2,7 +2,13 @@
 
 ## Status
 
-Accepted
+Superseded by ADR-004
+
+> **Note:** Only the file-layout section (Decision §1 — sub-package for `src/pipeline/`) is superseded by ADR-004. The following remain active:
+>
+> - The `NerPipeline` class and `NerResult` dataclass as the stages 1-2 seam
+> - The evaluation module's three-layer split (pure compute / orchestration / CLI)
+> - Keeping evaluation scoped to stages 1-2
 
 ## Date
 

@@ -315,11 +315,7 @@ backend/
 │   └── ...
 ├── location-extraction-service/     # Python microservice
 │   ├── src/
-│   │   ├── pipeline/
-│   │   │   ├── __init__.py          # NerPipeline + NerResult (public API)
-│   │   │   ├── detector.py          # Language detection (internal)
-│   │   │   ├── nlp_manager.py       # spaCy model manager (internal)
-│   │   │   └── extractor.py         # NER logic (internal)
+│   │   ├── pipeline.py              # NerPipeline + NerResult + internal detection/NER/model
 │   │   ├── evaluation/              # NER quality evaluation
 │   │   │   ├── __init__.py          # Pure evaluation computation
 │   │   │   ├── runner.py            # Pipeline orchestration + corpus loading
