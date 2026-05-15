@@ -13,7 +13,7 @@ Usage:
 import os
 import sys
 
-from src.evaluation.runner import (
+from .runner import (
     DEFAULT_CORPUS_DIR,
     evaluate_all_corpora,
     evaluate_corpus,

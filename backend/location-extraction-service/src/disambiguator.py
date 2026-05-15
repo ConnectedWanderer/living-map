@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 import pycountry
 
-from src.models import EventLocation, GeocodedLocation, ScoredLocation
+from .models import EventLocation, GeocodedLocation, ScoredLocation
 
 _BOOST_PREPOSITIONS = frozenset({"in", "at", "near"})
 _PREPOSITION_BOOST = 1.3

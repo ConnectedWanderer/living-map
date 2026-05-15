@@ -14,9 +14,6 @@ dependencies = [
     "pycountry>=26.2.16",
 ]
 
-[project.scripts]
-location-extract-server = "src.app:start"
-
 [dependency-groups]
 dev = [
     "pytest>=9.0.0",

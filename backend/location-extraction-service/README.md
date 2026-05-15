@@ -33,7 +33,7 @@ uv run python -m spacy download en_core_web_sm fr_core_news_sm
 # (No separate geocoder data download needed — geonamescache ships data with the package)
 
 # Run the server
-uv run uvicorn src:app --host 0.0.0.0 --port 8000 --reload
+uv run uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload
 
 # Run tests
 uv run python -m pytest
@@ -60,34 +60,45 @@ curl -X POST http://localhost:8000/api/extract-location \
   -d '{"text": "Breaking news from Paris, France about flooding in the Seine river.", "language": "auto"}'
 ```
 
-### Response
+### Response (GeoJSON FeatureCollection)
 
 ```json
 {
-  "detected_language": "en",
-  "event_location": {
-    "text": "Paris",
-    "lat": 48.8566,
-    "lon": 2.3522,
-    "country": "FR",
-    "country_name": "France",
-    "confidence": 0.85
-  },
-  "all_locations": [
+  "type": "FeatureCollection",
+  "features": [
     {
-      "text": "Paris",
-      "lat": 48.8566,
-      "lon": 2.3522,
-      "name": "Paris",
-      "country": "FR",
-      "type": "GPE"
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+      "properties": {
+        "name": "Paris",
+        "country": "FR",
+        "country_name": "France",
+        "confidence": 0.85
+      }
     }
   ],
-  "metadata": {
-    "processing_time_ms": 150,
-    "language_model": "en_core_web_sm",
-    "entities_found": 1,
-    "entities_geocoded": 1
+  "geocoding": {
+    "query": {
+      "text": "Breaking news from Paris, France about flooding in the Seine river."
+    },
+    "detected_language": "en",
+    "model_name": "en_core_web_sm",
+    "entities_found": 2,
+    "entities_geocoded": 1,
+    "processing_time_ms": 150.0,
+    "all_locations": [
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+        "properties": {
+          "name": "Paris",
+          "country": "FR",
+          "country_name": "France",
+          "type": "GPE",
+          "score": 2.17
+        }
+      }
+    ]
   }
 }
 ```
@@ -98,10 +109,14 @@ curl -X POST http://localhost:8000/api/extract-location \
 curl http://localhost:8000/health
 ```
 
+```json
+{ "status": "ok" }
+```
+
 ## Architecture
 
 ```
-Input Text → Language Detection → spaCy NER → geonamescache Geocoder → Event Location Inference → JSON
+Input Text → Language Detection → spaCy NER → geonamescache Geocoder → Event Location Inference → GeoJSON FeatureCollection
 ```
 
 ## Configuration

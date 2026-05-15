@@ -7,7 +7,7 @@ This document provides guidance for AI agents developing or maintaining this ser
 The service follows a 4-stage NLP pipeline:
 
 ```
-Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event Location Inference → JSON
+Input Text → Language Detection → spaCy NER → geonamescache Geocoder → Event Location Inference → GeoJSON FeatureCollection
 ```
 
 ### Components
@@ -19,6 +19,8 @@ Input Text → Language Detection → spaCy NER → text2geo Geocoder → Event 
 | `src/geocoding.py`              | `GeoPipeline` class + `GeoResult` dataclass + internal text2geo wrapper (injectable geocode_fn)                                                                                              |
 | `src/disambiguator.py`          | `DisambiguatePipeline` class + `DisambiguateResult` dataclass + event location inference (Stage 4)                                                                                           |
 | `src/orchestrator.py`           | `LocationPipeline` class composing all 4 stages into a single `.run(text) -> LocationResult` seam                                                                                            |
+| `src/app.py`                    | FastAPI server with `POST /api/extract-location`, `GET /health`, injectable pipeline via `Depends`                                                                                           |
+| `src/schemas.py`                | Pydantic request/response schemas (GeoJSON FeatureCollection, GeoFeature, GeocodingMetadata, etc.)                                                                                           |
 | `src/evaluation/__init__.py`    | Pure evaluation computation: `evaluate()`, `evaluate_geocoding()`, `evaluate_event_location()`                                                                                               |
 | `src/evaluation/runner.py`      | Orchestration: `run_pipeline_on_corpus()`, `evaluate_corpus()`, `evaluate_all_corpora()`, `run_full_pipeline_on_corpus()`, `evaluate_geocoding_corpus()`, `evaluate_geocoding_all_corpora()` |
 | `src/evaluation/__main__.py`    | CLI entry point: `uv run python -m src.evaluation` (supports `--geocoding` flag)                                                                                                             |
@@ -174,6 +176,7 @@ docker-compose up --build
 | fastapi    | >=0.135.0 | API server                 |
 | uvicorn    | >=0.30.0  | ASGI server                |
 | pydantic   | >=2.9.0   | Data validation            |
+| httpx      | >=0.28.0  | Async HTTP client (tests)  |
 | ruff       | >=0.9.0   | Linting/formatting         |
 | pytest     | >=9.0.0   | Testing                    |
 
@@ -212,9 +215,12 @@ docker-compose up --build
 ```
 location-extraction-service/
 ├── src/
+│   ├── __init__.py
+│   ├── app.py                # FastAPI server, /health, /api/extract-location, dependency injection
+│   ├── schemas.py            # Pydantic schemas (GeoJSON FeatureCollection, GeoFeature, etc.)
 │   ├── models.py             # Typed dataclasses (EntityMention, GeocodedLocation, LocationResult, etc.)
 │   ├── pipeline.py           # NerPipeline + NerResult + internal detection/NER/model
-│   ├── geocoding.py          # GeoPipeline + GeoResult + internal text2geo wrapper (injectable)
+│   ├── geocoding.py          # GeoPipeline + GeoResult + internal geonamescache wrapper (injectable)
 │   ├── disambiguator.py      # DisambiguatePipeline + DisambiguateResult + event location inference
 │   ├── orchestrator.py       # LocationPipeline composing all 4 stages
 │   ├── evaluation/
@@ -230,6 +236,7 @@ location-extraction-service/
 │   │   └── test_evaluation.py
 │   ├── integration/
 │   │   ├── conftest.py
+│   │   ├── test_api.py              # FastAPI integration tests (mock pipeline)
 │   │   ├── test_nlp_manager.py
 │   │   ├── test_pipeline_integration.py
 │   │   └── test_evaluation_integration.py

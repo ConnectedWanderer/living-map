@@ -5,8 +5,8 @@ import os
 import uvicorn
 from fastapi import Depends, FastAPI
 
-from src.orchestrator import LocationPipeline
-from src.schemas import (
+from .orchestrator import LocationPipeline
+from .schemas import (
     ExtractLocationRequest,
     ExtractLocationResponse,
     GeocodingMetadata,

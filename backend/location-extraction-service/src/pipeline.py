@@ -8,7 +8,7 @@ import langdetect
 import spacy
 from langdetect import DetectorFactory, LangDetectException
 
-from src.models import EntityMention
+from .models import EntityMention
 
 DetectorFactory.seed = 0
 

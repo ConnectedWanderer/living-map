@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .coverage
+*.egg-info/
 
 # Environment
 .env

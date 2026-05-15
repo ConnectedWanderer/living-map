@@ -237,6 +237,8 @@ def infer_event_location(locations: list[dict], text: str) -> dict | None:
 
 ## Output Format
 
+### Internal: `LocationResult` Dataclass
+
 `LocationPipeline.run(text)` returns a `LocationResult` dataclass:
 
 | Field                | Type                    | Description                              |
@@ -248,6 +250,26 @@ def infer_event_location(locations: list[dict], text: str) -> dict | None:
 | `entities_found`     | `int`                   | Number of NER entities extracted         |
 | `entities_geocoded`  | `int`                   | Number successfully geocoded             |
 | `processing_time_ms` | `float`                 | Total pipeline time in milliseconds      |
+
+### API: GeoJSON FeatureCollection
+
+The FastAPI server serializes the `LocationResult` into a GeoJSON FeatureCollection with a `geocoding` metadata block:
+
+| Field         | Type             | Description                                                    |
+| ------------- | ---------------- | -------------------------------------------------------------- |
+| `type`        | `str`            | `"FeatureCollection"`                                          |
+| `features`    | `list[GeoFeature]` | Array containing the primary event location as a GeoJSON Feature |
+| `geocoding`   | `GeocodingMetadata` | Metadata block with query info, counts, and all scored locations |
+
+Each `GeoFeature` (primary location):
+
+| Field        | Type                      | Description                            |
+| ------------ | ------------------------- | -------------------------------------- |
+| `type`       | `str`                     | `"Feature"`                            |
+| `geometry`   | `dict`                    | `{"type": "Point", "coordinates": [lon, lat]}` |
+| `properties` | `GeoFeatureProperties`    | `name`, `country`, `country_name`, `confidence` |
+
+The `GeocodingMetadata` block replicates pipeline diagnostics and includes `all_locations` as `ScoredFeature` objects (same GeoJSON Feature shape with `type`, `score` properties).
 
 ### Typed Intermediate Records
 
@@ -262,30 +284,40 @@ All pipeline stages exchange typed dataclasses rather than raw dicts:
 
 ```json
 {
-  "detected_language": "fr",
-  "model_name": "fr_core_news_sm",
-  "event_location": {
-    "text": "Paris",
-    "lat": 48.8566,
-    "lon": 2.3522,
-    "country": "FR",
-    "country_name": "France",
-    "confidence": 0.85
-  },
-  "all_locations": [
+  "type": "FeatureCollection",
+  "features": [
     {
-      "text": "Paris",
-      "lat": 48.8566,
-      "lon": 2.3522,
-      "country": "FR",
-      "country_name": "France",
-      "type": "GPE",
-      "score": 2.17
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+      "properties": {
+        "name": "Paris",
+        "country": "FR",
+        "country_name": "France",
+        "confidence": 0.85
+      }
     }
   ],
-  "entities_found": 2,
-  "entities_geocoded": 2,
-  "processing_time_ms": 150.0
+  "geocoding": {
+    "query": { "text": "Article text content here..." },
+    "detected_language": "fr",
+    "model_name": "fr_core_news_sm",
+    "entities_found": 2,
+    "entities_geocoded": 2,
+    "processing_time_ms": 150.0,
+    "all_locations": [
+      {
+        "type": "Feature",
+        "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+        "properties": {
+          "name": "Paris",
+          "country": "FR",
+          "country_name": "France",
+          "type": "GPE",
+          "score": 2.17
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -318,10 +350,16 @@ Content-Type: application/json
 
 {
   "text": "Article text content here...",
-  "language": "auto"  // "auto" for detection, or "en"/"fr" for specific
+  "language": "auto"
 }
 
-Response: Location extraction result (see Output Format)
+Response: GeoJSON FeatureCollection with geocoding metadata (see Output Format)
+```
+
+```
+GET /health
+
+Response: {"status": "ok"}
 ```
 
 ### Performance Targets
@@ -413,6 +451,8 @@ backend/
 │   └── ...
 ├── location-extraction-service/     # Python microservice
 │   ├── src/
+│   │   ├── app.py                   # FastAPI server, /health, /api/extract-location, dependency injection
+│   │   ├── schemas.py               # Pydantic schemas (GeoJSON FeatureCollection, GeoFeature, etc.)
 │   │   ├── models.py                # Typed dataclasses: EntityMention, GeocodedLocation, LocationResult, etc.
 │   │   ├── pipeline.py              # NerPipeline + NerResult + internal detection/NER/model
 │   │   ├── geocoding.py             # GeoPipeline + GeoResult + internal geonamescache wrapper (injectable)
@@ -432,6 +472,7 @@ backend/
 │   │   │   └── test_evaluation.py
 │   │   ├── integration/
 │   │   │   ├── conftest.py
+│   │   │   ├── test_api.py              # FastAPI integration tests (mock pipeline)
 │   │   │   ├── test_nlp_manager.py
 │   │   │   └── test_pipeline_integration.py
 │   │   └── corpus/                   # Evaluation test corpora
@@ -475,7 +516,7 @@ COPY src/ ./src/
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "src:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ### Environment Variables
@@ -496,9 +537,11 @@ These default to small models (~10MB) for fast processing. Override at runtime i
 - [x] geonamescache offline geocoding
 - [x] Basic event location inference
 - [x] Docker containerization
-- [x] FastAPI server
-- [x] HTTP API endpoint
+- [x] FastAPI server with GeoJSON FeatureCollection response
+- [x] HTTP API endpoint (POST /api/extract-location, GET /health)
+- [x] Pydantic request/response schemas
 - [x] Unit tests
+- [x] Integration tests (mocked pipeline)
 
 ### Phase 1b: Evaluation Framework
 

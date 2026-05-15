@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 import geonamescache
 
-from src.models import EntityMention, GeocodedLocation
+from .models import EntityMention, GeocodedLocation
 
 
 @dataclass

@@ -5,12 +5,12 @@ import glob
 import json
 import os
 
-from src.disambiguator import DisambiguatePipeline
-from src.evaluation import _sum_metrics, evaluate, evaluate_event_location, evaluate_geocoding
-from src.geocoding import GeoPipeline
-from src.models import EntityMention
-from src.orchestrator import LocationPipeline
-from src.pipeline import NerPipeline
+from ..disambiguator import DisambiguatePipeline
+from . import _sum_metrics, evaluate, evaluate_event_location, evaluate_geocoding
+from ..geocoding import GeoPipeline
+from ..models import EntityMention
+from ..orchestrator import LocationPipeline
+from ..pipeline import NerPipeline
 
 DEFAULT_CORPUS_DIR = "tests/corpus"
 

@@ -2,10 +2,10 @@
 
 import time
 
-from src.disambiguator import DisambiguatePipeline
-from src.geocoding import GeoPipeline
-from src.models import LocationResult
-from src.pipeline import NerPipeline
+from .disambiguator import DisambiguatePipeline
+from .geocoding import GeoPipeline
+from .models import LocationResult
+from .pipeline import NerPipeline
 
 
 class LocationPipeline:

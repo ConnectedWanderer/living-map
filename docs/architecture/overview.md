@@ -59,7 +59,7 @@ backend/
 ├── location-extraction-service/  # Python NLP microservice
 │   ├── src/             # FastAPI application
 │   ├── Dockerfile
-│   ├── requirements.txt
+│   ├── pyproject.toml
 │   └── README.md
 └── .env                 # Configuration (PORT, external API URLs)
 ```
@@ -105,7 +105,7 @@ sequenceDiagram
 | Real-time           | Polling (60s)          | MVP simplicity, sufficient for low-update-frequency data |
 | Caching             | In-memory (node-cache) | Simple, effective for MVP scale                          |
 | Responsive          | Mobile-first CSS       | Essential for mobile-friendly requirement                |
-| Location Extraction | spaCy + text2geo       | Offline NLP, zero API costs, global coverage             |
+| Location Extraction | spaCy + geonamescache   | Offline NLP, zero API costs, global coverage             |
 
 ## Constraints & Assumptions
 
