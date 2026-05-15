@@ -27,7 +27,7 @@ graph LR
 
 **Note**: `mock-feed` (port 3001) is a standalone service that simulates an external RSS feed for testing. The Location Extraction service is described in detail in [location-extraction.md](./location-extraction.md).
 
-## Frontend Architecture
+## Frontend Architecture (planned)
 
 ```
 frontend/
@@ -44,7 +44,7 @@ frontend/
 
 ```
 backend/
-├── src/
+├── src/ (planned)
 │   ├── routes/          # API endpoints
 │   ├── services/        # External API integrations
 │   │   └── location-service.ts   # HTTP client for location extraction

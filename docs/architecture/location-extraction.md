@@ -284,60 +284,7 @@ All pipeline stages exchange typed dataclasses rather than raw dicts:
 | `EntityResult`     | `text`, `type`, `start`, `end`, `geocoded`, `geocoding?`          |
 | `EventLocation`    | `text`, `lat`, `lon`, `country`, `country_name`, `confidence`     |
 
-```json
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
-      "properties": {
-        "name": "Paris",
-        "country": "FR",
-        "country_name": "France",
-        "confidence": 0.85
-      }
-    }
-  ],
-  "geocoding": {
-    "query": { "text": "Article text content here..." },
-    "detected_language": "fr",
-    "model_name": "fr_core_news_sm",
-    "entities_found": 2,
-    "entities_geocoded": 1,
-    "processing_time_ms": 150.0,
-    "all_entities": [
-      {
-        "type": "Feature",
-        "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
-        "properties": {
-          "name": "Paris",
-          "type": "GPE",
-          "start": 20,
-          "end": 25,
-          "geocoded": true,
-          "geocoding": {
-            "country": "FR",
-            "country_name": "France",
-            "score": 2.17
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": null,
-        "properties": {
-          "name": "France",
-          "type": "GPE",
-          "start": 27,
-          "end": 33,
-          "geocoded": false
-        }
-      }
-    ]
-  }
-}
-```
+See the [README.md](../../backend/location-extraction-service/README.md) for the full GeoJSON FeatureCollection response example.
 
 ## Service Architecture
 
@@ -391,59 +338,7 @@ Response: {"status": "ok"}
 
 ## Evaluation Module
 
-Evaluation framework for measuring pipeline quality. Covers both NER (Stages 1-2) and geocoding + event location (Stages 3-4).
-
-### Stages 1-2: NER Evaluation (Precision/Recall/F1)
-
-Defined in [ADR-002](../decisions/ADR-002-ner-evaluation-protocol.md).
-
-**Approach**: Entity-level exact match — a prediction is correct only when `text`, `start`, `end`, and `label` all match the expected annotation exactly. No partial credit.
-
-**Metrics** computed overall and per entity type (GPE, LOC):
-
-| Metric    | Meaning                               |
-| --------- | ------------------------------------- |
-| Precision | TP / (TP + FP)                        |
-| Recall    | TP / (TP + FN)                        |
-| Entity F1 | Harmonic mean of precision and recall |
-
-The pipeline runner was split in [ADR-006](../decisions/ADR-006-pipeline-architectural-improvements.md): `run_pipeline_on_corpus()` handles orchestration, `evaluate_corpus()` is a thin composition.
-
-### Stages 3-4: Geocoding and Event Location Evaluation
-
-**Geocoding Metrics**:
-
-| Metric           | Meaning                                              |
-| ---------------- | ---------------------------------------------------- |
-| Geocoding Rate   | Fraction of expected locations successfully geocoded |
-| Country Accuracy | Among geocoded, fraction with correct country code   |
-
-**Event Location Metrics**:
-
-| Metric   | Meaning                                                         |
-| -------- | --------------------------------------------------------------- |
-| Accuracy | Fraction of expected event locations where text + country match |
-
-Corpus samples can include optional `expected_geocoded_locations` and `expected_event_location` fields. When present, `evaluate_geocoding_corpus()` and `evaluate_geocoding_all_corpora()` compute geocoding metrics.
-
-### Usage
-
-```bash
-cd backend/location-extraction-service
-# NER evaluation (single corpus)
-uv run python -m src.evaluation tests/corpus/en_simple.json
-# NER evaluation (all corpora)
-uv run python -m src.evaluation
-# Stages 3-4 evaluation (single corpus)
-uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json
-
-# Geocoding evaluation (all corpora)
-uv run python -m src.evaluation --geocoding
-```
-
-### Corpus
-
-Six JSON files in `tests/corpus/` (simple, paragraphs, edge cases × EN, FR), totaling 200+ entities per language. Corpus samples optionally include `expected_geocoded_locations` (list of `{text, country}`) and `expected_event_location` (`{text, country}`) for geocoding evaluation.
+Quality evaluation covers NER (Stages 1-2) and Geocoding + Event Location (Stages 3-4). See the [Evaluation Guide](../evaluation.md) for metrics definitions, CLI commands, corpus format, and interpretation guidance.
 
 ## Technology Stack
 
@@ -508,34 +403,7 @@ backend/
 
 ## Dockerfile
 
-```dockerfile
-FROM python:3.14-slim
-
-WORKDIR /app
-
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    UV_COMPILE_BYTECODE=1 \
-    SPACY_EN_MODEL=en_core_web_sm \
-    SPACY_FR_MODEL=fr_core_news_sm
-
-RUN pip install --no-cache-dir uv
-
-COPY pyproject.toml .
-RUN uv sync --frozen --no-dev
-
-# Download spaCy models (using env variables for flexibility)
-RUN --mount=type=cache,target=/root/.cache \
-    uv run python -m spacy download ${SPACY_EN_MODEL} && \
-    uv run python -m spacy download ${SPACY_FR_MODEL}
-
-
-COPY src/ ./src/
-
-EXPOSE 8000
-
-CMD ["uv", "run", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
+See the [Dockerfile](../../backend/location-extraction-service/Dockerfile) for build configuration.
 
 ### Environment Variables
 

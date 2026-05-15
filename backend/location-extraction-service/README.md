@@ -148,6 +148,13 @@ Input Text → Language Detection → spaCy NER → geonamescache Geocoder → E
 | `SPACY_EN_MODEL` | `en_core_web_sm`  | English spaCy model |
 | `SPACY_FR_MODEL` | `fr_core_news_sm` | French spaCy model  |
 
+## Code Quality
+
+```bash
+uv run ruff check .     # Lint
+uv run ruff format .    # Format
+```
+
 ## Evaluation
 
 See the [Evaluation Guide](../../docs/evaluation.md) for details on running NER and geocoding quality evaluations:

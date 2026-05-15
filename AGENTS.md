@@ -24,3 +24,13 @@ You can also run the check manually:
 ```bash
 bash scripts/format.sh --check
 ```
+
+## Documentation Conventions
+
+Each component follows a consistent documentation structure:
+
+| File        | Audience  | Content                                                                                                           |
+| ----------- | --------- | ----------------------------------------------------------------------------------------------------------------- |
+| `README.md` | Humans    | What, why, quick start, API usage, config, deployment                                                             |
+| `AGENTS.md` | AI agents | Commands, code conventions, patterns, troubleshooting. Thin — references README + `docs/` rather than duplicating |
+| `docs/`     | Both      | Deep architecture, ADRs, evaluation guides                                                                        |

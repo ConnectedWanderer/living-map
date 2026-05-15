@@ -53,3 +53,7 @@ Edit `src/utils/generator.js`:
 - `uuid`: Unique ID generation
 
 No external RSS libraries - uses custom XML builder.
+
+## Related Documentation
+
+- [README.md](README.md) — Setup, endpoints, configuration
