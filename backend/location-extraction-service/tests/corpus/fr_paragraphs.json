@@ -40,7 +40,49 @@
           "start": 185,
           "end": 192
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Paris",
+          "lat": 48.8534951,
+          "lon": 2.3483915,
+          "country": "FR"
+        },
+        {
+          "text": "Berlin",
+          "lat": 52.5173885,
+          "lon": 13.3951309,
+          "country": "DE"
+        },
+        {
+          "text": "Madrid",
+          "lat": 40.416782,
+          "lon": -3.703507,
+          "country": "ES"
+        },
+        {
+          "text": "Rome",
+          "lat": 41.8933203,
+          "lon": 12.4829321,
+          "country": "IT"
+        },
+        {
+          "text": "Seine",
+          "lat": 48.7340697,
+          "lon": 2.4448155,
+          "country": "FR"
+        },
+        {
+          "text": "Londres",
+          "lat": 51.5074456,
+          "lon": -0.1277653,
+          "country": "GB"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Paris",
+        "country": "FR"
+      }
     },
     {
       "text": "La mer Méditerranée s'est considérablement réchauffée au cours de la dernière décennie, selon une nouvelle étude de l'Université de Barcelone. Les chercheurs à Marseille ont collecté des données des stations de surveillance le long de la côte du sud de la France. Les résultats ont des implications pour des villes comme Nice, Valence et Gênes.",
@@ -88,7 +130,55 @@
           "start": 338,
           "end": 343
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Méditerranée",
+          "lat": 35.0000035,
+          "lon": 19.9999957,
+          "country": null
+        },
+        {
+          "text": "Barcelone",
+          "lat": 41.3825802,
+          "lon": 2.177073,
+          "country": "ES"
+        },
+        {
+          "text": "Marseille",
+          "lat": 43.2963986,
+          "lon": 5.3777888,
+          "country": "FR"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        },
+        {
+          "text": "Nice",
+          "lat": 43.7009358,
+          "lon": 7.2683912,
+          "country": "FR"
+        },
+        {
+          "text": "Valence",
+          "lat": 39.4697065,
+          "lon": -0.3763353,
+          "country": "ES"
+        },
+        {
+          "text": "Gênes",
+          "lat": 44.40726,
+          "lon": 8.9338624,
+          "country": "IT"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Barcelone",
+        "country": "ES"
+      }
     },
     {
       "text": "La forêt amazonienne s'étend sur neuf pays d'Amérique du Sud. Les taux de déforestation au Brésil ont suscité des critiques internationales. Le bassin du fleuve Amazone abrite des milliers d'espèces. Les communautés autochtones du Pérou, de la Colombie et de l'Équateur sont en première ligne des efforts de conservation.",
@@ -130,7 +220,49 @@
           "start": 261,
           "end": 269
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Amérique du Sud",
+          "lat": -21.0002179,
+          "lon": -61.0006565,
+          "country": null
+        },
+        {
+          "text": "Brésil",
+          "lat": -10.3333333,
+          "lon": -53.2,
+          "country": "BR"
+        },
+        {
+          "text": "Amazone",
+          "lat": -2.5922521,
+          "lon": -57.175954,
+          "country": "BR"
+        },
+        {
+          "text": "Pérou",
+          "lat": -6.8699697,
+          "lon": -75.0458515,
+          "country": "PE"
+        },
+        {
+          "text": "Colombie",
+          "lat": 4.099917,
+          "lon": -72.9088133,
+          "country": "CO"
+        },
+        {
+          "text": "Équateur",
+          "lat": -1.3397668,
+          "lon": -79.3666965,
+          "country": "EC"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Brésil",
+        "country": "BR"
+      }
     },
     {
       "text": "La vallée de la Loire en France est célèbre pour ses vignobles et ses châteaux historiques. Tours est la ville principale, tandis que des petites villes comme Amboise et Chinon offrent des expériences intimes. La rivière du Cher traverse la région, passant par des villages qui existent depuis des siècles.",
@@ -172,7 +304,49 @@
           "start": 224,
           "end": 228
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Loire",
+          "lat": 45.7538536,
+          "lon": 4.0454737,
+          "country": "FR"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        },
+        {
+          "text": "Tours",
+          "lat": 47.3900474,
+          "lon": 0.6889268,
+          "country": "FR"
+        },
+        {
+          "text": "Amboise",
+          "lat": 47.4110351,
+          "lon": 0.983698,
+          "country": "FR"
+        },
+        {
+          "text": "Chinon",
+          "lat": 47.1667182,
+          "lon": 0.2402095,
+          "country": "FR"
+        },
+        {
+          "text": "Cher",
+          "lat": 47.0248824,
+          "lon": 2.5753334,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "France",
+        "country": "FR"
+      }
     },
     {
       "text": "Des diplomates du Japon, de la Corée du Sud et de la Chine se sont réunis à Tokyo pour discuter de la sécurité régionale. Les entretiens ont porté sur les accords commerciaux, les frontières maritimes en mer de Chine orientale et les réponses conjointes aux catastrophes naturelles.",
@@ -208,7 +382,37 @@
           "start": 204,
           "end": 226
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Japon",
+          "lat": 36.5748441,
+          "lon": 139.2394179,
+          "country": "JP"
+        },
+        {
+          "text": "Corée du Sud",
+          "lat": 36.638392,
+          "lon": 127.6961188,
+          "country": "KR"
+        },
+        {
+          "text": "Chine",
+          "lat": 35.000074,
+          "lon": 104.999927,
+          "country": "CN"
+        },
+        {
+          "text": "Tokyo",
+          "lat": 35.6768601,
+          "lon": 139.7638947,
+          "country": "JP"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Japon",
+        "country": "JP"
+      }
     },
     {
       "text": "La ville indienne de Mumbai a été frappée par de graves inondations de mousson, perturbant les transports et la vie quotidienne. Les autorités à Delhi et à Kolkata sont en état d'alerte alors que le système orageux se déplace vers l'est. Le Gange atteint des niveaux dangereux dans plusieurs districts de l'Uttar Pradesh.",
@@ -244,7 +448,43 @@
           "start": 307,
           "end": 320
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mumbai",
+          "lat": 19.054999,
+          "lon": 72.8692035,
+          "country": "IN"
+        },
+        {
+          "text": "Delhi",
+          "lat": 28.6138954,
+          "lon": 77.2090057,
+          "country": "IN"
+        },
+        {
+          "text": "Kolkata",
+          "lat": 22.5726459,
+          "lon": 88.3638953,
+          "country": "IN"
+        },
+        {
+          "text": "Gange",
+          "lat": 25.7202249,
+          "lon": 84.1052245,
+          "country": "IN"
+        },
+        {
+          "text": "Uttar Pradesh",
+          "lat": 27.1303344,
+          "lon": 80.859666,
+          "country": "IN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Mumbai",
+        "country": "IN"
+      }
     },
     {
       "text": "Les dirigeants africains se sont réunis à Nairobi pour un sommet sur le développement durable. Les présidents du Kenya, du Nigeria et de l'Afrique du Sud ont signé une déclaration commune. La région du Sahara a été identifiée comme prioritaire pour l'investissement dans les énergies renouvelables.",
@@ -280,7 +520,43 @@
           "start": 202,
           "end": 208
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Nairobi",
+          "lat": -1.302398,
+          "lon": 36.8288509,
+          "country": "KE"
+        },
+        {
+          "text": "Kenya",
+          "lat": 1.4419683,
+          "lon": 38.4313975,
+          "country": "KE"
+        },
+        {
+          "text": "Nigeria",
+          "lat": 9.6000359,
+          "lon": 7.9999721,
+          "country": "NG"
+        },
+        {
+          "text": "Afrique du Sud",
+          "lat": -28.8166236,
+          "lon": 24.991639,
+          "country": "ZA"
+        },
+        {
+          "text": "Sahara",
+          "lat": 22.25,
+          "lon": 9.8,
+          "country": "DZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Nairobi",
+        "country": "KE"
+      }
     },
     {
       "text": "Des archéologues travaillant près du Caire ont découvert une tombe antique importante dans le delta du Nil. Le ministère égyptien du Tourisme s'attend à ce que cette découverte stimule le nombre de visiteurs à Louxor et dans la Vallée des Rois. Le tourisme reste un secteur vital pour l'économie égyptienne.",
@@ -310,7 +586,37 @@
           "start": 228,
           "end": 243
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Caire",
+          "lat": 30.0332516,
+          "lon": 31.5621651,
+          "country": "EG"
+        },
+        {
+          "text": "Nil",
+          "lat": 22.724378,
+          "lon": 32.1053309,
+          "country": "EG"
+        },
+        {
+          "text": "Louxor",
+          "lat": 25.702096,
+          "lon": 32.647186,
+          "country": "EG"
+        },
+        {
+          "text": "Vallée des Rois",
+          "lat": 25.7404899,
+          "lon": 32.6017581,
+          "country": "EG"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Caire",
+        "country": "EG"
+      }
     },
     {
       "text": "L'Australie connaît un essor du tourisme international, avec Sydney et Melbourne enregistrant des nombres record de visiteurs. Les touristes affluent vers la Grande Barrière de Corail au Queensland et l'outback du Territoire du Nord. La Nouvelle-Zélande a également vu une augmentation des arrivées en provenance d'Asie et des États-Unis.",
@@ -370,7 +676,67 @@
           "start": 327,
           "end": 337
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Australie",
+          "lat": -24.7761086,
+          "lon": 134.755,
+          "country": "AU"
+        },
+        {
+          "text": "Sydney",
+          "lat": -33.8698439,
+          "lon": 151.2082848,
+          "country": "AU"
+        },
+        {
+          "text": "Melbourne",
+          "lat": -37.8142454,
+          "lon": 144.9631732,
+          "country": "AU"
+        },
+        {
+          "text": "Grande Barrière de Corail",
+          "lat": -16.35,
+          "lon": 145.9,
+          "country": "AU"
+        },
+        {
+          "text": "Queensland",
+          "lat": -22.1646782,
+          "lon": 144.5844903,
+          "country": "AU"
+        },
+        {
+          "text": "Territoire du Nord",
+          "lat": -19.8516101,
+          "lon": 133.2303375,
+          "country": "AU"
+        },
+        {
+          "text": "Nouvelle-Zélande",
+          "lat": -41.5000831,
+          "lon": 172.8344077,
+          "country": "NZ"
+        },
+        {
+          "text": "Asie",
+          "lat": 51.2086975,
+          "lon": 89.2343748,
+          "country": null
+        },
+        {
+          "text": "États-Unis",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Australie",
+        "country": "AU"
+      }
     },
     {
       "text": "Le canal de Panama fait face à une réduction du trafic en raison de la sécheresse au Panama. Les navires voyageant entre l'océan Atlantique et l'océan Pacifique sont obligés de prendre des routes plus longues autour du cap Horn. La situation a perturbé les chaînes d'approvisionnement pour les ports des États-Unis et d'Europe.",
@@ -418,7 +784,43 @@
           "start": 320,
           "end": 326
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Panama",
+          "lat": 8.559559,
+          "lon": -81.1308434,
+          "country": "PA"
+        },
+        {
+          "text": "Atlantique",
+          "lat": 13.581921,
+          "lon": -38.320312,
+          "country": null
+        },
+        {
+          "text": "Pacifique",
+          "lat": 48.873054,
+          "lon": 2.3796868,
+          "country": "FR"
+        },
+        {
+          "text": "États-Unis",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        },
+        {
+          "text": "Europe",
+          "lat": 51.0,
+          "lon": 10.0,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Panama",
+        "country": "PA"
+      }
     },
     {
       "text": "Une nouvelle ligne ferroviaire à grande vitesse reliant Mexico à Guadalajara a été annoncée. Le projet devrait réduire de moitié le temps de trajet et stimuler le commerce entre le centre du Mexique et la côte Pacifique. Des ingénieurs d'Espagne et du Japon ont été engagés pour la conception.",
@@ -460,7 +862,49 @@
           "start": 252,
           "end": 257
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mexico",
+          "lat": 23.6585116,
+          "lon": -102.0077097,
+          "country": "MX"
+        },
+        {
+          "text": "Guadalajara",
+          "lat": 20.6720375,
+          "lon": -103.338396,
+          "country": "MX"
+        },
+        {
+          "text": "Mexique",
+          "lat": 23.6585116,
+          "lon": -102.0077097,
+          "country": "MX"
+        },
+        {
+          "text": "Pacifique",
+          "lat": 48.873054,
+          "lon": 2.3796868,
+          "country": "FR"
+        },
+        {
+          "text": "Espagne",
+          "lat": 39.3260685,
+          "lon": -4.8379791,
+          "country": "ES"
+        },
+        {
+          "text": "Japon",
+          "lat": 36.5748441,
+          "lon": 139.2394179,
+          "country": "JP"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Mexico",
+        "country": "MX"
+      }
     },
     {
       "text": "Les entreprises technologiques de la Silicon Valley recrutent de plus en plus d'ingénieurs de Bangalore et d'Hyderabad. Cette évolution reflète l'importance croissante du secteur technologique indien sur le marché mondial. Google et Microsoft ont agrandi leurs campus à Bengaluru et Gurgaon.",
@@ -496,7 +940,43 @@
           "start": 283,
           "end": 290
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Silicon Valley",
+          "lat": 37.4429964,
+          "lon": -122.1545229,
+          "country": "US"
+        },
+        {
+          "text": "Bangalore",
+          "lat": 12.9767936,
+          "lon": 77.590082,
+          "country": "IN"
+        },
+        {
+          "text": "Hyderabad",
+          "lat": 17.360589,
+          "lon": 78.4740613,
+          "country": "IN"
+        },
+        {
+          "text": "Bengaluru",
+          "lat": 12.9767936,
+          "lon": 77.590082,
+          "country": "IN"
+        },
+        {
+          "text": "Gurgaon",
+          "lat": 28.4646148,
+          "lon": 77.0299194,
+          "country": "IN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Bangalore",
+        "country": "IN"
+      }
     },
     {
       "text": "Le bassin du Mékong en Asie du Sud-Est est confronté à des défis environnementaux liés à la construction de barrages. Les pays comme le Cambodge, le Laos, la Thaïlande et le Viêt Nam ont des intérêts contradictoires concernant la gestion de l'eau. La Commission du Mékong a appelé à une plus grande coopération entre les États membres.",
@@ -544,7 +1024,49 @@
           "start": 251,
           "end": 271
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mékong",
+          "lat": 20.0566065,
+          "lon": 101.9933152,
+          "country": "LA"
+        },
+        {
+          "text": "Asie du Sud-Est",
+          "lat": 49.2189027,
+          "lon": 4.0216072,
+          "country": "FR"
+        },
+        {
+          "text": "Cambodge",
+          "lat": 12.5433216,
+          "lon": 104.8144914,
+          "country": "KH"
+        },
+        {
+          "text": "Laos",
+          "lat": 20.0171109,
+          "lon": 103.378253,
+          "country": "LA"
+        },
+        {
+          "text": "Thaïlande",
+          "lat": 14.8971921,
+          "lon": 100.83273,
+          "country": "TH"
+        },
+        {
+          "text": "Viêt Nam",
+          "lat": 15.9266657,
+          "lon": 107.9650855,
+          "country": "VN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Cambodge",
+        "country": "KH"
+      }
     },
     {
       "text": "Le Moyen-Orient connaît un essor touristique, avec Dubaï et Abou Dabi en tête de la reprise. Les visiteurs d'Europe et d'Asie sont attirés par les centres commerciaux, la cuisine et les paysages désertiques de la région. L'Arabie saoudite a ouvert ses frontières aux touristes internationaux, promouvant des destinations comme Riyad et Djeddah.",
@@ -598,7 +1120,61 @@
           "start": 336,
           "end": 343
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Moyen-Orient",
+          "lat": 48.8479455,
+          "lon": 2.3518603,
+          "country": "FR"
+        },
+        {
+          "text": "Dubaï",
+          "lat": 25.2647227,
+          "lon": 55.2924146,
+          "country": "AE"
+        },
+        {
+          "text": "Abou Dabi",
+          "lat": 24.4538352,
+          "lon": 54.3774014,
+          "country": "AE"
+        },
+        {
+          "text": "Europe",
+          "lat": 51.0,
+          "lon": 10.0,
+          "country": null
+        },
+        {
+          "text": "Asie",
+          "lat": 51.2086975,
+          "lon": 89.2343748,
+          "country": null
+        },
+        {
+          "text": "Arabie saoudite",
+          "lat": 25.6242618,
+          "lon": 42.3528328,
+          "country": "SA"
+        },
+        {
+          "text": "Riyad",
+          "lat": 24.638916,
+          "lon": 46.7160104,
+          "country": "SA"
+        },
+        {
+          "text": "Djeddah",
+          "lat": 21.5504432,
+          "lon": 39.1742363,
+          "country": "SA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Dubaï",
+        "country": "AE"
+      }
     },
     {
       "text": "Une violente tempête hivernale a recouvert une grande partie du Canada et du nord des États-Unis. Des villes comme Toronto, Montréal et Vancouver ont émis des avertissements de voyage. La région des Rocheuses a reçu des chutes de neige records, créant des conditions idéales pour les stations de ski en Colombie-Britannique et en Alberta.",
@@ -652,7 +1228,61 @@
           "start": 330,
           "end": 337
         }
-      ]
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Canada",
+          "lat": 61.0666922,
+          "lon": -107.991707,
+          "country": "CA"
+        },
+        {
+          "text": "États-Unis",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        },
+        {
+          "text": "Toronto",
+          "lat": 43.6534817,
+          "lon": -79.3839347,
+          "country": "CA"
+        },
+        {
+          "text": "Montréal",
+          "lat": 45.5031824,
+          "lon": -73.5698065,
+          "country": "CA"
+        },
+        {
+          "text": "Vancouver",
+          "lat": 49.2608724,
+          "lon": -123.113952,
+          "country": "CA"
+        },
+        {
+          "text": "Rocheuses",
+          "lat": 43.3578532,
+          "lon": -110.917506,
+          "country": "US"
+        },
+        {
+          "text": "Colombie-Britannique",
+          "lat": 55.001251,
+          "lon": -125.002441,
+          "country": "CA"
+        },
+        {
+          "text": "Alberta",
+          "lat": 55.001251,
+          "lon": -115.002136,
+          "country": "CA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Canada",
+        "country": "CA"
+      }
     }
   ]
 }

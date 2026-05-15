@@ -1,4 +1,14 @@
-"""CLI entry point for NER and geocoding evaluation."""
+"""CLI entry point for NER and geocoding evaluation.
+
+Usage:
+    uv run python -m src.evaluation                         # Full evaluation (NER + Geocoding)
+    uv run python -m src.evaluation --ner                    # NER only
+    uv run python -m src.evaluation --geocoding              # Geocoding only
+    uv run python -m src.evaluation corpus.json              # Full on single corpus
+    uv run python -m src.evaluation --ner corpus.json        # NER on single corpus
+    uv run python -m src.evaluation --geocoding corpus.json  # Geocoding on single corpus
+
+"""
 
 import os
 import sys
@@ -7,8 +17,8 @@ from src.evaluation.runner import (
     DEFAULT_CORPUS_DIR,
     evaluate_all_corpora,
     evaluate_corpus,
-    evaluate_geocoding_all_corpora,
-    evaluate_geocoding_corpus,
+    evaluate_geocoding_decoupled_all_corpora,
+    evaluate_geocoding_decoupled_corpus,
 )
 
 _GREEN = "\033[92m"
@@ -111,17 +121,26 @@ def _print_synthesis(result: dict) -> None:
     )
 
 
+def _print_geocoding_metrics(g: dict) -> None:
+    print(f"  Geocoding Rate:    {_fmt(g['geocoding_rate'])}")
+    print(f"  Country Accuracy:  {_fmt(g['country_accuracy'])}")
+    print(
+        f"  Expected: {g['total_expected']}  Geocoded: {g['geocoded']}  Country Matches: {g['country_matches']}"
+    )
+    if g.get("distance_checkable", 0) > 0:
+        print(f"  Mean Distance:     {g['mean_distance_km']:.1f} km")
+        print(f"  Within 1km:        {_fmt(g['within_1km'])}")
+        print(f"  Within 10km:       {_fmt(g['within_10km'])}")
+        print(f"  Within 100km:      {_fmt(g['within_100km'])}")
+        print(f"  Distance Checkable: {g['distance_checkable']}")
+
+
 def _print_geocoding_single_corpus(result: dict) -> None:
     print(f"Corpus: {result['corpus_path']}")
     print(f"Samples: {result['sample_count']}")
     print()
     print("Geocoding Metrics:")
-    g = result["geocoding"]
-    print(f"  Geocoding Rate:  {_fmt(g['geocoding_rate'])}")
-    print(f"  Country Accuracy: {_fmt(g['country_accuracy'])}")
-    print(
-        f"  Expected: {g['total_expected']}  Geocoded: {g['geocoded']}  Country Matches: {g['country_matches']}"
-    )
+    _print_geocoding_metrics(result["geocoding"])
     print()
     print("Event Location Metrics:")
     e = result["event_location"]
@@ -156,12 +175,7 @@ def _print_geocoding_synthesis(result: dict) -> None:
     print()
     print("Aggregate Geocoding Metrics:")
     agg = result["aggregate"]
-    g = agg["geocoding"]
-    print(f"  Geocoding Rate:   {_fmt(g['geocoding_rate'])}")
-    print(f"  Country Accuracy: {_fmt(g['country_accuracy'])}")
-    print(
-        f"  Expected: {g['total_expected']}  Geocoded: {g['geocoded']}  Country Matches: {g['country_matches']}"
-    )
+    _print_geocoding_metrics(agg["geocoding"])
     print()
     print("Aggregate Event Location Metrics:")
     e = agg["event_location"]
@@ -172,40 +186,66 @@ def _print_geocoding_synthesis(result: dict) -> None:
     for c in result["corpora"]:
         g = c["geocoding"]
         ev = c["event_location"]
-        print(
-            f"  {os.path.basename(c['corpus_path']):30s}  {c['sample_count']:3d} samples    "
-            f"Geo={_fmt(g['geocoding_rate'])}  Ctry={_fmt(g['country_accuracy'])}  "
-            f"Event={_fmt(ev['accuracy']) if ev['expected'] > 0 else 'N/A'}"
-        )
+        parts = [f"  {os.path.basename(c['corpus_path']):30s}  {c['sample_count']:3d} samples"]
+        parts.append(f"  Geo={_fmt(g['geocoding_rate'])}")
+        parts.append(f"  Ctry={_fmt(g['country_accuracy'])}")
+        if g.get("distance_checkable", 0) > 0:
+            parts.append(f"  Dist={g['mean_distance_km']:.1f}km")
+            parts.append(f"  10km={_fmt(g['within_10km'])}")
+        parts.append(f"  Event={_fmt(ev['accuracy']) if ev['expected'] > 0 else 'N/A'}")
+        print("".join(parts))
+
+
+def _parse_args() -> tuple[bool, bool, str | None]:
+    """Parse CLI arguments.
+
+    Returns:
+        Tuple of (run_ner, run_geocoding, corpus_path_or_None).
+
+    """
+    args = sys.argv[1:]
+    run_ner = "--ner" in args
+    run_geocoding = "--geocoding" in args
+
+    if not run_ner and not run_geocoding:
+        run_ner = True
+        run_geocoding = True
+
+    positional = [a for a in args if not a.startswith("--")]
+    corpus_path = positional[0] if positional else None
+    return run_ner, run_geocoding, corpus_path
+
+
+def _run_ner(corpus_path: str | None) -> None:
+    if corpus_path:
+        result = evaluate_corpus(corpus_path)
+        _print_single_corpus(result)
+    else:
+        result = evaluate_all_corpora()
+        _print_synthesis(result)
+
+
+def _run_geocoding(corpus_path: str | None) -> None:
+    if corpus_path:
+        result = evaluate_geocoding_decoupled_corpus(corpus_path)
+        _print_geocoding_single_corpus(result)
+    else:
+        result = evaluate_geocoding_decoupled_all_corpora()
+        _print_geocoding_synthesis(result)
 
 
 def main():
-    """CLI entry point for evaluation.
+    """CLI entry point for evaluation."""
+    run_ner, run_geocoding, corpus_path = _parse_args()
 
-    Usage:
-        uv run python -m src.evaluation                    # Aggregate NER evaluation
-        uv run python -m src.evaluation <corpus.json>      # Single corpus NER evaluation
-        uv run python -m src.evaluation --geocoding       # Aggregate geocoding evaluation
-        uv run python -m src.evaluation --geocoding <corpus.json>  # Single corpus geocoding evaluation
+    if run_ner:
+        _run_ner(corpus_path)
 
-    """
-    args = [a for a in sys.argv[1:] if a != "--geocoding"]
-    geocoding_mode = "--geocoding" in sys.argv[1:]
+    if run_ner and run_geocoding:
+        print()
 
-    if geocoding_mode:
-        if len(args) < 1:
-            result = evaluate_geocoding_all_corpora()
-            _print_geocoding_synthesis(result)
-        else:
-            result = evaluate_geocoding_corpus(args[0])
-            _print_geocoding_single_corpus(result)
-    else:
-        if len(args) < 1:
-            result = evaluate_all_corpora()
-            _print_synthesis(result)
-        else:
-            result = evaluate_corpus(args[0])
-            _print_single_corpus(result)
+    if run_geocoding:
+        _run_geocoding(corpus_path)
 
 
 if __name__ == "__main__":

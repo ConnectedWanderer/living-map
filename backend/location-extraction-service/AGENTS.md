@@ -73,19 +73,23 @@ uv run python -m spacy download fr_core_news_sm
 ## Evaluation
 
 ```bash
-# NER evaluation (Stages 1-2)
-uv run python -m src.evaluation tests/corpus/en_simple.json   # Single corpus
+# Full evaluation (NER + Geocoding)
 uv run python -m src.evaluation                                 # Aggregate synthesis of all corpora
+uv run python -m src.evaluation tests/corpus/en_simple.json     # Single corpus
 
-# Stages 3-4 evaluation (Geocoding + Event Location)
-uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json   # Single corpus
-uv run python -m src.evaluation --geocoding                                 # Aggregate synthesis of all corpora
+# NER evaluation (Stages 1-2)
+uv run python -m src.evaluation --ner                            # Aggregate synthesis
+uv run python -m src.evaluation --ner tests/corpus/en_simple.json
+
+# Geocoding evaluation (Stages 3-4, decoupled from NER)
+uv run python -m src.evaluation --geocoding                      # Aggregate synthesis
+uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json
 
 # NER synthesis prints aggregate entity-level metrics (precision/recall/F1),
 # per-type breakdown, and per-corpus summary table.
-# Geocoding synthesis prints geocoding rate, country accuracy, and event
-# location accuracy. Corpus samples can include optional
-# expected_geocoded_locations and expected_event_location fields.
+# Geocoding synthesis is decoupled from NER (feeds corpus entities to GeoPipeline
+# directly). Reports geocoding rate, country accuracy, coordinate-distance metrics
+# (mean distance, within 1/10/100 km), and event location accuracy.
 ```
 
 ## Corpus Maintenance
@@ -229,7 +233,7 @@ location-extraction-service/
 │   │   ├── test_nlp_manager.py
 │   │   ├── test_pipeline_integration.py
 │   │   └── test_evaluation_integration.py
-│   └── corpus/               # Evaluation corpora (EN + FR)
+│   └── corpus/               # Evaluation corpora (EN + FR, with geocoding annotations)
 │       ├── en_simple.json
 │       ├── en_paragraphs.json
 │       ├── en_edge_cases.json
@@ -237,6 +241,7 @@ location-extraction-service/
 │       ├── fr_paragraphs.json
 │       └── fr_edge_cases.json
 ├── scripts/
+│   ├── annotate_geocoding.py    # Geocoding ground-truth annotation via Nominatim
 │   ├── fix_corpus_offsets.py    # Corpus offset fixer
 │   └── ci.sh                    # CI entry point (--fast for unit-only)
 ├── Dockerfile
@@ -249,6 +254,7 @@ location-extraction-service/
 
 ## Related Documentation
 
+- [Evaluation Guide](../../docs/evaluation.md)
 - [Architecture](../../docs/architecture/location-extraction.md)
 - [ADR-001](../../docs/decisions/ADR-001-location-extraction-approach.md)
 - [ADR-002](../../docs/decisions/ADR-002-ner-evaluation-protocol.md)
@@ -256,6 +262,7 @@ location-extraction-service/
 - [ADR-004](../../docs/decisions/ADR-004-consolidate-pipeline-module.md)
 - [ADR-005](../../docs/decisions/ADR-005-text2geo-nan-bug.md) (deprecated — `text2geo` replaced by `geonamescache` per [ADR-007](../../docs/decisions/ADR-007-replace-text2geo-with-geonamescache.md))
 - [ADR-006](../../docs/decisions/ADR-006-pipeline-architectural-improvements.md)
+- [ADR-008](../../docs/decisions/ADR-008-geocoding-evaluation-corpus.md)
 - [spaCy Documentation](https://spacy.io/)
 - [text2geo](https://github.com/charonviz/text2geo)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)

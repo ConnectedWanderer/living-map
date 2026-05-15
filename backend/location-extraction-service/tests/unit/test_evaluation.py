@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from src.evaluation import evaluate, evaluate_event_location, evaluate_geocoding
+from src.evaluation import evaluate, evaluate_event_location, evaluate_geocoding, haversine
 from src.evaluation.runner import discover_corpora, load_corpus
 
 
@@ -274,6 +274,25 @@ class TestDiscoverCorpora:
         assert discover_corpora(str(tmp_path)) == []
 
 
+class TestHaversine:
+    def test_known_distance_paris_london(self):
+        d = haversine(48.8566, 2.3522, 51.5074, -0.1278)
+        assert 340 < d < 345
+
+    def test_zero_distance(self):
+        d = haversine(48.8566, 2.3522, 48.8566, 2.3522)
+        assert d == 0.0
+
+    def test_antipodal(self):
+        d = haversine(0.0, 0.0, 0.0, 180.0)
+        assert 20000 < d < 20100
+
+    def test_symmetry(self):
+        d1 = haversine(48.8566, 2.3522, 51.5074, -0.1278)
+        d2 = haversine(51.5074, -0.1278, 48.8566, 2.3522)
+        assert abs(d1 - d2) < 0.001
+
+
 class TestEvaluateGeocoding:
     def test_all_expected_geocoded_country_match(self):
         predictions = [
@@ -336,6 +355,53 @@ class TestEvaluateGeocoding:
         assert result["geocoding_rate"] == 1.0
         assert result["country_accuracy"] == 1.0
         assert result["country_matches"] == 0
+
+    def test_distance_metrics_with_coordinates(self):
+        predictions = [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"}]
+        expected = [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"}]
+        result = evaluate_geocoding(predictions, expected)
+        assert result["mean_distance_km"] == 0.0
+        assert result["within_1km"] == 1.0
+        assert result["within_10km"] == 1.0
+        assert result["within_100km"] == 1.0
+        assert result["distance_checkable"] == 1
+
+    def test_distance_metrics_no_lat_lon_in_expected(self):
+        predictions = [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"}]
+        expected = [{"text": "Paris", "country": "FR"}]
+        result = evaluate_geocoding(predictions, expected)
+        assert result["distance_checkable"] == 0
+        assert result["mean_distance_km"] == 0.0
+
+    def test_distance_metrics_distant_location(self):
+        predictions = [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"}]
+        expected = [{"text": "Paris", "lat": 51.5074, "lon": -0.1278, "country": "GB"}]
+        result = evaluate_geocoding(predictions, expected)
+        assert 340 < result["mean_distance_km"] < 345
+        assert result["within_1km"] == 0.0
+        assert result["within_10km"] == 0.0
+        assert result["within_100km"] == 0.0
+
+    def test_distance_metrics_partial(self):
+        predictions = [
+            {"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"},
+        ]
+        expected = [
+            {"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"},
+            {"text": "London", "lat": 51.5074, "lon": -0.1278, "country": "GB"},
+        ]
+        result = evaluate_geocoding(predictions, expected)
+        assert result["distance_checkable"] == 1
+        assert result["mean_distance_km"] == 0.0
+        assert result["within_1km"] == 1.0
+
+    def test_distance_metrics_empty_expected(self):
+        result = evaluate_geocoding(
+            [{"text": "Paris", "lat": 48.8566, "lon": 2.3522, "country": "FR"}],
+            [],
+        )
+        assert result["distance_checkable"] == 0
+        assert result["mean_distance_km"] == 0.0
 
 
 class TestEvaluateEventLocation:

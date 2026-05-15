@@ -114,6 +114,26 @@ Input Text → Language Detection → spaCy NER → geonamescache Geocoder → E
 | `SPACY_EN_MODEL` | `en_core_web_sm`  | English spaCy model |
 | `SPACY_FR_MODEL` | `fr_core_news_sm` | French spaCy model  |
 
+## Evaluation
+
+See the [Evaluation Guide](../../docs/evaluation.md) for details on running NER and geocoding quality evaluations:
+
+```bash
+# Full evaluation (NER + Geocoding)
+uv run python -m src.evaluation
+
+# Geocoding only (decoupled from NER)
+uv run python -m src.evaluation --geocoding
+```
+
+## Related Documentation
+
+- [Architecture Documentation](../../docs/architecture/location-extraction.md)
+- [Evaluation Guide](../../docs/evaluation.md)
+- [ADR-001: Location Extraction Approach](../../docs/decisions/ADR-001-location-extraction-approach.md)
+- [ADR-002: NER Evaluation Protocol](../../docs/decisions/ADR-002-ner-evaluation-protocol.md)
+- [ADR-008: Geocoding Evaluation Corpus](../../docs/decisions/ADR-008-geocoding-evaluation-corpus.md)
+
 ## License
 
 MIT

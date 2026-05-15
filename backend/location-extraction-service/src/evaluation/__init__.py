@@ -1,4 +1,19 @@
-"""NER quality metrics: precision, recall, F1 computation."""
+"""NER quality metrics: precision, recall, F1 computation and geocoding accuracy."""
+
+import math
+
+_EARTH_RADIUS_KM = 6371.0
+
+
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Great-circle distance in km between two (lat, lon) points (Haversine formula)."""
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    )
+    return _EARTH_RADIUS_KM * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
 def _compute_rates(tp: int, fp: int, fn: int) -> dict:
@@ -53,6 +68,38 @@ def _sum_metrics(metrics_list: list[dict]) -> dict:
     )
 
 
+def _compute_distance_metrics(
+    pred_by_text: dict[str, dict],
+    expected: list[dict],
+) -> dict:
+    """Compute coordinate-distance metrics for matched predictions.
+
+    Args:
+        pred_by_text: Predictions keyed by text.
+        expected: Expected location dicts with optional lat/lon.
+
+    Returns:
+        Dict with mean_distance_km, within_1km, within_10km, within_100km,
+        and distance_checkable count.
+
+    """
+    distances: list[float] = []
+    for exp in expected:
+        text = exp["text"]
+        pred = pred_by_text.get(text)
+        if pred is not None and "lat" in exp and "lon" in exp and "lat" in pred and "lon" in pred:
+            distances.append(haversine(exp["lat"], exp["lon"], pred["lat"], pred["lon"]))
+
+    n = len(distances)
+    return {
+        "mean_distance_km": sum(distances) / n if n > 0 else 0.0,
+        "within_1km": sum(1 for d in distances if d <= 1.0) / n if n > 0 else 0.0,
+        "within_10km": sum(1 for d in distances if d <= 10.0) / n if n > 0 else 0.0,
+        "within_100km": sum(1 for d in distances if d <= 100.0) / n if n > 0 else 0.0,
+        "distance_checkable": n,
+    }
+
+
 def evaluate_geocoding(predictions: list[dict], expected: list[dict]) -> dict:
     """Evaluate geocoding accuracy against expected locations.
 
@@ -60,12 +107,15 @@ def evaluate_geocoding(predictions: list[dict], expected: list[dict]) -> dict:
     expected locations (from corpus annotations). Matches by place name text.
 
     Args:
-        predictions: List of predicted location dicts with 'text' and 'country'.
-        expected: List of expected location dicts with 'text' and 'country'.
+        predictions: List of predicted location dicts with 'text', 'country',
+            and optionally 'lat'/'lon'.
+        expected: List of expected location dicts with 'text', 'country',
+            and optionally 'lat'/'lon'.
 
     Returns:
         Dict with geocoding_rate, country_accuracy, total_expected, geocoded,
-        and country_matches.
+        country_matches, and coordinate-distance metrics (mean_distance_km,
+        within_1km, within_10km, within_100km, distance_checkable).
 
     """
     pred_by_text = {p["text"]: p for p in predictions}
@@ -85,13 +135,15 @@ def evaluate_geocoding(predictions: list[dict], expected: list[dict]) -> dict:
                 if pred.get("country") == exp["country"]:
                     country_matches += 1
 
-    return {
+    result = {
         "geocoding_rate": geocoded / total if total > 0 else 0.0,
         "country_accuracy": country_matches / country_checkable if country_checkable > 0 else 1.0,
         "total_expected": total,
         "geocoded": geocoded,
         "country_matches": country_matches,
     }
+    result.update(_compute_distance_metrics(pred_by_text, expected))
+    return result
 
 
 def evaluate_event_location(predicted: dict | None, expected: dict | None) -> dict:
