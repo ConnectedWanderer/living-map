@@ -14,7 +14,7 @@ Input Text → Language Detection → spaCy NER → geonamescache Geocoder → E
 
 | File                            | Purpose                                                                                                                                                                                      |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/models.py`                 | Typed dataclasses: EntityMention, GeocodedLocation, ScoredLocation, EventLocation, LocationResult                                                                                            |
+| `src/models.py`                 | Typed dataclasses: EntityMention, GeocodedLocation, ScoredLocation, GeocodeResult, EntityResult, EventLocation, LocationResult                                                               |
 | `src/pipeline.py`               | `NerPipeline` class + `NerResult` dataclass + internal detection/NER/model logic                                                                                                             |
 | `src/geocoding.py`              | `GeoPipeline` class + `GeoResult` dataclass + internal text2geo wrapper (injectable geocode_fn)                                                                                              |
 | `src/disambiguator.py`          | `DisambiguatePipeline` class + `DisambiguateResult` dataclass + event location inference (Stage 4)                                                                                           |

@@ -6,7 +6,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from src.app import app, get_pipeline
-from src.models import EventLocation, LocationResult, ScoredLocation
+from src.models import EntityResult, EventLocation, GeocodeResult, LocationResult
 
 
 @pytest.fixture
@@ -23,15 +23,27 @@ def mock_pipeline():
             country_name="France",
             confidence=0.85,
         ),
-        all_locations=[
-            ScoredLocation(
+        all_entities=[
+            EntityResult(
                 text="Paris",
-                lat=48.8566,
-                lon=2.3522,
-                country="FR",
-                country_name="France",
                 type="GPE",
-                score=2.17,
+                start=0,
+                end=5,
+                geocoded=True,
+                geocoding=GeocodeResult(
+                    lat=48.8566,
+                    lon=2.3522,
+                    country="FR",
+                    country_name="France",
+                    score=2.17,
+                ),
+            ),
+            EntityResult(
+                text="France",
+                type="GPE",
+                start=16,
+                end=22,
+                geocoded=False,
             ),
         ],
         entities_found=2,
@@ -92,28 +104,39 @@ class TestExtractLocation:
         assert props["confidence"] == 0.85
 
     @pytest.mark.asyncio
-    async def test_geocoding_contains_all_locations(self, client):
+    async def test_geocoding_contains_all_entities(self, client):
         response = await client.post(
             "/api/extract-location",
             json={"text": "Paris is in France."},
         )
         data = response.json()
         geocoding = data["geocoding"]
-        assert "all_locations" in geocoding
-        all_locs = geocoding["all_locations"]
-        assert len(all_locs) == 1
-        loc = all_locs[0]
-        assert loc["type"] == "Feature"
-        assert loc["geometry"] == {
-            "type": "Point",
-            "coordinates": [2.3522, 48.8566],
-        }
-        props = loc["properties"]
+        assert "all_entities" in geocoding
+        all_ent = geocoding["all_entities"]
+        assert len(all_ent) == 2
+
+        # Geocoded entity
+        paris = all_ent[0]
+        assert paris["type"] == "Feature"
+        assert paris["geometry"] == {"type": "Point", "coordinates": [2.3522, 48.8566]}
+        props = paris["properties"]
         assert props["name"] == "Paris"
-        assert props["country"] == "FR"
-        assert props["country_name"] == "France"
         assert props["type"] == "GPE"
-        assert props["score"] == 2.17
+        assert props["start"] == 0
+        assert props["end"] == 5
+        assert props["geocoded"] is True
+        assert props["geocoding"]["country"] == "FR"
+        assert props["geocoding"]["country_name"] == "France"
+        assert props["geocoding"]["score"] == 2.17
+
+        # Non-geocoded entity
+        france = all_ent[1]
+        assert france["type"] == "Feature"
+        assert france["geometry"] is None
+        props2 = france["properties"]
+        assert props2["name"] == "France"
+        assert props2["geocoded"] is False
+        assert props2["geocoding"] is None
 
     @pytest.mark.asyncio
     async def test_geocoding_includes_metadata(self, client):
@@ -153,7 +176,7 @@ class TestExtractLocation:
             detected_language="en",
             model_name=None,
             event_location=None,
-            all_locations=[],
+            all_entities=[],
             entities_found=0,
             entities_geocoded=0,
             processing_time_ms=5.0,
@@ -167,7 +190,7 @@ class TestExtractLocation:
         data = response.json()
         assert data["type"] == "FeatureCollection"
         assert data["features"] == []
-        assert data["geocoding"]["all_locations"] == []
+        assert data["geocoding"]["all_entities"] == []
         assert data["geocoding"]["entities_found"] == 0
         assert data["geocoding"]["entities_geocoded"] == 0
 

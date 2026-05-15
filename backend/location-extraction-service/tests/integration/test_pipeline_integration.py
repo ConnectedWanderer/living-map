@@ -64,18 +64,22 @@ class TestPipelineIntegration:
         result = pipe.run(sample_english_text)
         assert result.detected_language == "en"
 
-    def test_all_locations_in_response(self, sample_english_text):
+    def test_all_entities_in_response(self, sample_english_text):
         ner = NerPipeline()
         ner_result = ner.run(sample_english_text)
         geo = _MockGeoPipeline(ner_result.entities)
         pipe = LocationPipeline(ner=ner, geo=geo)
         result = pipe.run(sample_english_text)
-        assert len(result.all_locations) > 0
-        for loc in result.all_locations:
-            assert loc.text is not None
-            assert loc.lat is not None
-            assert loc.lon is not None
-            assert loc.country is not None
+        assert len(result.all_entities) > 0
+        for ent in result.all_entities:
+            assert ent.text is not None
+            assert ent.type is not None
+            assert ent.geocoded in (True, False)
+            if ent.geocoded:
+                assert ent.geocoding is not None
+                assert ent.geocoding.lat is not None
+                assert ent.geocoding.lon is not None
+                assert ent.geocoding.country is not None
 
     def test_metadata_in_response(self, sample_english_text):
         ner = NerPipeline()
@@ -106,7 +110,7 @@ class TestPipelineIntegration:
         pipe = LocationPipeline()
         result = pipe.run("Hello world.")
         assert result.event_location is None
-        assert result.all_locations == []
+        assert result.all_entities == []
         assert result.entities_found == 0
         assert result.entities_geocoded == 0
 
@@ -128,7 +132,7 @@ class TestPipelineIntegration:
         result = pipe.run("")
         assert result.detected_language == "en"
         assert result.event_location is None
-        assert result.all_locations == []
+        assert result.all_entities == []
         assert result.entities_found == 0
         assert result.entities_geocoded == 0
 

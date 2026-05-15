@@ -7,13 +7,14 @@ from fastapi import Depends, FastAPI
 
 from .orchestrator import LocationPipeline
 from .schemas import (
+    EntityFeature,
+    EntityFeatureProperties,
     ExtractLocationRequest,
     ExtractLocationResponse,
+    GeocodeProperties,
     GeocodingMetadata,
     GeoFeature,
     GeoFeatureProperties,
-    ScoredFeature,
-    ScoredFeatureProperties,
 )
 
 app = FastAPI(title="Location Extraction Service")
@@ -46,17 +47,28 @@ def _build_response(result, query_text: str) -> ExtractLocationResponse:
             )
         )
 
-    all_locs = []
-    for loc in result.all_locations:
-        all_locs.append(
-            ScoredFeature(
-                geometry={"type": "Point", "coordinates": [loc.lon, loc.lat]},
-                properties=ScoredFeatureProperties(
-                    name=loc.text,
-                    country=loc.country,
-                    country_name=loc.country_name,
-                    type=loc.type,
-                    score=loc.score,
+    all_ent = []
+    for ent in result.all_entities:
+        geometry = None
+        geocoding = None
+        if ent.geocoded and ent.geocoding:
+            geometry = {"type": "Point", "coordinates": [ent.geocoding.lon, ent.geocoding.lat]}
+            geocoding = GeocodeProperties(
+                country=ent.geocoding.country,
+                country_name=ent.geocoding.country_name,
+                score=ent.geocoding.score,
+            )
+
+        all_ent.append(
+            EntityFeature(
+                geometry=geometry,
+                properties=EntityFeatureProperties(
+                    name=ent.text,
+                    type=ent.type,
+                    start=ent.start,
+                    end=ent.end,
+                    geocoded=ent.geocoded,
+                    geocoding=geocoding,
                 ),
             )
         )
@@ -70,7 +82,7 @@ def _build_response(result, query_text: str) -> ExtractLocationResponse:
             entities_found=result.entities_found,
             entities_geocoded=result.entities_geocoded,
             processing_time_ms=result.processing_time_ms,
-            all_locations=all_locs,
+            all_entities=all_ent,
         ),
     )
 

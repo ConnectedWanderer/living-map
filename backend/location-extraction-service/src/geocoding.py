@@ -13,11 +13,13 @@ class GeoResult:
     """Result of running Stage 3 (geocoding) of the location extraction pipeline.
 
     Attributes:
-        locations: Geocoded locations as GeocodedLocation records.
+        locations: Successfully geocoded locations as GeocodedLocation records.
+        failures: Entity mentions that could not be geocoded.
 
     """
 
     locations: list[GeocodedLocation] = field(default_factory=list)
+    failures: list[EntityMention] = field(default_factory=list)
 
 
 _NAME_INDEX: dict[str, list[dict]] | None = None
@@ -104,6 +106,7 @@ class GeoPipeline:
 
         """
         locations = []
+        failures = []
         for entity in entities:
             result = self._geocode_fn(entity.text)
             if result is not None:
@@ -116,4 +119,6 @@ class GeoPipeline:
                         type=entity.label,
                     )
                 )
-        return GeoResult(locations=locations)
+            else:
+                failures.append(entity)
+        return GeoResult(locations=locations, failures=failures)

@@ -6,11 +6,11 @@ import json
 import os
 
 from ..disambiguator import DisambiguatePipeline
-from . import _sum_metrics, evaluate, evaluate_event_location, evaluate_geocoding
 from ..geocoding import GeoPipeline
 from ..models import EntityMention
 from ..orchestrator import LocationPipeline
 from ..pipeline import NerPipeline
+from . import _sum_metrics, evaluate, evaluate_event_location, evaluate_geocoding
 
 DEFAULT_CORPUS_DIR = "tests/corpus"
 
@@ -211,12 +211,13 @@ def run_full_pipeline_on_corpus(
 
         predicted_geocoded = [
             {
-                "text": loc.text,
-                "lat": loc.lat,
-                "lon": loc.lon,
-                "country": loc.country,
+                "text": ent.text,
+                "lat": ent.geocoding.lat if ent.geocoding else None,
+                "lon": ent.geocoding.lon if ent.geocoding else None,
+                "country": ent.geocoding.country if ent.geocoding else None,
             }
-            for loc in result.all_locations
+            for ent in result.all_entities
+            if ent.geocoded
         ]
 
         expected_geocoded = sample.get("expected_geocoded_locations", [])

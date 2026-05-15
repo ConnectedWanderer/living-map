@@ -86,16 +86,35 @@ curl -X POST http://localhost:8000/api/extract-location \
     "entities_found": 2,
     "entities_geocoded": 1,
     "processing_time_ms": 150.0,
-    "all_locations": [
+    "all_entities": [
       {
         "type": "Feature",
-        "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [2.3488, 48.85341]
+        },
         "properties": {
           "name": "Paris",
-          "country": "FR",
-          "country_name": "France",
           "type": "GPE",
-          "score": 2.17
+          "start": 20,
+          "end": 25,
+          "geocoded": true,
+          "geocoding": {
+            "country": "FR",
+            "country_name": "France",
+            "score": 2.5
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": null,
+        "properties": {
+          "name": "France",
+          "type": "GPE",
+          "start": 27,
+          "end": 33,
+          "geocoded": false
         }
       }
     ]

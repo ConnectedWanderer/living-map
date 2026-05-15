@@ -38,6 +38,29 @@ class ScoredLocation:
 
 
 @dataclass
+class GeocodeResult:
+    """Geocoding details for a successfully geocoded entity."""
+
+    lat: float
+    lon: float
+    country: str
+    country_name: str
+    score: float
+
+
+@dataclass
+class EntityResult:
+    """Entity mention with optional geocoding result."""
+
+    text: str
+    type: str
+    start: int
+    end: int
+    geocoded: bool
+    geocoding: GeocodeResult | None = None
+
+
+@dataclass
 class EventLocation:
     """Best-guess event location with confidence score."""
 
@@ -56,7 +79,7 @@ class LocationResult:
     detected_language: str
     model_name: str | None
     event_location: EventLocation | None
-    all_locations: list[ScoredLocation]
+    all_entities: list[EntityResult]
     entities_found: int
     entities_geocoded: int
     processing_time_ms: float

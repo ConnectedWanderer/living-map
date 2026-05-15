@@ -27,26 +27,35 @@ class GeoFeature(BaseModel):
     properties: GeoFeatureProperties
 
 
-class ScoredFeatureProperties(BaseModel):
-    """Properties for a scored location in all_locations."""
+class GeocodeProperties(BaseModel):
+    """Geocoding details for a successfully geocoded entity."""
 
-    name: str
     country: str
     country_name: str
-    type: str | None = None
     score: float
 
 
-class ScoredFeature(BaseModel):
-    """GeoJSON Feature for a scored location with disambiguation score."""
+class EntityFeatureProperties(BaseModel):
+    """Properties for an entity in all_entities."""
+
+    name: str
+    type: str
+    start: int
+    end: int
+    geocoded: bool
+    geocoding: GeocodeProperties | None = None
+
+
+class EntityFeature(BaseModel):
+    """GeoJSON Feature for an entity with optional geocoding data."""
 
     type: str = "Feature"
-    geometry: dict
-    properties: ScoredFeatureProperties
+    geometry: dict | None = None
+    properties: EntityFeatureProperties
 
 
 class GeocodingMetadata(BaseModel):
-    """Metadata block containing query info, counts, and all scored locations."""
+    """Metadata block containing query info, counts, and all entities."""
 
     query: dict
     detected_language: str
@@ -54,7 +63,7 @@ class GeocodingMetadata(BaseModel):
     entities_found: int
     entities_geocoded: int
     processing_time_ms: float
-    all_locations: list[ScoredFeature]
+    all_entities: list[EntityFeature]
 
 
 class ExtractLocationResponse(BaseModel):

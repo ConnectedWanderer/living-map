@@ -246,7 +246,7 @@ def infer_event_location(locations: list[dict], text: str) -> dict | None:
 | `detected_language`  | `str`                   | Detected language code (e.g. 'en', 'fr') |
 | `model_name`         | `str \| None`           | spaCy model used for NER                 |
 | `event_location`     | `EventLocation \| None` | Best-guess event location or null        |
-| `all_locations`      | `list[ScoredLocation]`  | All scored locations with scores         |
+| `all_entities`       | `list[EntityResult]`    | All NER entities with optional geocoding |
 | `entities_found`     | `int`                   | Number of NER entities extracted         |
 | `entities_geocoded`  | `int`                   | Number successfully geocoded             |
 | `processing_time_ms` | `float`                 | Total pipeline time in milliseconds      |
@@ -269,7 +269,7 @@ Each `GeoFeature` (primary location):
 | `geometry`   | `dict`                    | `{"type": "Point", "coordinates": [lon, lat]}` |
 | `properties` | `GeoFeatureProperties`    | `name`, `country`, `country_name`, `confidence` |
 
-The `GeocodingMetadata` block replicates pipeline diagnostics and includes `all_locations` as `ScoredFeature` objects (same GeoJSON Feature shape with `type`, `score` properties).
+The `GeocodingMetadata` block replicates pipeline diagnostics and includes `all_entities` as `EntityFeature` objects — each entity found by NER with a nested `geocoding` object if successfully geocoded, or `null` geometry and `geocoding` for unresolvable entities.
 
 ### Typed Intermediate Records
 
@@ -280,6 +280,8 @@ All pipeline stages exchange typed dataclasses rather than raw dicts:
 | `EntityMention`    | `text`, `label`, `start`, `end`                                   |
 | `GeocodedLocation` | `text`, `lat`, `lon`, `country`, `type?`                          |
 | `ScoredLocation`   | `text`, `lat`, `lon`, `country`, `country_name`, `type?`, `score` |
+| `GeocodeResult`    | `lat`, `lon`, `country`, `country_name`, `score`                  |
+| `EntityResult`     | `text`, `type`, `start`, `end`, `geocoded`, `geocoding?`          |
 | `EventLocation`    | `text`, `lat`, `lon`, `country`, `country_name`, `confidence`     |
 
 ```json
@@ -302,18 +304,34 @@ All pipeline stages exchange typed dataclasses rather than raw dicts:
     "detected_language": "fr",
     "model_name": "fr_core_news_sm",
     "entities_found": 2,
-    "entities_geocoded": 2,
+    "entities_geocoded": 1,
     "processing_time_ms": 150.0,
-    "all_locations": [
+    "all_entities": [
       {
         "type": "Feature",
         "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
         "properties": {
           "name": "Paris",
-          "country": "FR",
-          "country_name": "France",
           "type": "GPE",
-          "score": 2.17
+          "start": 20,
+          "end": 25,
+          "geocoded": true,
+          "geocoding": {
+            "country": "FR",
+            "country_name": "France",
+            "score": 2.17
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": null,
+        "properties": {
+          "name": "France",
+          "type": "GPE",
+          "start": 27,
+          "end": 33,
+          "geocoded": false
         }
       }
     ]
