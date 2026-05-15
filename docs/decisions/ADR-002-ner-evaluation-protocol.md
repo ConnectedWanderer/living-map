@@ -20,6 +20,7 @@ The location extraction service needs a standardized way to measure and track th
 ### Scope
 
 This ADR covers evaluation of **Stages 1-2 only**:
+
 - **Stage 1**: Language detection (`detector.py`)
 - **Stage 2**: NER entity extraction (`extractor.py`)
 
@@ -27,12 +28,12 @@ Geocoding (Stage 3) and event location inference (Stage 4) will be addressed in 
 
 ### Considered Evaluation Approaches
 
-| Approach | Granularity | Complexity | Relevance to Downstream |
-|----------|------------|------------|------------------------|
-| **Entity-level exact match** | Whole-entity | Low | High — geocoding depends on correct spans |
-| Token-level BIO tagging | Per-token | Medium | Medium — measures token classification |
-| Relaxed (partial overlap) | Whole-entity | Medium | Low — downstream needs exact coordinates |
-| Text-based (string match) | Surface form | Low | Low — ignores span boundaries |
+| Approach                     | Granularity  | Complexity | Relevance to Downstream                   |
+| ---------------------------- | ------------ | ---------- | ----------------------------------------- |
+| **Entity-level exact match** | Whole-entity | Low        | High — geocoding depends on correct spans |
+| Token-level BIO tagging      | Per-token    | Medium     | Medium — measures token classification    |
+| Relaxed (partial overlap)    | Whole-entity | Medium     | Low — downstream needs exact coordinates  |
+| Text-based (string match)    | Surface form | Low        | Low — ignores span boundaries             |
 
 ## Decision
 
@@ -42,34 +43,35 @@ Geocoding (Stage 3) and event location inference (Stage 4) will be addressed in 
 
 A predicted entity is counted as **correct (True Positive)** only if **all four** fields match the expected annotation exactly:
 
-| Field | Criterion |
-|-------|-----------|
-| `text` | Character-for-character identical |
-| `start` | Character offset matches exactly |
-| `end` | Character offset matches exactly |
-| `label` | Entity type matches (GPE or LOC) |
+| Field   | Criterion                         |
+| ------- | --------------------------------- |
+| `text`  | Character-for-character identical |
+| `start` | Character offset matches exactly  |
+| `end`   | Character offset matches exactly  |
+| `label` | Entity type matches (GPE or LOC)  |
 
 No partial credit is awarded. This is the strictest evaluation mode (consistent with CoNLL-2003).
 
 ### Metrics Computed
 
-| Metric | Formula | What It Tells Us |
-|--------|---------|------------------|
-| **Precision** | TP / (TP + FP) | How many of our predictions are correct |
-| **Recall** | TP / (TP + FN) | How many actual entities we found |
-| **Entity F1** | 2 × P × R / (P + R) | Balanced quality score |
+| Metric        | Formula             | What It Tells Us                        |
+| ------------- | ------------------- | --------------------------------------- |
+| **Precision** | TP / (TP + FP)      | How many of our predictions are correct |
+| **Recall**    | TP / (TP + FN)      | How many actual entities we found       |
+| **Entity F1** | 2 × P × R / (P + R) | Balanced quality score                  |
 
 Each metric is computed:
+
 - **Overall** across all entity types
 - **Per type** (GPE, LOC) separately
 
 ### Why Not Other Approaches
 
-| Approach | Reason for Rejection |
-|----------|---------------------|
-| **Token-level** | Measures token classification, not entity quality; downstream geocoding needs whole entities |
-| **Relaxed/partial** | Downstream geocoding needs exact character offsets; partial matches are not actionable |
-| **Text-only match** | Ignores span boundaries, which matter for multi-word entities and sentence context |
+| Approach            | Reason for Rejection                                                                         |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| **Token-level**     | Measures token classification, not entity quality; downstream geocoding needs whole entities |
+| **Relaxed/partial** | Downstream geocoding needs exact character offsets; partial matches are not actionable       |
+| **Text-only match** | Ignores span boundaries, which matter for multi-word entities and sentence context           |
 
 ## Consequences
 
@@ -97,6 +99,7 @@ Each metric is computed:
 ## Test Corpus Requirements
 
 The evaluation corpus must be:
+
 - Stored in-repo at `tests/corpus/` as JSON files
 - Annotated with exact character offsets and entity types
 - Cover both English and French
@@ -105,14 +108,15 @@ The evaluation corpus must be:
 
 ### Recommended Corpus Size
 
-| Category | English | French | Rationale |
-|----------|---------|--------|-----------|
-| Simple sentences (1-2 locations) | 15 docs (~50 entities) | 15 docs (~50 entities) | Baseline quality |
-| Full news paragraphs (3-5 locations) | 15 docs (~80 entities) | 15 docs (~80 entities) | Realistic load |
-| Edge cases (empty, no locations, misspellings) | 10 docs (~20 entities) | 10 docs (~20 entities) | Robustness |
-| **Total** | **40 docs (~150 entities)** | **40 docs (~150 entities)** | |
+| Category                                       | English                     | French                      | Rationale        |
+| ---------------------------------------------- | --------------------------- | --------------------------- | ---------------- |
+| Simple sentences (1-2 locations)               | 15 docs (~50 entities)      | 15 docs (~50 entities)      | Baseline quality |
+| Full news paragraphs (3-5 locations)           | 15 docs (~80 entities)      | 15 docs (~80 entities)      | Realistic load   |
+| Edge cases (empty, no locations, misspellings) | 10 docs (~20 entities)      | 10 docs (~20 entities)      | Robustness       |
+| **Total**                                      | **40 docs (~150 entities)** | **40 docs (~150 entities)** |                  |
 
 **~150 entities per language** balances annotation effort against statistical reliability:
+
 - 50 entities → harmonic mean (F1) is ±~7% (too noisy)
 - 150 entities → F1 is ±~4% (acceptable for MVP)
 - 500+ entities → F1 is ±~2% (robust)
@@ -128,8 +132,8 @@ Per-type breakdown (GPE vs LOC) needs at least ~30 entities per type to be meani
       "text": "The meeting in Paris was attended by officials from London.",
       "language": "en",
       "entities": [
-        {"text": "Paris", "label": "GPE", "start": 16, "end": 21},
-        {"text": "London", "label": "GPE", "start": 59, "end": 65}
+        { "text": "Paris", "label": "GPE", "start": 16, "end": 21 },
+        { "text": "London", "label": "GPE", "start": 59, "end": 65 }
       ]
     }
   ]
@@ -146,18 +150,18 @@ uv run python -m src.evaluation
 
 ## Abbreviations
 
-| Abbreviation | Meaning |
-|-------------|---------|
-| **TP** | True Positive — correctly predicted entity |
-| **FP** | False Positive — predicted entity that does not exist in expected annotations |
-| **FN** | False Negative — actual entity that was not predicted |
-| **P** | Precision — TP / (TP + FP) |
-| **R** | Recall — TP / (TP + FN) |
-| **F1** | Harmonic mean of Precision and Recall — 2 × P × R / (P + R) |
-| **GPE** | Geopolitical Entity (spaCy label for countries, cities, states) |
-| **LOC** | Non-GPE Location (spaCy label for rivers, mountains, regions) |
-| **NER** | Named Entity Recognition |
-| **CoNLL** | Conference on Natural Language Learning (origin of standard NER eval) |
+| Abbreviation | Meaning                                                                       |
+| ------------ | ----------------------------------------------------------------------------- |
+| **TP**       | True Positive — correctly predicted entity                                    |
+| **FP**       | False Positive — predicted entity that does not exist in expected annotations |
+| **FN**       | False Negative — actual entity that was not predicted                         |
+| **P**        | Precision — TP / (TP + FP)                                                    |
+| **R**        | Recall — TP / (TP + FN)                                                       |
+| **F1**       | Harmonic mean of Precision and Recall — 2 × P × R / (P + R)                   |
+| **GPE**      | Geopolitical Entity (spaCy label for countries, cities, states)               |
+| **LOC**      | Non-GPE Location (spaCy label for rivers, mountains, regions)                 |
+| **NER**      | Named Entity Recognition                                                      |
+| **CoNLL**    | Conference on Natural Language Learning (origin of standard NER eval)         |
 
 ## Related Documents
 

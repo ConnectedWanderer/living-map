@@ -16,6 +16,7 @@ npm run dev
 - **Optional query**: `?count=N` (N between 10-100, default: 50)
 
 Example:
+
 ```bash
 curl http://localhost:3001/feed?count=20
 ```
@@ -31,6 +32,7 @@ PORT=3001
 ## Output Format
 
 RSS 2.0 with English content. Each item includes:
+
 - `title`: Event description with location
 - `description`: Event details
 - `category`: Event type (Earthquake, Protest, Fire, etc.)

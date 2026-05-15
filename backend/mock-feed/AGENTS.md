@@ -19,6 +19,7 @@ src/
 ## Format
 
 RSS 2.0 matching France24 EN structure:
+
 - Namespace: `xmlns:atom`, `xmlns:media`, `xmlns:dc`
 - Channel fields: `language`, `title`, `description`, `link`, `lastBuildDate`, `atom:link`
 - Item fields: `category`, `title`, `link`, `description`, `guid`, `pubDate`, `dc:creator`
@@ -28,13 +29,16 @@ Reference: `https://www.france24.com/en/rss`
 ## Adding New Event Types
 
 Edit `src/utils/generator.js`:
+
 1. Add new type object to `eventTypes` array:
+
 ```js
 { type: 'NewType', templates: [
   'Event description in {location}',
   'Another template with {location}'
 ]}
 ```
+
 2. Templates use `{location}` placeholder (optional `{magnitude}`)
 
 ## Modifying Output

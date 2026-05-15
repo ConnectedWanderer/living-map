@@ -33,13 +33,13 @@ Non-named entities (lowercase common nouns like "river" mis-tagged as LOC) are e
 
 The `evaluate_geocoding()` function now also computes:
 
-| Metric | Definition |
-|--------|------------|
-| `mean_distance_km` | Mean great-circle (Haversine) distance between predicted and expected coordinates |
-| `within_1km` | Fraction of resolved entities within 1km of expected |
-| `within_10km` | Fraction within 10km |
-| `within_100km` | Fraction within 100km |
-| `distance_checkable` | Count of pairs with both predicted and expected coordinates |
+| Metric               | Definition                                                                        |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `mean_distance_km`   | Mean great-circle (Haversine) distance between predicted and expected coordinates |
+| `within_1km`         | Fraction of resolved entities within 1km of expected                              |
+| `within_10km`        | Fraction within 10km                                                              |
+| `within_100km`       | Fraction within 100km                                                             |
+| `distance_checkable` | Count of pairs with both predicted and expected coordinates                       |
 
 These are only computed when both predicted and expected entries include `lat`/`lon`. Entries where geocoding returned `None` contribute to the geocoding rate denominator but not to distance metrics.
 
@@ -48,6 +48,7 @@ These are only computed when both predicted and expected entries include `lat`/`
 A new `run_geocoding_pipeline_on_corpus()` function feeds the ground-truth `entities` from the corpus directly into `GeoPipeline`, bypassing `NerPipeline`. This ensures geocoding quality is measured independently of NER quality.
 
 The decoupled functions are:
+
 - `run_geocoding_pipeline_on_corpus()` — bypasses NER, feeds corpus entities to GeoPipeline + DisambiguatePipeline
 - `evaluate_geocoding_decoupled_corpus()` — wraps above with metrics
 - `evaluate_geocoding_decoupled_all_corpora()` — aggregate across all corpora
@@ -56,11 +57,11 @@ The decoupled functions are:
 
 The `--geocoding` flag now uses the decoupled evaluation. A new `--ner` flag runs NER-only evaluation. Without flags, both modes run sequentially.
 
-| Command | Mode |
-|---------|------|
-| `uv run python -m src.evaluation` | Full: NER + Geocoding |
-| `uv run python -m src.evaluation --ner` | NER only |
-| `uv run python -m src.evaluation --geocoding` | Geocoding only |
+| Command                                       | Mode                  |
+| --------------------------------------------- | --------------------- |
+| `uv run python -m src.evaluation`             | Full: NER + Geocoding |
+| `uv run python -m src.evaluation --ner`       | NER only              |
+| `uv run python -m src.evaluation --geocoding` | Geocoding only        |
 
 The old full-pipeline `evaluate_geocoding_corpus()` function is kept but can be accessed via the class directly if needed for comparison.
 

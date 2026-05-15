@@ -22,12 +22,12 @@ A replacement was sought that provides the same capabilities (offline, GeoNames-
 
 ## Options Considered
 
-| Approach | Maintenance | Fuzzy Match | Offline | Complexity |
-|----------|-------------|-------------|---------|------------|
-| **geonamescache + rapidfuzz** | ✅ Active (Mar 2026) | ✅ Optional | ✅ Bundled | Low |
-| DIY: cities500.txt + rapidfuzz | ✅ Weekly GeoNames updates | ✅ Optional | ✅ Download | Medium |
-| Keep text2geo (vendor it) | ⚠️ Unknown | ✅ Built-in | ✅ Download | Lowest |
-| Mordecai3 | ✅ Active | Partial | ❌ Needs ES | Very high |
+| Approach                       | Maintenance                | Fuzzy Match | Offline     | Complexity |
+| ------------------------------ | -------------------------- | ----------- | ----------- | ---------- |
+| **geonamescache + rapidfuzz**  | ✅ Active (Mar 2026)       | ✅ Optional | ✅ Bundled  | Low        |
+| DIY: cities500.txt + rapidfuzz | ✅ Weekly GeoNames updates | ✅ Optional | ✅ Download | Medium     |
+| Keep text2geo (vendor it)      | ⚠️ Unknown                 | ✅ Built-in | ✅ Download | Lowest     |
+| Mordecai3                      | ✅ Active                  | Partial     | ❌ Needs ES | Very high  |
 
 Since exact name matching is sufficient (NER extracts canonical place names, fuzzy matching for typos is unnecessary), `geonamescache` alone — without `rapidfuzz` — covers the use case.
 
@@ -36,6 +36,7 @@ Since exact name matching is sufficient (NER extracts canonical place names, fuz
 Replace `text2geo` with `geonamescache>=3.0.1` as the offline geocoding backend.
 
 Key reasons:
+
 - **Actively maintained**: v3.0.1 released March 2026, 8 contributors, regular releases since 2012.
 - **Bundled data**: City data ships with the pip package — no download step at build time, no NaN bug.
 - **Exact matching sufficient**: The name index (primary name + all alternatenames, case-insensitive) resolves to highest-population city on collision — the same heuristic text2geo uses.

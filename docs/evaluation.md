@@ -4,9 +4,9 @@
 
 The location extraction service provides **two evaluation modes**, both using the same corpus files in `backend/location-extraction-service/tests/corpus/`:
 
-| Mode | Stages | Measures | Use Case |
-|------|--------|----------|----------|
-| **NER** (Stages 1-2) | Language detection + spaCy NER | Precision, Recall, F1 for entity extraction | Is the NER finding the right locations? |
+| Mode                       | Stages                                    | Measures                                                                       | Use Case                                            |
+| -------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------- |
+| **NER** (Stages 1-2)       | Language detection + spaCy NER            | Precision, Recall, F1 for entity extraction                                    | Is the NER finding the right locations?             |
 | **Geocoding** (Stages 3-4) | geonamescache resolution + disambiguation | Geocoding rate, country accuracy, coordinate distance, event location accuracy | Is the geocoder resolving to the right coordinates? |
 
 Geocoding evaluation is **decoupled from NER** — it uses the ground-truth `entities` from the corpus as input, so geocoding quality is measured independently of NER quality.
@@ -29,12 +29,12 @@ uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json
 
 ### CLI Flags
 
-| Flags | Behavior |
-|-------|----------|
-| *(no flags)* | Runs both NER and Geocoding evaluation |
-| `--ner` | NER evaluation only |
-| `--geocoding` | Geocoding evaluation only (decoupled) |
-| `--ner --geocoding` | Both, overrides the default |
+| Flags               | Behavior                               |
+| ------------------- | -------------------------------------- |
+| _(no flags)_        | Runs both NER and Geocoding evaluation |
+| `--ner`             | NER evaluation only                    |
+| `--geocoding`       | Geocoding evaluation only (decoupled)  |
+| `--ner --geocoding` | Both, overrides the default            |
 
 > **Note**: The `--geocoding` flag replaces the old `--geocoding` behavior from the full-pipeline evaluation. Geocoding is now always evaluated decoupled from NER to give independent quality signal.
 
@@ -49,11 +49,11 @@ uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json
 
 ### Metrics
 
-| Metric | Formula | What It Tells You |
-|--------|---------|-------------------|
-| **Precision** | TP / (TP + FP) | How many of our predictions are correct |
-| **Recall** | TP / (TP + FN) | How many actual entities we found |
-| **F1** | 2 × P × R / (P + R) | Balanced quality score |
+| Metric        | Formula             | What It Tells You                       |
+| ------------- | ------------------- | --------------------------------------- |
+| **Precision** | TP / (TP + FP)      | How many of our predictions are correct |
+| **Recall**    | TP / (TP + FN)      | How many actual entities we found       |
+| **F1**        | 2 × P × R / (P + R) | Balanced quality score                  |
 
 Metrics are computed **overall** (across all entity types) and **per-type** (GPE vs LOC).
 
@@ -91,13 +91,13 @@ Per-Corpus Summary:
 
 ### Metrics
 
-| Metric | Definition |
-|--------|------------|
-| **Geocoding Rate** | % of expected places that were successfully resolved |
-| **Country Accuracy** | % of resolved places with correct country code |
-| **Mean Distance** | Mean great-circle distance (Haversine) in km between predicted and expected coordinates |
+| Metric                        | Definition                                                                                     |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Geocoding Rate**            | % of expected places that were successfully resolved                                           |
+| **Country Accuracy**          | % of resolved places with correct country code                                                 |
+| **Mean Distance**             | Mean great-circle distance (Haversine) in km between predicted and expected coordinates        |
 | **Within 1km / 10km / 100km** | % of resolved places whose coordinates fall within the given distance of the expected location |
-| **Event Location Accuracy** | % of samples where the predicted event location (text + country) matches expected |
+| **Event Location Accuracy**   | % of samples where the predicted event location (text + country) matches expected              |
 
 ### Example Output
 
@@ -144,14 +144,14 @@ All corpus files live in `tests/corpus/` as JSON with this schema:
       "text": "The meeting in Paris was attended by officials from London.",
       "language": "en",
       "entities": [
-        {"text": "Paris", "label": "GPE", "start": 15, "end": 20},
-        {"text": "London", "label": "GPE", "start": 52, "end": 58}
+        { "text": "Paris", "label": "GPE", "start": 15, "end": 20 },
+        { "text": "London", "label": "GPE", "start": 52, "end": 58 }
       ],
       "expected_geocoded_locations": [
-        {"text": "Paris", "lat": 48.8535, "lon": 2.3484, "country": "FR"},
-        {"text": "London", "lat": 51.5074, "lon": -0.1278, "country": "GB"}
+        { "text": "Paris", "lat": 48.8535, "lon": 2.3484, "country": "FR" },
+        { "text": "London", "lat": 51.5074, "lon": -0.1278, "country": "GB" }
       ],
-      "expected_event_location": {"text": "Paris", "country": "FR"}
+      "expected_event_location": { "text": "Paris", "country": "FR" }
     }
   ]
 }
@@ -159,26 +159,26 @@ All corpus files live in `tests/corpus/` as JSON with this schema:
 
 ### Field Guide
 
-| Field | Required for NER | Required for Geo | Description |
-|-------|-----------------|-----------------|-------------|
-| `text` | Yes | Yes | The input text |
-| `language` | Yes | Yes | Expected language code |
-| `entities` | Yes | Yes | NER entities with character offsets |
-| `expected_geocoded_locations` | No | Yes | Expected geocoding results with coordinates |
-| `expected_event_location` | No | Yes | Expected primary event location |
+| Field                         | Required for NER | Required for Geo | Description                                 |
+| ----------------------------- | ---------------- | ---------------- | ------------------------------------------- |
+| `text`                        | Yes              | Yes              | The input text                              |
+| `language`                    | Yes              | Yes              | Expected language code                      |
+| `entities`                    | Yes              | Yes              | NER entities with character offsets         |
+| `expected_geocoded_locations` | No               | Yes              | Expected geocoding results with coordinates |
+| `expected_event_location`     | No               | Yes              | Expected primary event location             |
 
 Non-named entities (common nouns like "river" mis-tagged as LOC) should **not** be included in `expected_geocoded_locations`.
 
 ### Available Corpora
 
-| File | Language | Focus | NER Samples | Geo Entities |
-|------|----------|-------|-------------|--------------|
-| `en_simple.json` | EN | Simple sentences, 1-2 locations | 45 | ~89 |
-| `en_paragraphs.json` | EN | News paragraphs, 3-5 locations | 15 | ~99 |
-| `en_edge_cases.json` | EN | Empty text, no locations, edge cases | 10 | ~16 |
-| `fr_simple.json` | FR | Simple sentences | 43 | ~84 |
-| `fr_paragraphs.json` | FR | News paragraphs | 15 | ~90 |
-| `fr_edge_cases.json` | FR | Edge cases | 10 | ~8 |
+| File                 | Language | Focus                                | NER Samples | Geo Entities |
+| -------------------- | -------- | ------------------------------------ | ----------- | ------------ |
+| `en_simple.json`     | EN       | Simple sentences, 1-2 locations      | 45          | ~89          |
+| `en_paragraphs.json` | EN       | News paragraphs, 3-5 locations       | 15          | ~99          |
+| `en_edge_cases.json` | EN       | Empty text, no locations, edge cases | 10          | ~16          |
+| `fr_simple.json`     | FR       | Simple sentences                     | 43          | ~84          |
+| `fr_paragraphs.json` | FR       | News paragraphs                      | 15          | ~90          |
+| `fr_edge_cases.json` | FR       | Edge cases                           | 10          | ~8           |
 
 ## Adding New Test Cases
 
@@ -189,8 +189,8 @@ Non-named entities (common nouns like "river" mis-tagged as LOC) should **not** 
   "text": "The summit in Nairobi attracted delegates from across Africa.",
   "language": "en",
   "entities": [
-    {"text": "Nairobi", "label": "GPE", "start": 14, "end": 21},
-    {"text": "Africa", "label": "LOC", "start": 58, "end": 64}
+    { "text": "Nairobi", "label": "GPE", "start": 14, "end": 21 },
+    { "text": "Africa", "label": "LOC", "start": 58, "end": 64 }
   ]
 }
 ```
@@ -200,13 +200,16 @@ Non-named entities (common nouns like "river" mis-tagged as LOC) should **not** 
 To add geocoding annotations to an existing or new sample:
 
 1. **Look up coordinates** via [Nominatim](https://nominatim.openstreetmap.org/):
+
    ```bash
    curl "https://nominatim.openstreetmap.org/search?q=Nairobi&format=json&limit=1&addressdetails=1"
    ```
+
    Extract `lat`, `lon`, and `address.country_code` from the first result.
    Always use `addressdetails=1` to get the full address.
 
 2. **Add to the sample**:
+
    ```json
    "expected_geocoded_locations": [
      {"text": "Nairobi", "lat": -1.2921, "lon": 36.8219, "country": "KE"},
@@ -232,13 +235,13 @@ To add geocoding annotations to an existing or new sample:
 
 ### Good Signs
 
-| Metric | Threshold | What It Means |
-|--------|-----------|---------------|
-| NER F1 > 80% | On `_simple` corpora | Pipeline is working well for standard cases |
-| Geocoding Rate > 80% | On GPE entities | Most cities/countries are being resolved |
-| Country Accuracy > 95% | On GPE entities | Cities are resolving to the correct country |
-| Within 10km > 90% | On city entities | Coordinates are precise |
-| Event Accuracy > 80% | On samples with clear events | Disambiguation is working |
+| Metric                 | Threshold                    | What It Means                               |
+| ---------------------- | ---------------------------- | ------------------------------------------- |
+| NER F1 > 80%           | On `_simple` corpora         | Pipeline is working well for standard cases |
+| Geocoding Rate > 80%   | On GPE entities              | Most cities/countries are being resolved    |
+| Country Accuracy > 95% | On GPE entities              | Cities are resolving to the correct country |
+| Within 10km > 90%      | On city entities             | Coordinates are precise                     |
+| Event Accuracy > 80%   | On samples with clear events | Disambiguation is working                   |
 
 ### Concerning Signs
 

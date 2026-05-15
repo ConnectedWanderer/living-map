@@ -255,19 +255,19 @@ def infer_event_location(locations: list[dict], text: str) -> dict | None:
 
 The FastAPI server serializes the `LocationResult` into a GeoJSON FeatureCollection with a `geocoding` metadata block:
 
-| Field         | Type             | Description                                                    |
-| ------------- | ---------------- | -------------------------------------------------------------- |
-| `type`        | `str`            | `"FeatureCollection"`                                          |
-| `features`    | `list[GeoFeature]` | Array containing the primary event location as a GeoJSON Feature |
-| `geocoding`   | `GeocodingMetadata` | Metadata block with query info, counts, and all scored locations |
+| Field       | Type                | Description                                                      |
+| ----------- | ------------------- | ---------------------------------------------------------------- |
+| `type`      | `str`               | `"FeatureCollection"`                                            |
+| `features`  | `list[GeoFeature]`  | Array containing the primary event location as a GeoJSON Feature |
+| `geocoding` | `GeocodingMetadata` | Metadata block with query info, counts, and all scored locations |
 
 Each `GeoFeature` (primary location):
 
-| Field        | Type                      | Description                            |
-| ------------ | ------------------------- | -------------------------------------- |
-| `type`       | `str`                     | `"Feature"`                            |
-| `geometry`   | `dict`                    | `{"type": "Point", "coordinates": [lon, lat]}` |
-| `properties` | `GeoFeatureProperties`    | `name`, `country`, `country_name`, `confidence` |
+| Field        | Type                   | Description                                     |
+| ------------ | ---------------------- | ----------------------------------------------- |
+| `type`       | `str`                  | `"Feature"`                                     |
+| `geometry`   | `dict`                 | `{"type": "Point", "coordinates": [lon, lat]}`  |
+| `properties` | `GeoFeatureProperties` | `name`, `country`, `country_name`, `confidence` |
 
 The `GeocodingMetadata` block replicates pipeline diagnostics and includes `all_entities` as `EntityFeature` objects — each entity found by NER with a nested `geocoding` object if successfully geocoded, or `null` geometry and `geocoding` for unresolvable entities.
 

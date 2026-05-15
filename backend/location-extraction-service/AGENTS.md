@@ -167,18 +167,18 @@ docker-compose up --build
 
 ## Key Dependencies
 
-| Package       | Version    | Purpose                    |
-| ------------- | ---------- | -------------------------- |
-| spacy         | >=3.8.0    | NLP framework              |
-| langdetect    | >=1.0.9    | Language detection         |
-| geonamescache | >=3.0.1    | Offline geocoding (PyPI)   |
-| pycountry     | >=26.2.16  | ISO country name lookup    |
-| fastapi    | >=0.135.0 | API server                 |
-| uvicorn    | >=0.30.0  | ASGI server                |
-| pydantic   | >=2.9.0   | Data validation            |
-| httpx      | >=0.28.0  | Async HTTP client (tests)  |
-| ruff       | >=0.9.0   | Linting/formatting         |
-| pytest     | >=9.0.0   | Testing                    |
+| Package       | Version   | Purpose                   |
+| ------------- | --------- | ------------------------- |
+| spacy         | >=3.8.0   | NLP framework             |
+| langdetect    | >=1.0.9   | Language detection        |
+| geonamescache | >=3.0.1   | Offline geocoding (PyPI)  |
+| pycountry     | >=26.2.16 | ISO country name lookup   |
+| fastapi       | >=0.135.0 | API server                |
+| uvicorn       | >=0.30.0  | ASGI server               |
+| pydantic      | >=2.9.0   | Data validation           |
+| httpx         | >=0.28.0  | Async HTTP client (tests) |
+| ruff          | >=0.9.0   | Linting/formatting        |
+| pytest        | >=9.0.0   | Testing                   |
 
 ## Performance Targets
 
