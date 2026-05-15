@@ -14,6 +14,9 @@ dependencies = [
     "pycountry>=26.2.16",
 ]
 
+[project.scripts]
+location-extract-server = "src.app:start"
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.0",
@@ -44,6 +47,7 @@ ignore = [
     "D107",
     "D203",
     "D213",
+    "B008",
 ]
 
 [tool.ruff.lint.per-file-ignores]
