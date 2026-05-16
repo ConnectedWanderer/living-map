@@ -1,0 +1,190 @@
+{
+  "samples": [
+    {
+      "text": "",
+      "language": "fr",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "Cette phrase ne contient aucune mention de lieu.",
+      "language": "fr",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "   \n\t  ",
+      "language": "fr",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "Paris Paris Paris",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 6,
+          "end": 11
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 12,
+          "end": 17
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Paris",
+          "lat": 48.8534951,
+          "lon": 2.3483915,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Paris",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "J'ai visité le fleuve.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "fleuve",
+          "label": "LOC",
+          "start": 15,
+          "end": 21
+        }
+      ],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "NEW YORK — La ville ne dort jamais.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "NEW YORK",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "NEW YORK",
+          "lat": 40.7127281,
+          "lon": -74.0060152,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "NEW YORK",
+        "country": "US"
+      }
+    },
+    {
+      "text": "Saint-Tropez est une destination prisée.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Saint-Tropez",
+          "label": "GPE",
+          "start": 0,
+          "end": 12
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Saint-Tropez",
+          "lat": 43.2727191,
+          "lon": 6.6405225,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Saint-Tropez",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "BIENVENUE À L'ÉVÉNEMENT",
+      "language": "fr",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "Le roi d'Angleterre a visité la France en 1066.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Angleterre",
+          "label": "GPE",
+          "start": 9,
+          "end": 19
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 32,
+          "end": 38
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Angleterre",
+          "lat": 52.5310214,
+          "lon": -1.2649062,
+          "country": "GB"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Angleterre",
+        "country": "GB"
+      }
+    },
+    {
+      "text": "La Nouvelle-Orléans est célèbre pour son jazz.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Nouvelle-Orléans",
+          "label": "GPE",
+          "start": 3,
+          "end": 19
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Nouvelle-Orléans",
+          "lat": -4.2539894,
+          "lon": 15.2710379,
+          "country": "CG"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Nouvelle-Orléans",
+        "country": "CG"
+      }
+    }
+  ]
+}

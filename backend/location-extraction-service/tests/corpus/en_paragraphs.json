@@ -1,0 +1,1378 @@
+{
+  "samples": [
+    {
+      "text": "Authorities in Paris have confirmed that the summit will proceed as planned. Delegates from Berlin, Madrid, and Rome are expected to attend. The Seine river banks will be closed during the event. London has sent a delegation led by the mayor.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 15,
+          "end": 20
+        },
+        {
+          "text": "Berlin",
+          "label": "GPE",
+          "start": 92,
+          "end": 98
+        },
+        {
+          "text": "Madrid",
+          "label": "GPE",
+          "start": 100,
+          "end": 106
+        },
+        {
+          "text": "Rome",
+          "label": "GPE",
+          "start": 112,
+          "end": 116
+        },
+        {
+          "text": "Seine",
+          "label": "LOC",
+          "start": 145,
+          "end": 150
+        },
+        {
+          "text": "London",
+          "label": "GPE",
+          "start": 196,
+          "end": 202
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Paris",
+          "lat": 48.8534951,
+          "lon": 2.3483915,
+          "country": "FR"
+        },
+        {
+          "text": "Berlin",
+          "lat": 52.5173885,
+          "lon": 13.3951309,
+          "country": "DE"
+        },
+        {
+          "text": "Madrid",
+          "lat": 40.416782,
+          "lon": -3.703507,
+          "country": "ES"
+        },
+        {
+          "text": "Rome",
+          "lat": 41.8933203,
+          "lon": 12.4829321,
+          "country": "IT"
+        },
+        {
+          "text": "Seine",
+          "lat": 48.7340697,
+          "lon": 2.4448155,
+          "country": "FR"
+        },
+        {
+          "text": "London",
+          "lat": 51.5074456,
+          "lon": -0.1277653,
+          "country": "GB"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Paris",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "The Mediterranean Sea has warmed significantly over the past decade, according to a new study from the University of Barcelona. Researchers in Marseille collected data from monitoring stations along the coast of southern France. The findings have implications for cities like Nice, Valencia, and Genoa.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Mediterranean Sea",
+          "label": "LOC",
+          "start": 4,
+          "end": 21
+        },
+        {
+          "text": "Barcelona",
+          "label": "GPE",
+          "start": 117,
+          "end": 126
+        },
+        {
+          "text": "Marseille",
+          "label": "GPE",
+          "start": 143,
+          "end": 152
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 221,
+          "end": 227
+        },
+        {
+          "text": "Nice",
+          "label": "GPE",
+          "start": 276,
+          "end": 280
+        },
+        {
+          "text": "Valencia",
+          "label": "GPE",
+          "start": 282,
+          "end": 290
+        },
+        {
+          "text": "Genoa",
+          "label": "GPE",
+          "start": 296,
+          "end": 301
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mediterranean Sea",
+          "lat": 35.0000035,
+          "lon": 19.9999957,
+          "country": null
+        },
+        {
+          "text": "Barcelona",
+          "lat": 41.3825802,
+          "lon": 2.177073,
+          "country": "ES"
+        },
+        {
+          "text": "Marseille",
+          "lat": 43.2963986,
+          "lon": 5.3777888,
+          "country": "FR"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        },
+        {
+          "text": "Nice",
+          "lat": 43.7009358,
+          "lon": 7.2683912,
+          "country": "FR"
+        },
+        {
+          "text": "Valencia",
+          "lat": 39.4697065,
+          "lon": -0.3763353,
+          "country": "ES"
+        },
+        {
+          "text": "Genoa",
+          "lat": 44.40726,
+          "lon": 8.9338624,
+          "country": "IT"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Barcelona",
+        "country": "ES"
+      }
+    },
+    {
+      "text": "The Amazon rainforest spans nine countries across South America. Deforestation rates in Brazil have drawn international criticism. The Amazon river basin is home to thousands of species. Indigenous communities in Peru, Colombia, and Ecuador are on the front lines of conservation efforts.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Amazon",
+          "label": "LOC",
+          "start": 4,
+          "end": 10
+        },
+        {
+          "text": "South America",
+          "label": "LOC",
+          "start": 50,
+          "end": 63
+        },
+        {
+          "text": "Brazil",
+          "label": "GPE",
+          "start": 88,
+          "end": 94
+        },
+        {
+          "text": "Amazon",
+          "label": "LOC",
+          "start": 135,
+          "end": 141
+        },
+        {
+          "text": "Peru",
+          "label": "GPE",
+          "start": 213,
+          "end": 217
+        },
+        {
+          "text": "Colombia",
+          "label": "GPE",
+          "start": 219,
+          "end": 227
+        },
+        {
+          "text": "Ecuador",
+          "label": "GPE",
+          "start": 233,
+          "end": 240
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Amazon",
+          "lat": 0.2504402,
+          "lon": -50.6229266,
+          "country": "BR"
+        },
+        {
+          "text": "South America",
+          "lat": -21.0002179,
+          "lon": -61.0006565,
+          "country": null
+        },
+        {
+          "text": "Brazil",
+          "lat": -10.3333333,
+          "lon": -53.2,
+          "country": "BR"
+        },
+        {
+          "text": "Peru",
+          "lat": -6.8699697,
+          "lon": -75.0458515,
+          "country": "PE"
+        },
+        {
+          "text": "Colombia",
+          "lat": 4.099917,
+          "lon": -72.9088133,
+          "country": "CO"
+        },
+        {
+          "text": "Ecuador",
+          "lat": -1.3397668,
+          "lon": -79.3666965,
+          "country": "EC"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Brazil",
+        "country": "BR"
+      }
+    },
+    {
+      "text": "The Loire Valley in France is famous for its wineries and historic chateaux. Tours is the main gateway city, while smaller towns like Amboise and Chinon offer intimate experiences. The Cher river winds through the region, past villages that have stood for centuries.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Loire Valley",
+          "label": "LOC",
+          "start": 4,
+          "end": 16
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 20,
+          "end": 26
+        },
+        {
+          "text": "Tours",
+          "label": "GPE",
+          "start": 77,
+          "end": 82
+        },
+        {
+          "text": "Amboise",
+          "label": "GPE",
+          "start": 134,
+          "end": 141
+        },
+        {
+          "text": "Chinon",
+          "label": "GPE",
+          "start": 146,
+          "end": 152
+        },
+        {
+          "text": "Cher",
+          "label": "LOC",
+          "start": 185,
+          "end": 189
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Loire Valley",
+          "lat": 47.4492772,
+          "lon": -0.349549,
+          "country": "FR"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        },
+        {
+          "text": "Tours",
+          "lat": 47.3900474,
+          "lon": 0.6889268,
+          "country": "FR"
+        },
+        {
+          "text": "Amboise",
+          "lat": 47.4110351,
+          "lon": 0.983698,
+          "country": "FR"
+        },
+        {
+          "text": "Chinon",
+          "lat": 47.1667182,
+          "lon": 0.2402095,
+          "country": "FR"
+        },
+        {
+          "text": "Cher",
+          "lat": 47.0248824,
+          "lon": 2.5753334,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "France",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Diplomats from Japan, South Korea, and China met in Tokyo to discuss regional security. The talks covered trade agreements, maritime boundaries in the East China Sea, and joint responses to natural disasters. Delegates praised the constructive atmosphere throughout the three-day summit.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Japan",
+          "label": "GPE",
+          "start": 15,
+          "end": 20
+        },
+        {
+          "text": "South Korea",
+          "label": "GPE",
+          "start": 22,
+          "end": 33
+        },
+        {
+          "text": "China",
+          "label": "GPE",
+          "start": 39,
+          "end": 44
+        },
+        {
+          "text": "Tokyo",
+          "label": "GPE",
+          "start": 52,
+          "end": 57
+        },
+        {
+          "text": "East China Sea",
+          "label": "LOC",
+          "start": 151,
+          "end": 165
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Japan",
+          "lat": 36.5748441,
+          "lon": 139.2394179,
+          "country": "JP"
+        },
+        {
+          "text": "South Korea",
+          "lat": 36.638392,
+          "lon": 127.6961188,
+          "country": "KR"
+        },
+        {
+          "text": "China",
+          "lat": 35.000074,
+          "lon": 104.999927,
+          "country": "CN"
+        },
+        {
+          "text": "Tokyo",
+          "lat": 35.6768601,
+          "lon": 139.7638947,
+          "country": "JP"
+        },
+        {
+          "text": "East China Sea",
+          "lat": 28.9999625,
+          "lon": 125.0000442,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Japan",
+        "country": "JP"
+      }
+    },
+    {
+      "text": "The Indian city of Mumbai has been hit by severe monsoon flooding, disrupting transportation and daily life. Authorities in Delhi and Kolkata are on high alert as the storm system moves eastward. The Ganges river is approaching dangerous levels in several districts of Uttar Pradesh.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "India",
+          "label": "GPE",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "text": "Mumbai",
+          "label": "GPE",
+          "start": 19,
+          "end": 25
+        },
+        {
+          "text": "Delhi",
+          "label": "GPE",
+          "start": 124,
+          "end": 129
+        },
+        {
+          "text": "Kolkata",
+          "label": "GPE",
+          "start": 134,
+          "end": 141
+        },
+        {
+          "text": "Ganges",
+          "label": "LOC",
+          "start": 200,
+          "end": 206
+        },
+        {
+          "text": "Uttar Pradesh",
+          "label": "GPE",
+          "start": 269,
+          "end": 282
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "India",
+          "lat": 22.3511148,
+          "lon": 78.6677428,
+          "country": "IN"
+        },
+        {
+          "text": "Mumbai",
+          "lat": 19.054999,
+          "lon": 72.8692035,
+          "country": "IN"
+        },
+        {
+          "text": "Delhi",
+          "lat": 28.6138954,
+          "lon": 77.2090057,
+          "country": "IN"
+        },
+        {
+          "text": "Kolkata",
+          "lat": 22.5726459,
+          "lon": 88.3638953,
+          "country": "IN"
+        },
+        {
+          "text": "Ganges",
+          "lat": 25.7202249,
+          "lon": 84.1052245,
+          "country": "IN"
+        },
+        {
+          "text": "Uttar Pradesh",
+          "lat": 27.1303344,
+          "lon": 80.859666,
+          "country": "IN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "India",
+        "country": "IN"
+      }
+    },
+    {
+      "text": "African leaders gathered in Nairobi for a summit on sustainable development. Presidents from Kenya, Nigeria, and South Africa signed a joint declaration. The Sahara region was highlighted as a priority area for renewable energy investment, with Morocco and Algeria leading several initiatives.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Nairobi",
+          "label": "GPE",
+          "start": 28,
+          "end": 35
+        },
+        {
+          "text": "Kenya",
+          "label": "GPE",
+          "start": 93,
+          "end": 98
+        },
+        {
+          "text": "Nigeria",
+          "label": "GPE",
+          "start": 100,
+          "end": 107
+        },
+        {
+          "text": "South Africa",
+          "label": "GPE",
+          "start": 113,
+          "end": 125
+        },
+        {
+          "text": "Sahara",
+          "label": "LOC",
+          "start": 158,
+          "end": 164
+        },
+        {
+          "text": "Morocco",
+          "label": "GPE",
+          "start": 245,
+          "end": 252
+        },
+        {
+          "text": "Algeria",
+          "label": "GPE",
+          "start": 257,
+          "end": 264
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Nairobi",
+          "lat": -1.302398,
+          "lon": 36.8288509,
+          "country": "KE"
+        },
+        {
+          "text": "Kenya",
+          "lat": 1.4419683,
+          "lon": 38.4313975,
+          "country": "KE"
+        },
+        {
+          "text": "Nigeria",
+          "lat": 9.6000359,
+          "lon": 7.9999721,
+          "country": "NG"
+        },
+        {
+          "text": "South Africa",
+          "lat": -28.8166236,
+          "lon": 24.991639,
+          "country": "ZA"
+        },
+        {
+          "text": "Sahara",
+          "lat": 22.25,
+          "lon": 9.8,
+          "country": "DZ"
+        },
+        {
+          "text": "Morocco",
+          "lat": 28.3347722,
+          "lon": -10.3713379,
+          "country": "MA"
+        },
+        {
+          "text": "Algeria",
+          "lat": 36.7729333,
+          "lon": 3.0588445,
+          "country": "DZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Nairobi",
+        "country": "KE"
+      }
+    },
+    {
+      "text": "Archaeologists working near Cairo have uncovered a significant ancient tomb in the Nile delta. The Egyptian Ministry of Tourism expects the discovery to boost visitor numbers to Luxor and the Valley of the Kings. Tourism remains a vital sector for Egypt's economy.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Cairo",
+          "label": "GPE",
+          "start": 28,
+          "end": 33
+        },
+        {
+          "text": "Nile",
+          "label": "LOC",
+          "start": 83,
+          "end": 87
+        },
+        {
+          "text": "Luxor",
+          "label": "GPE",
+          "start": 178,
+          "end": 183
+        },
+        {
+          "text": "Valley of the Kings",
+          "label": "LOC",
+          "start": 192,
+          "end": 211
+        },
+        {
+          "text": "Egypt",
+          "label": "GPE",
+          "start": 99,
+          "end": 104
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Cairo",
+          "lat": 30.0443879,
+          "lon": 31.2357257,
+          "country": "EG"
+        },
+        {
+          "text": "Nile",
+          "lat": 46.836279,
+          "lon": -120.9445995,
+          "country": "US"
+        },
+        {
+          "text": "Luxor",
+          "lat": 25.702096,
+          "lon": 32.647186,
+          "country": "EG"
+        },
+        {
+          "text": "Valley of the Kings",
+          "lat": 25.7404899,
+          "lon": 32.6017581,
+          "country": "EG"
+        },
+        {
+          "text": "Egypt",
+          "lat": 26.2540493,
+          "lon": 29.2675469,
+          "country": "EG"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Cairo",
+        "country": "EG"
+      }
+    },
+    {
+      "text": "Australia is experiencing a surge in international tourism, with Sydney and Melbourne reporting record visitor numbers. Tourists are flocking to the Great Barrier Reef in Queensland and the outback of Northern Territory. New Zealand has also seen a rise in arrivals from Asia and the United States.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Australia",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "text": "Sydney",
+          "label": "GPE",
+          "start": 65,
+          "end": 71
+        },
+        {
+          "text": "Melbourne",
+          "label": "GPE",
+          "start": 76,
+          "end": 85
+        },
+        {
+          "text": "Great Barrier Reef",
+          "label": "LOC",
+          "start": 149,
+          "end": 167
+        },
+        {
+          "text": "Queensland",
+          "label": "GPE",
+          "start": 171,
+          "end": 181
+        },
+        {
+          "text": "Northern Territory",
+          "label": "GPE",
+          "start": 201,
+          "end": 219
+        },
+        {
+          "text": "New Zealand",
+          "label": "GPE",
+          "start": 221,
+          "end": 232
+        },
+        {
+          "text": "Asia",
+          "label": "LOC",
+          "start": 271,
+          "end": 275
+        },
+        {
+          "text": "United States",
+          "label": "GPE",
+          "start": 284,
+          "end": 297
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Australia",
+          "lat": -24.7761086,
+          "lon": 134.755,
+          "country": "AU"
+        },
+        {
+          "text": "Sydney",
+          "lat": -33.8698439,
+          "lon": 151.2082848,
+          "country": "AU"
+        },
+        {
+          "text": "Melbourne",
+          "lat": -37.8142454,
+          "lon": 144.9631732,
+          "country": "AU"
+        },
+        {
+          "text": "Great Barrier Reef",
+          "lat": -16.35,
+          "lon": 145.9,
+          "country": "AU"
+        },
+        {
+          "text": "Queensland",
+          "lat": -22.1646782,
+          "lon": 144.5844903,
+          "country": "AU"
+        },
+        {
+          "text": "Northern Territory",
+          "lat": -19.8516101,
+          "lon": 133.2303375,
+          "country": "AU"
+        },
+        {
+          "text": "New Zealand",
+          "lat": -41.5000831,
+          "lon": 172.8344077,
+          "country": "NZ"
+        },
+        {
+          "text": "Asia",
+          "lat": 51.2086975,
+          "lon": 89.2343748,
+          "country": null
+        },
+        {
+          "text": "United States",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Australia",
+        "country": "AU"
+      }
+    },
+    {
+      "text": "The Panama Canal is facing reduced traffic due to drought conditions in Panama. Ships traveling between the Atlantic and Pacific Oceans are being forced to take longer routes around Cape Horn. The situation has disrupted supply chains for ports in the United States and Europe.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Panama Canal",
+          "label": "LOC",
+          "start": 4,
+          "end": 16
+        },
+        {
+          "text": "Panama",
+          "label": "GPE",
+          "start": 4,
+          "end": 10
+        },
+        {
+          "text": "Atlantic",
+          "label": "LOC",
+          "start": 108,
+          "end": 116
+        },
+        {
+          "text": "Pacific",
+          "label": "LOC",
+          "start": 121,
+          "end": 128
+        },
+        {
+          "text": "Cape Horn",
+          "label": "LOC",
+          "start": 182,
+          "end": 191
+        },
+        {
+          "text": "United States",
+          "label": "GPE",
+          "start": 252,
+          "end": 265
+        },
+        {
+          "text": "Europe",
+          "label": "LOC",
+          "start": 270,
+          "end": 276
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Panama Canal",
+          "lat": 8.9988205,
+          "lon": -79.6024233,
+          "country": "PA"
+        },
+        {
+          "text": "Panama",
+          "lat": 8.559559,
+          "lon": -81.1308434,
+          "country": "PA"
+        },
+        {
+          "text": "Atlantic",
+          "lat": 39.5143268,
+          "lon": -74.6632883,
+          "country": "US"
+        },
+        {
+          "text": "Pacific",
+          "lat": 46.5334929,
+          "lon": -123.768029,
+          "country": "US"
+        },
+        {
+          "text": "Cape Horn",
+          "lat": -55.9774572,
+          "lon": -67.2630538,
+          "country": "CL"
+        },
+        {
+          "text": "United States",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        },
+        {
+          "text": "Europe",
+          "lat": 51.0,
+          "lon": 10.0,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Panama",
+        "country": "PA"
+      }
+    },
+    {
+      "text": "A new high-speed rail line connecting Mexico City to Guadalajara has been announced. The project is expected to cut travel time by half and boost commerce between central Mexico and the Pacific coast. Engineers from Spain and Japan have been contracted to assist with the design.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Mexico City",
+          "label": "GPE",
+          "start": 38,
+          "end": 49
+        },
+        {
+          "text": "Guadalajara",
+          "label": "GPE",
+          "start": 53,
+          "end": 64
+        },
+        {
+          "text": "Mexico",
+          "label": "GPE",
+          "start": 38,
+          "end": 44
+        },
+        {
+          "text": "Pacific",
+          "label": "LOC",
+          "start": 186,
+          "end": 193
+        },
+        {
+          "text": "Spain",
+          "label": "GPE",
+          "start": 216,
+          "end": 221
+        },
+        {
+          "text": "Japan",
+          "label": "GPE",
+          "start": 226,
+          "end": 231
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mexico City",
+          "lat": 19.4326296,
+          "lon": -99.1331785,
+          "country": "MX"
+        },
+        {
+          "text": "Guadalajara",
+          "lat": 20.6720375,
+          "lon": -103.338396,
+          "country": "MX"
+        },
+        {
+          "text": "Mexico",
+          "lat": 23.6585116,
+          "lon": -102.0077097,
+          "country": "MX"
+        },
+        {
+          "text": "Pacific",
+          "lat": 46.5334929,
+          "lon": -123.768029,
+          "country": "US"
+        },
+        {
+          "text": "Spain",
+          "lat": 39.3260685,
+          "lon": -4.8379791,
+          "country": "ES"
+        },
+        {
+          "text": "Japan",
+          "lat": 36.5748441,
+          "lon": 139.2394179,
+          "country": "JP"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Mexico City",
+        "country": "MX"
+      }
+    },
+    {
+      "text": "Tech companies in Silicon Valley are increasingly looking to hire engineers from Bangalore and Hyderabad. The shift reflects the growing importance of India's technology sector in the global market. Companies like Google and Microsoft have expanded their campuses in Bengaluru and Gurgaon.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Silicon Valley",
+          "label": "LOC",
+          "start": 18,
+          "end": 32
+        },
+        {
+          "text": "Bangalore",
+          "label": "GPE",
+          "start": 81,
+          "end": 90
+        },
+        {
+          "text": "Hyderabad",
+          "label": "GPE",
+          "start": 95,
+          "end": 104
+        },
+        {
+          "text": "India",
+          "label": "GPE",
+          "start": 151,
+          "end": 156
+        },
+        {
+          "text": "Bengaluru",
+          "label": "GPE",
+          "start": 267,
+          "end": 276
+        },
+        {
+          "text": "Gurgaon",
+          "label": "GPE",
+          "start": 281,
+          "end": 288
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Silicon Valley",
+          "lat": 37.4429964,
+          "lon": -122.1545229,
+          "country": "US"
+        },
+        {
+          "text": "Bangalore",
+          "lat": 12.9767936,
+          "lon": 77.590082,
+          "country": "IN"
+        },
+        {
+          "text": "Hyderabad",
+          "lat": 17.360589,
+          "lon": 78.4740613,
+          "country": "IN"
+        },
+        {
+          "text": "India",
+          "lat": 22.3511148,
+          "lon": 78.6677428,
+          "country": "IN"
+        },
+        {
+          "text": "Bengaluru",
+          "lat": 12.9767936,
+          "lon": 77.590082,
+          "country": "IN"
+        },
+        {
+          "text": "Gurgaon",
+          "lat": 28.4646148,
+          "lon": 77.0299194,
+          "country": "IN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Bangalore",
+        "country": "IN"
+      }
+    },
+    {
+      "text": "The Mekong river basin in Southeast Asia faces environmental challenges from dam construction. Countries including Cambodia, Laos, Thailand, and Vietnam have conflicting interests over water management. The Mekong River Commission has called for greater cooperation between member states.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Mekong",
+          "label": "LOC",
+          "start": 4,
+          "end": 10
+        },
+        {
+          "text": "Southeast Asia",
+          "label": "LOC",
+          "start": 26,
+          "end": 40
+        },
+        {
+          "text": "Cambodia",
+          "label": "GPE",
+          "start": 115,
+          "end": 123
+        },
+        {
+          "text": "Laos",
+          "label": "GPE",
+          "start": 125,
+          "end": 129
+        },
+        {
+          "text": "Thailand",
+          "label": "GPE",
+          "start": 131,
+          "end": 139
+        },
+        {
+          "text": "Vietnam",
+          "label": "GPE",
+          "start": 145,
+          "end": 152
+        },
+        {
+          "text": "Mekong River Commission",
+          "label": "LOC",
+          "start": 207,
+          "end": 230
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mekong",
+          "lat": 20.0566065,
+          "lon": 101.9933152,
+          "country": "LA"
+        },
+        {
+          "text": "Southeast Asia",
+          "lat": 49.1963816,
+          "lon": 16.6088699,
+          "country": "CZ"
+        },
+        {
+          "text": "Cambodia",
+          "lat": 12.5433216,
+          "lon": 104.8144914,
+          "country": "KH"
+        },
+        {
+          "text": "Laos",
+          "lat": 20.0171109,
+          "lon": 103.378253,
+          "country": "LA"
+        },
+        {
+          "text": "Thailand",
+          "lat": 14.8971921,
+          "lon": 100.83273,
+          "country": "TH"
+        },
+        {
+          "text": "Vietnam",
+          "lat": 15.9266657,
+          "lon": 107.9650855,
+          "country": "VN"
+        },
+        {
+          "text": "Mekong River Commission",
+          "lat": 11.5163066,
+          "lon": 104.9357482,
+          "country": "KH"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Cambodia",
+        "country": "KH"
+      }
+    },
+    {
+      "text": "The Middle East is seeing a tourism boom, with Dubai and Abu Dhabi leading the recovery. Visitors from Europe and Asia are drawn to the region's shopping, cuisine, and desert landscapes. Saudi Arabia has opened its borders to international tourists, promoting destinations like Riyadh and Jeddah.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Middle East",
+          "label": "LOC",
+          "start": 4,
+          "end": 15
+        },
+        {
+          "text": "Dubai",
+          "label": "GPE",
+          "start": 47,
+          "end": 52
+        },
+        {
+          "text": "Abu Dhabi",
+          "label": "GPE",
+          "start": 57,
+          "end": 66
+        },
+        {
+          "text": "Europe",
+          "label": "LOC",
+          "start": 103,
+          "end": 109
+        },
+        {
+          "text": "Asia",
+          "label": "LOC",
+          "start": 114,
+          "end": 118
+        },
+        {
+          "text": "Saudi Arabia",
+          "label": "GPE",
+          "start": 187,
+          "end": 199
+        },
+        {
+          "text": "Riyadh",
+          "label": "GPE",
+          "start": 278,
+          "end": 284
+        },
+        {
+          "text": "Jeddah",
+          "label": "GPE",
+          "start": 289,
+          "end": 295
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Middle East",
+          "lat": 39.3014159,
+          "lon": -76.5888477,
+          "country": "US"
+        },
+        {
+          "text": "Dubai",
+          "lat": 25.0742823,
+          "lon": 55.1885387,
+          "country": "AE"
+        },
+        {
+          "text": "Abu Dhabi",
+          "lat": 24.4538352,
+          "lon": 54.3774014,
+          "country": "AE"
+        },
+        {
+          "text": "Europe",
+          "lat": 51.0,
+          "lon": 10.0,
+          "country": null
+        },
+        {
+          "text": "Asia",
+          "lat": 51.2086975,
+          "lon": 89.2343748,
+          "country": null
+        },
+        {
+          "text": "Saudi Arabia",
+          "lat": 25.6242618,
+          "lon": 42.3528328,
+          "country": "SA"
+        },
+        {
+          "text": "Riyadh",
+          "lat": 24.638916,
+          "lon": 46.7160104,
+          "country": "SA"
+        },
+        {
+          "text": "Jeddah",
+          "lat": 21.5504432,
+          "lon": 39.1742363,
+          "country": "SA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Dubai",
+        "country": "AE"
+      }
+    },
+    {
+      "text": "A severe winter storm has blanketed much of Canada and the northern United States. Cities like Toronto, Montreal, and Chicago have issued travel advisories. The Rocky Mountains region has received record snowfall, creating ideal conditions for ski resorts in British Columbia and Alberta.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Canada",
+          "label": "GPE",
+          "start": 44,
+          "end": 50
+        },
+        {
+          "text": "United States",
+          "label": "GPE",
+          "start": 68,
+          "end": 81
+        },
+        {
+          "text": "Toronto",
+          "label": "GPE",
+          "start": 95,
+          "end": 102
+        },
+        {
+          "text": "Montreal",
+          "label": "GPE",
+          "start": 104,
+          "end": 112
+        },
+        {
+          "text": "Chicago",
+          "label": "GPE",
+          "start": 118,
+          "end": 125
+        },
+        {
+          "text": "Rocky Mountains",
+          "label": "LOC",
+          "start": 161,
+          "end": 176
+        },
+        {
+          "text": "British Columbia",
+          "label": "GPE",
+          "start": 259,
+          "end": 275
+        },
+        {
+          "text": "Alberta",
+          "label": "GPE",
+          "start": 280,
+          "end": 287
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Canada",
+          "lat": 61.0666922,
+          "lon": -107.991707,
+          "country": "CA"
+        },
+        {
+          "text": "United States",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        },
+        {
+          "text": "Toronto",
+          "lat": 43.6534817,
+          "lon": -79.3839347,
+          "country": "CA"
+        },
+        {
+          "text": "Montreal",
+          "lat": 45.5031824,
+          "lon": -73.5698065,
+          "country": "CA"
+        },
+        {
+          "text": "Chicago",
+          "lat": 41.8755616,
+          "lon": -87.6244212,
+          "country": "US"
+        },
+        {
+          "text": "Rocky Mountains",
+          "lat": 43.3578532,
+          "lon": -110.917506,
+          "country": "US"
+        },
+        {
+          "text": "British Columbia",
+          "lat": 55.001251,
+          "lon": -125.002441,
+          "country": "CA"
+        },
+        {
+          "text": "Alberta",
+          "lat": 55.001251,
+          "lon": -115.002136,
+          "country": "CA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Canada",
+        "country": "CA"
+      }
+    }
+  ]
+}

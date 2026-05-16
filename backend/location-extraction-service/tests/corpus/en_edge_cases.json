@@ -1,0 +1,214 @@
+{
+  "samples": [
+    {
+      "text": "",
+      "language": "en",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "This sentence has no location mentions whatsoever.",
+      "language": "en",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "   \n\t  ",
+      "language": "en",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "Paris Paris Paris",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 6,
+          "end": 11
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 12,
+          "end": 17
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Paris",
+          "lat": 48.8534951,
+          "lon": 2.3483915,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Paris",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "I visited the river.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "river",
+          "label": "LOC",
+          "start": 14,
+          "end": 19
+        }
+      ],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "WASHINGTON DC — The president arrived today.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "WASHINGTON DC",
+          "label": "GPE",
+          "start": 0,
+          "end": 13
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "WASHINGTON DC",
+          "lat": 38.8950982,
+          "lon": -77.0363849,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "WASHINGTON DC",
+        "country": "US"
+      }
+    },
+    {
+      "text": "New York-based company expands to San Francisco.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "New York",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "San Francisco",
+          "label": "GPE",
+          "start": 34,
+          "end": 47
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "New York",
+          "lat": 40.7127281,
+          "lon": -74.0060152,
+          "country": "US"
+        },
+        {
+          "text": "San Francisco",
+          "lat": 37.7879363,
+          "lon": -122.4075201,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "New York",
+        "country": "US"
+      }
+    },
+    {
+      "text": "WELCOME TO THE EVENT",
+      "language": "en",
+      "entities": [],
+      "expected_geocoded_locations": [],
+      "expected_event_location": null
+    },
+    {
+      "text": "St. Petersburg is a beautiful city in Florida.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "St. Petersburg",
+          "label": "GPE",
+          "start": 0,
+          "end": 14
+        },
+        {
+          "text": "Florida",
+          "label": "GPE",
+          "start": 38,
+          "end": 45
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "St. Petersburg",
+          "lat": 59.9606739,
+          "lon": 30.1586551,
+          "country": "RU"
+        },
+        {
+          "text": "Florida",
+          "lat": 27.7567667,
+          "lon": -81.4639835,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "St. Petersburg",
+        "country": "RU"
+      }
+    },
+    {
+      "text": "The king of England visited France in 1066.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "England",
+          "label": "GPE",
+          "start": 12,
+          "end": 19
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 28,
+          "end": 34
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "England",
+          "lat": 52.5310214,
+          "lon": -1.2649062,
+          "country": "GB"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "England",
+        "country": "GB"
+      }
+    }
+  ]
+}

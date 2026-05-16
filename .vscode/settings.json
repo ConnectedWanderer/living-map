@@ -1,0 +1,6 @@
+{
+  "python.testing.pytestArgs": ["backend/location-extraction-service/tests/"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.defaultInterpreterPath": "backend/location-extraction-service/.venv/bin/python"
+}

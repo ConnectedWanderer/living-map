@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.coverage
+*.egg-info/
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store

@@ -1,0 +1,1612 @@
+{
+  "samples": [
+    {
+      "text": "The meeting in Paris was attended by officials from London.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 15,
+          "end": 20
+        },
+        {
+          "text": "London",
+          "label": "GPE",
+          "start": 52,
+          "end": 58
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Paris",
+          "lat": 48.8534951,
+          "lon": 2.3483915,
+          "country": "FR"
+        },
+        {
+          "text": "London",
+          "lat": 51.5074456,
+          "lon": -0.1277653,
+          "country": "GB"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Paris",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Berlin and Madrid are discussing new trade agreements.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Berlin",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Madrid",
+          "label": "GPE",
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Berlin",
+          "lat": 52.5173885,
+          "lon": 13.3951309,
+          "country": "DE"
+        },
+        {
+          "text": "Madrid",
+          "lat": 40.416782,
+          "lon": -3.703507,
+          "country": "ES"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Berlin",
+        "country": "DE"
+      }
+    },
+    {
+      "text": "The Seine river flows through the heart of Paris.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Seine",
+          "label": "LOC",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 43,
+          "end": 48
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Seine",
+          "lat": 48.7340697,
+          "lon": 2.4448155,
+          "country": "FR"
+        },
+        {
+          "text": "Paris",
+          "lat": 48.8534951,
+          "lon": 2.3483915,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Paris",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Officials from Rome and Berlin will meet in Milan next week.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Rome",
+          "label": "GPE",
+          "start": 15,
+          "end": 19
+        },
+        {
+          "text": "Berlin",
+          "label": "GPE",
+          "start": 24,
+          "end": 30
+        },
+        {
+          "text": "Milan",
+          "label": "GPE",
+          "start": 44,
+          "end": 49
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Rome",
+          "lat": 41.8933203,
+          "lon": 12.4829321,
+          "country": "IT"
+        },
+        {
+          "text": "Berlin",
+          "lat": 52.5173885,
+          "lon": 13.3951309,
+          "country": "DE"
+        },
+        {
+          "text": "Milan",
+          "lat": 45.4641943,
+          "lon": 9.1896346,
+          "country": "IT"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Rome",
+        "country": "IT"
+      }
+    },
+    {
+      "text": "The Alps are visible from the city of Munich.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Alps",
+          "label": "LOC",
+          "start": 4,
+          "end": 8
+        },
+        {
+          "text": "Munich",
+          "label": "GPE",
+          "start": 38,
+          "end": 44
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Alps",
+          "lat": 45.9083263,
+          "lon": 9.1420628,
+          "country": "IT"
+        },
+        {
+          "text": "Munich",
+          "lat": 48.1371079,
+          "lon": 11.5753822,
+          "country": "DE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Munich",
+        "country": "DE"
+      }
+    },
+    {
+      "text": "Travel from Lyon to Marseille takes about three hours by train.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Lyon",
+          "label": "GPE",
+          "start": 12,
+          "end": 16
+        },
+        {
+          "text": "Marseille",
+          "label": "GPE",
+          "start": 20,
+          "end": 29
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Lyon",
+          "lat": 45.7578137,
+          "lon": 4.8320114,
+          "country": "FR"
+        },
+        {
+          "text": "Marseille",
+          "lat": 43.2963986,
+          "lon": 5.3777888,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Lyon",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "The Danube river crosses Vienna before reaching the Black Sea.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Danube",
+          "label": "LOC",
+          "start": 4,
+          "end": 10
+        },
+        {
+          "text": "Vienna",
+          "label": "GPE",
+          "start": 25,
+          "end": 31
+        },
+        {
+          "text": "Black Sea",
+          "label": "LOC",
+          "start": 52,
+          "end": 61
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Danube",
+          "lat": 47.9221618,
+          "lon": 17.4307889,
+          "country": "HU"
+        },
+        {
+          "text": "Vienna",
+          "lat": 48.2083537,
+          "lon": 16.3725042,
+          "country": "AT"
+        },
+        {
+          "text": "Black Sea",
+          "lat": 43.872824,
+          "lon": 33.9938077,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Vienna",
+        "country": "AT"
+      }
+    },
+    {
+      "text": "Athens has announced new measures to boost tourism.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Athens",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Athens",
+          "lat": 33.9597677,
+          "lon": -83.376398,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Athens",
+        "country": "US"
+      }
+    },
+    {
+      "text": "The Rhine valley is known for its vineyards and castles.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Rhine",
+          "label": "LOC",
+          "start": 4,
+          "end": 9
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Rhine",
+          "lat": 50.4693743,
+          "lon": 7.3499986,
+          "country": "DE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Rhine",
+        "country": "DE"
+      }
+    },
+    {
+      "text": "Warsaw and Prague are both popular destinations for European tourists.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Warsaw",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Prague",
+          "label": "GPE",
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Warsaw",
+          "lat": 52.2333742,
+          "lon": 21.0711489,
+          "country": "PL"
+        },
+        {
+          "text": "Prague",
+          "lat": 50.0874654,
+          "lon": 14.4212535,
+          "country": "CZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Warsaw",
+        "country": "PL"
+      }
+    },
+    {
+      "text": "Hiking in the Pyrenees is a popular summer activity in Spain.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Pyrenees",
+          "label": "LOC",
+          "start": 14,
+          "end": 22
+        },
+        {
+          "text": "Spain",
+          "label": "GPE",
+          "start": 55,
+          "end": 60
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Pyrenees",
+          "lat": 42.6687275,
+          "lon": 0.4202897,
+          "country": "ES"
+        },
+        {
+          "text": "Spain",
+          "lat": 39.3260685,
+          "lon": -4.8379791,
+          "country": "ES"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Spain",
+        "country": "ES"
+      }
+    },
+    {
+      "text": "The conference in Brussels will address climate policy across Europe.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Brussels",
+          "label": "GPE",
+          "start": 18,
+          "end": 26
+        },
+        {
+          "text": "Europe",
+          "label": "LOC",
+          "start": 62,
+          "end": 68
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Brussels",
+          "lat": 50.8467372,
+          "lon": 4.352493,
+          "country": "BE"
+        },
+        {
+          "text": "Europe",
+          "lat": 51.0,
+          "lon": 10.0,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Brussels",
+        "country": "BE"
+      }
+    },
+    {
+      "text": "Stockholm is built on several islands connected by bridges.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Stockholm",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Stockholm",
+          "lat": 59.3251172,
+          "lon": 18.0710935,
+          "country": "SE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Stockholm",
+        "country": "SE"
+      }
+    },
+    {
+      "text": "The Loire valley contains some of the finest chateaux in France.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Loire",
+          "label": "LOC",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 57,
+          "end": 63
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Loire",
+          "lat": 45.7538536,
+          "lon": 4.0454737,
+          "country": "FR"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "France",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Dublin and Edinburgh are famous for their literary heritage.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Dublin",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Edinburgh",
+          "label": "GPE",
+          "start": 11,
+          "end": 20
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Dublin",
+          "lat": 53.3493795,
+          "lon": -6.2605593,
+          "country": "IE"
+        },
+        {
+          "text": "Edinburgh",
+          "lat": 55.9533456,
+          "lon": -3.1883749,
+          "country": "GB"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Dublin",
+        "country": "IE"
+      }
+    },
+    {
+      "text": "The flight from Cairo to Nairobi was delayed by six hours.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Cairo",
+          "label": "GPE",
+          "start": 16,
+          "end": 21
+        },
+        {
+          "text": "Nairobi",
+          "label": "GPE",
+          "start": 25,
+          "end": 32
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Cairo",
+          "lat": 30.0443879,
+          "lon": 31.2357257,
+          "country": "EG"
+        },
+        {
+          "text": "Nairobi",
+          "lat": -1.302398,
+          "lon": 36.8288509,
+          "country": "KE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Cairo",
+        "country": "EG"
+      }
+    },
+    {
+      "text": "Lagos and Johannesburg are major economic hubs in Africa.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Lagos",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Johannesburg",
+          "label": "GPE",
+          "start": 10,
+          "end": 22
+        },
+        {
+          "text": "Africa",
+          "label": "LOC",
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Lagos",
+          "lat": 6.4550575,
+          "lon": 3.3941795,
+          "country": "NG"
+        },
+        {
+          "text": "Johannesburg",
+          "lat": -26.205,
+          "lon": 28.049722,
+          "country": "ZA"
+        },
+        {
+          "text": "Africa",
+          "lat": 11.5024338,
+          "lon": 17.7578122,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Lagos",
+        "country": "NG"
+      }
+    },
+    {
+      "text": "Marrakech is a popular tourist destination known for its markets.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Marrakech",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Marrakech",
+          "lat": 31.6258257,
+          "lon": -7.9891608,
+          "country": "MA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Marrakech",
+        "country": "MA"
+      }
+    },
+    {
+      "text": "The Sahara desert stretches across northern Africa.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Sahara",
+          "label": "LOC",
+          "start": 4,
+          "end": 10
+        },
+        {
+          "text": "Africa",
+          "label": "LOC",
+          "start": 44,
+          "end": 50
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Sahara",
+          "lat": 22.25,
+          "lon": 9.8,
+          "country": "DZ"
+        },
+        {
+          "text": "Africa",
+          "lat": 11.5024338,
+          "lon": 17.7578122,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Sahara",
+        "country": "DZ"
+      }
+    },
+    {
+      "text": "Mount Kilimanjaro is the highest peak in Africa.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Kilimanjaro",
+          "label": "LOC",
+          "start": 6,
+          "end": 17
+        },
+        {
+          "text": "Africa",
+          "label": "LOC",
+          "start": 41,
+          "end": 47
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Kilimanjaro",
+          "lat": -3.0786534,
+          "lon": 37.4198556,
+          "country": "TZ"
+        },
+        {
+          "text": "Africa",
+          "lat": 11.5024338,
+          "lon": 17.7578122,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Kilimanjaro",
+        "country": "TZ"
+      }
+    },
+    {
+      "text": "The Nile river flows through Egypt and Sudan.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Nile",
+          "label": "LOC",
+          "start": 4,
+          "end": 8
+        },
+        {
+          "text": "Egypt",
+          "label": "GPE",
+          "start": 29,
+          "end": 34
+        },
+        {
+          "text": "Sudan",
+          "label": "GPE",
+          "start": 39,
+          "end": 44
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Nile",
+          "lat": 46.836279,
+          "lon": -120.9445995,
+          "country": "US"
+        },
+        {
+          "text": "Egypt",
+          "lat": 26.2540493,
+          "lon": 29.2675469,
+          "country": "EG"
+        },
+        {
+          "text": "Sudan",
+          "lat": 14.5844444,
+          "lon": 29.4917691,
+          "country": "SD"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Egypt",
+        "country": "EG"
+      }
+    },
+    {
+      "text": "Tokyo and Seoul are connected by direct flights.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Tokyo",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Seoul",
+          "label": "GPE",
+          "start": 10,
+          "end": 15
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Tokyo",
+          "lat": 35.6768601,
+          "lon": 139.7638947,
+          "country": "JP"
+        },
+        {
+          "text": "Seoul",
+          "lat": 37.5666791,
+          "lon": 126.9782914,
+          "country": "KR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Tokyo",
+        "country": "JP"
+      }
+    },
+    {
+      "text": "The markets in Shanghai and Hong Kong attract investors from around the world.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Shanghai",
+          "label": "GPE",
+          "start": 15,
+          "end": 23
+        },
+        {
+          "text": "Hong Kong",
+          "label": "GPE",
+          "start": 28,
+          "end": 37
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Shanghai",
+          "lat": 31.2312707,
+          "lon": 121.4700152,
+          "country": "CN"
+        },
+        {
+          "text": "Hong Kong",
+          "lat": 22.2792968,
+          "lon": 114.1628907,
+          "country": "CN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Shanghai",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "Mumbai is the financial capital of India.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Mumbai",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "India",
+          "label": "GPE",
+          "start": 35,
+          "end": 40
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mumbai",
+          "lat": 19.054999,
+          "lon": 72.8692035,
+          "country": "IN"
+        },
+        {
+          "text": "India",
+          "lat": 22.3511148,
+          "lon": 78.6677428,
+          "country": "IN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Mumbai",
+        "country": "IN"
+      }
+    },
+    {
+      "text": "Singapore and Dubai are both major hubs for international trade.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Singapore",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "text": "Dubai",
+          "label": "GPE",
+          "start": 14,
+          "end": 19
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Singapore",
+          "lat": 1.357107,
+          "lon": 103.8194992,
+          "country": "SG"
+        },
+        {
+          "text": "Dubai",
+          "lat": 25.0742823,
+          "lon": 55.1885387,
+          "country": "AE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Singapore",
+        "country": "SG"
+      }
+    },
+    {
+      "text": "The Great Wall of China is visible from space according to legend.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Great Wall of China",
+          "label": "LOC",
+          "start": 4,
+          "end": 23
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Great Wall of China",
+          "lat": 40.4455003,
+          "lon": 113.3278884,
+          "country": "CN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Great Wall of China",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "Bangkok and Singapore are the most visited cities in Southeast Asia.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Bangkok",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        },
+        {
+          "text": "Singapore",
+          "label": "GPE",
+          "start": 12,
+          "end": 21
+        },
+        {
+          "text": "Southeast Asia",
+          "label": "LOC",
+          "start": 53,
+          "end": 67
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Bangkok",
+          "lat": 13.7524938,
+          "lon": 100.4935089,
+          "country": "TH"
+        },
+        {
+          "text": "Singapore",
+          "lat": 1.357107,
+          "lon": 103.8194992,
+          "country": "SG"
+        },
+        {
+          "text": "Southeast Asia",
+          "lat": 49.1963816,
+          "lon": 16.6088699,
+          "country": "CZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Bangkok",
+        "country": "TH"
+      }
+    },
+    {
+      "text": "Beijing and Delhi have both invested heavily in renewable energy.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Beijing",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        },
+        {
+          "text": "Delhi",
+          "label": "GPE",
+          "start": 12,
+          "end": 17
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Beijing",
+          "lat": 39.9057136,
+          "lon": 116.3912972,
+          "country": "CN"
+        },
+        {
+          "text": "Delhi",
+          "lat": 28.6138954,
+          "lon": 77.2090057,
+          "country": "IN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Beijing",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "The Himalayas separate the Indian subcontinent from the Tibetan plateau.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Himalayas",
+          "label": "LOC",
+          "start": 4,
+          "end": 13
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Himalayas",
+          "lat": 30.5231861,
+          "lon": 80.5727039,
+          "country": "CN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Himalayas",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "The Yangtze river is the longest in Asia.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Yangtze",
+          "label": "LOC",
+          "start": 4,
+          "end": 11
+        },
+        {
+          "text": "Asia",
+          "label": "LOC",
+          "start": 36,
+          "end": 40
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Yangtze",
+          "lat": 30.5641456,
+          "lon": 114.2917049,
+          "country": "CN"
+        },
+        {
+          "text": "Asia",
+          "lat": 51.2086975,
+          "lon": 89.2343748,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Yangtze",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "New York and Chicago are linked by rail and air.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "New York",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "Chicago",
+          "label": "GPE",
+          "start": 13,
+          "end": 20
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "New York",
+          "lat": 40.7127281,
+          "lon": -74.0060152,
+          "country": "US"
+        },
+        {
+          "text": "Chicago",
+          "lat": 41.8755616,
+          "lon": -87.6244212,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "New York",
+        "country": "US"
+      }
+    },
+    {
+      "text": "The Amazon rainforest spans nine countries in South America.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Amazon",
+          "label": "LOC",
+          "start": 4,
+          "end": 10
+        },
+        {
+          "text": "South America",
+          "label": "LOC",
+          "start": 46,
+          "end": 59
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Amazon",
+          "lat": 0.2504402,
+          "lon": -50.6229266,
+          "country": "BR"
+        },
+        {
+          "text": "South America",
+          "lat": -21.0002179,
+          "lon": -61.0006565,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Amazon",
+        "country": "BR"
+      }
+    },
+    {
+      "text": "Buenos Aires and Rio de Janeiro are famous for their vibrant culture.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Buenos Aires",
+          "label": "GPE",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "Rio de Janeiro",
+          "label": "GPE",
+          "start": 17,
+          "end": 31
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Buenos Aires",
+          "lat": -34.6095579,
+          "lon": -58.3887904,
+          "country": "AR"
+        },
+        {
+          "text": "Rio de Janeiro",
+          "lat": -22.9110137,
+          "lon": -43.2093727,
+          "country": "BR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Buenos Aires",
+        "country": "AR"
+      }
+    },
+    {
+      "text": "Mexico City and Lima have rich culinary traditions.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Mexico City",
+          "label": "GPE",
+          "start": 0,
+          "end": 11
+        },
+        {
+          "text": "Lima",
+          "label": "GPE",
+          "start": 16,
+          "end": 20
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mexico City",
+          "lat": 19.4326296,
+          "lon": -99.1331785,
+          "country": "MX"
+        },
+        {
+          "text": "Lima",
+          "lat": -12.0459808,
+          "lon": -77.0305912,
+          "country": "PE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Mexico City",
+        "country": "MX"
+      }
+    },
+    {
+      "text": "Santiago is the capital of Chile.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Santiago",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "Chile",
+          "label": "GPE",
+          "start": 27,
+          "end": 32
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Santiago",
+          "lat": 9.8694792,
+          "lon": -83.7980749,
+          "country": "CR"
+        },
+        {
+          "text": "Chile",
+          "lat": -31.7613365,
+          "lon": -71.3187697,
+          "country": "CL"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Santiago",
+        "country": "CR"
+      }
+    },
+    {
+      "text": "The Mississippi river is a major waterway in the United States.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Mississippi",
+          "label": "LOC",
+          "start": 4,
+          "end": 15
+        },
+        {
+          "text": "United States",
+          "label": "GPE",
+          "start": 49,
+          "end": 62
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mississippi",
+          "lat": 32.9715285,
+          "lon": -89.7348497,
+          "country": "US"
+        },
+        {
+          "text": "United States",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "United States",
+        "country": "US"
+      }
+    },
+    {
+      "text": "Toronto is the largest city in Canada.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Toronto",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        },
+        {
+          "text": "Canada",
+          "label": "GPE",
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Toronto",
+          "lat": 43.6534817,
+          "lon": -79.3839347,
+          "country": "CA"
+        },
+        {
+          "text": "Canada",
+          "lat": 61.0666922,
+          "lon": -107.991707,
+          "country": "CA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Toronto",
+        "country": "CA"
+      }
+    },
+    {
+      "text": "The Andes mountain range runs along the western edge of South America.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Andes",
+          "label": "LOC",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "text": "South America",
+          "label": "LOC",
+          "start": 56,
+          "end": 69
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Andes",
+          "lat": 5.6556134,
+          "lon": -75.8776753,
+          "country": "CO"
+        },
+        {
+          "text": "South America",
+          "lat": -21.0002179,
+          "lon": -61.0006565,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Andes",
+        "country": "CO"
+      }
+    },
+    {
+      "text": "Sydney and Melbourne are the largest cities in Australia.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Sydney",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Melbourne",
+          "label": "GPE",
+          "start": 11,
+          "end": 20
+        },
+        {
+          "text": "Australia",
+          "label": "GPE",
+          "start": 47,
+          "end": 56
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Sydney",
+          "lat": -33.8698439,
+          "lon": 151.2082848,
+          "country": "AU"
+        },
+        {
+          "text": "Melbourne",
+          "lat": -37.8142454,
+          "lon": 144.9631732,
+          "country": "AU"
+        },
+        {
+          "text": "Australia",
+          "lat": -24.7761086,
+          "lon": 134.755,
+          "country": "AU"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Sydney",
+        "country": "AU"
+      }
+    },
+    {
+      "text": "Auckland is the gateway to New Zealand.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Auckland",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "New Zealand",
+          "label": "GPE",
+          "start": 27,
+          "end": 38
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Auckland",
+          "lat": -36.852095,
+          "lon": 174.7631803,
+          "country": "NZ"
+        },
+        {
+          "text": "New Zealand",
+          "lat": -41.5000831,
+          "lon": 172.8344077,
+          "country": "NZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Auckland",
+        "country": "NZ"
+      }
+    },
+    {
+      "text": "The Great Barrier Reef is one of the natural wonders of the world.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Great Barrier Reef",
+          "label": "LOC",
+          "start": 4,
+          "end": 22
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Great Barrier Reef",
+          "lat": -16.35,
+          "lon": 145.9,
+          "country": "AU"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Great Barrier Reef",
+        "country": "AU"
+      }
+    },
+    {
+      "text": "Jakarta and Manila are rapidly growing cities in Southeast Asia.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Jakarta",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        },
+        {
+          "text": "Manila",
+          "label": "GPE",
+          "start": 12,
+          "end": 18
+        },
+        {
+          "text": "Southeast Asia",
+          "label": "LOC",
+          "start": 49,
+          "end": 63
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Jakarta",
+          "lat": -6.1754049,
+          "lon": 106.827168,
+          "country": "ID"
+        },
+        {
+          "text": "Manila",
+          "lat": 14.5904492,
+          "lon": 120.9803621,
+          "country": "PH"
+        },
+        {
+          "text": "Southeast Asia",
+          "lat": 49.1963816,
+          "lon": 16.6088699,
+          "country": "CZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Jakarta",
+        "country": "ID"
+      }
+    },
+    {
+      "text": "Los Angeles and San Francisco are on the west coast of the United States.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Los Angeles",
+          "label": "GPE",
+          "start": 0,
+          "end": 11
+        },
+        {
+          "text": "San Francisco",
+          "label": "GPE",
+          "start": 16,
+          "end": 29
+        },
+        {
+          "text": "United States",
+          "label": "GPE",
+          "start": 59,
+          "end": 72
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Los Angeles",
+          "lat": 34.0536909,
+          "lon": -118.242766,
+          "country": "US"
+        },
+        {
+          "text": "San Francisco",
+          "lat": 37.7879363,
+          "lon": -122.4075201,
+          "country": "US"
+        },
+        {
+          "text": "United States",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Los Angeles",
+        "country": "US"
+      }
+    },
+    {
+      "text": "Cape Town is known for its stunning coastline and Table Mountain.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Cape Town",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Cape Town",
+          "lat": -33.9288301,
+          "lon": 18.4172197,
+          "country": "ZA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Cape Town",
+        "country": "ZA"
+      }
+    },
+    {
+      "text": "The Gobi desert experiences extreme temperatures between summer and winter.",
+      "language": "en",
+      "entities": [
+        {
+          "text": "Gobi",
+          "label": "LOC",
+          "start": 4,
+          "end": 8
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Gobi",
+          "lat": 43.0,
+          "lon": 107.0,
+          "country": "MN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Gobi",
+        "country": "MN"
+      }
+    }
+  ]
+}

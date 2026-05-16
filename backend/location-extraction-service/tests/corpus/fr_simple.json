@@ -1,0 +1,1540 @@
+{
+  "samples": [
+    {
+      "text": "La réunion à Paris a réuni des responsables de Londres.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Paris",
+          "label": "GPE",
+          "start": 13,
+          "end": 18
+        },
+        {
+          "text": "Londres",
+          "label": "GPE",
+          "start": 47,
+          "end": 54
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Paris",
+          "lat": 48.8534951,
+          "lon": 2.3483915,
+          "country": "FR"
+        },
+        {
+          "text": "Londres",
+          "lat": 51.5074456,
+          "lon": -0.1277653,
+          "country": "GB"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Paris",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Berlin et Madrid discutent de nouveaux accords commerciaux.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Berlin",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Madrid",
+          "label": "GPE",
+          "start": 10,
+          "end": 16
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Berlin",
+          "lat": 52.5173885,
+          "lon": 13.3951309,
+          "country": "DE"
+        },
+        {
+          "text": "Madrid",
+          "lat": 40.416782,
+          "lon": -3.703507,
+          "country": "ES"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Berlin",
+        "country": "DE"
+      }
+    },
+    {
+      "text": "Le Rhône traverse Lyon avant de se jeter dans la mer.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Rhône",
+          "label": "LOC",
+          "start": 3,
+          "end": 8
+        },
+        {
+          "text": "Lyon",
+          "label": "GPE",
+          "start": 18,
+          "end": 22
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Rhône",
+          "lat": 45.8802348,
+          "lon": 4.5645336,
+          "country": "FR"
+        },
+        {
+          "text": "Lyon",
+          "lat": 45.7578137,
+          "lon": 4.8320114,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Lyon",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Des responsables de Rome et Berlin se rencontreront à Milan.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Rome",
+          "label": "GPE",
+          "start": 20,
+          "end": 24
+        },
+        {
+          "text": "Berlin",
+          "label": "GPE",
+          "start": 28,
+          "end": 34
+        },
+        {
+          "text": "Milan",
+          "label": "GPE",
+          "start": 54,
+          "end": 59
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Rome",
+          "lat": 41.8933203,
+          "lon": 12.4829321,
+          "country": "IT"
+        },
+        {
+          "text": "Berlin",
+          "lat": 52.5173885,
+          "lon": 13.3951309,
+          "country": "DE"
+        },
+        {
+          "text": "Milan",
+          "lat": 45.4641943,
+          "lon": 9.1896346,
+          "country": "IT"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Rome",
+        "country": "IT"
+      }
+    },
+    {
+      "text": "Les Alpes sont visibles depuis la ville de Munich.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Alpes",
+          "label": "LOC",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "text": "Munich",
+          "label": "GPE",
+          "start": 43,
+          "end": 49
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Alpes",
+          "lat": 45.9083263,
+          "lon": 9.1420628,
+          "country": "IT"
+        },
+        {
+          "text": "Munich",
+          "lat": 48.1371079,
+          "lon": 11.5753822,
+          "country": "DE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Munich",
+        "country": "DE"
+      }
+    },
+    {
+      "text": "Le voyage de Lyon à Marseille dure environ trois heures en train.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Lyon",
+          "label": "GPE",
+          "start": 13,
+          "end": 17
+        },
+        {
+          "text": "Marseille",
+          "label": "GPE",
+          "start": 20,
+          "end": 29
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Lyon",
+          "lat": 45.7578137,
+          "lon": 4.8320114,
+          "country": "FR"
+        },
+        {
+          "text": "Marseille",
+          "lat": 43.2963986,
+          "lon": 5.3777888,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Lyon",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Le Danube traverse Vienne avant d'atteindre la mer Noire.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Danube",
+          "label": "LOC",
+          "start": 3,
+          "end": 9
+        },
+        {
+          "text": "Vienne",
+          "label": "GPE",
+          "start": 19,
+          "end": 25
+        },
+        {
+          "text": "mer Noire",
+          "label": "LOC",
+          "start": 47,
+          "end": 56
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Danube",
+          "lat": 47.9221618,
+          "lon": 17.4307889,
+          "country": "HU"
+        },
+        {
+          "text": "Vienne",
+          "lat": 48.2083537,
+          "lon": 16.3725042,
+          "country": "AT"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Vienne",
+        "country": "AT"
+      }
+    },
+    {
+      "text": "Athènes a annoncé de nouvelles mesures pour stimuler le tourisme.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Athènes",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Athènes",
+          "lat": 37.9755648,
+          "lon": 23.7348324,
+          "country": "GR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Athènes",
+        "country": "GR"
+      }
+    },
+    {
+      "text": "La vallée du Rhin est connue pour ses vignobles et ses châteaux.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Rhin",
+          "label": "LOC",
+          "start": 13,
+          "end": 17
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Rhin",
+          "lat": 50.4693743,
+          "lon": 7.3499986,
+          "country": "DE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Rhin",
+        "country": "DE"
+      }
+    },
+    {
+      "text": "Varsovie et Prague sont des destinations populaires pour les touristes européens.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Varsovie",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "Prague",
+          "label": "GPE",
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Varsovie",
+          "lat": 52.2333742,
+          "lon": 21.0711489,
+          "country": "PL"
+        },
+        {
+          "text": "Prague",
+          "lat": 50.0874654,
+          "lon": 14.4212535,
+          "country": "CZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Varsovie",
+        "country": "PL"
+      }
+    },
+    {
+      "text": "La randonnée dans les Pyrénées est une activité estivale populaire en Espagne.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Pyrénées",
+          "label": "LOC",
+          "start": 22,
+          "end": 30
+        },
+        {
+          "text": "Espagne",
+          "label": "GPE",
+          "start": 70,
+          "end": 77
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Pyrénées",
+          "lat": 42.6687275,
+          "lon": 0.4202897,
+          "country": "ES"
+        },
+        {
+          "text": "Espagne",
+          "lat": 39.3260685,
+          "lon": -4.8379791,
+          "country": "ES"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Espagne",
+        "country": "ES"
+      }
+    },
+    {
+      "text": "La conférence à Bruxelles abordera la politique climatique à travers l'Europe.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Bruxelles",
+          "label": "GPE",
+          "start": 16,
+          "end": 25
+        },
+        {
+          "text": "Europe",
+          "label": "LOC",
+          "start": 71,
+          "end": 77
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Bruxelles",
+          "lat": 50.8551025,
+          "lon": 4.3510915,
+          "country": "BE"
+        },
+        {
+          "text": "Europe",
+          "lat": 51.0,
+          "lon": 10.0,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Bruxelles",
+        "country": "BE"
+      }
+    },
+    {
+      "text": "Stockholm est construite sur plusieurs îles reliées par des ponts.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Stockholm",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Stockholm",
+          "lat": 59.3251172,
+          "lon": 18.0710935,
+          "country": "SE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Stockholm",
+        "country": "SE"
+      }
+    },
+    {
+      "text": "La vallée de la Loire contient certains des plus beaux châteaux de France.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Loire",
+          "label": "LOC",
+          "start": 16,
+          "end": 21
+        },
+        {
+          "text": "France",
+          "label": "GPE",
+          "start": 67,
+          "end": 73
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Loire",
+          "lat": 45.7538536,
+          "lon": 4.0454737,
+          "country": "FR"
+        },
+        {
+          "text": "France",
+          "lat": 46.603354,
+          "lon": 1.8883335,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "France",
+        "country": "FR"
+      }
+    },
+    {
+      "text": "Dublin et Édimbourg sont célèbres pour leur héritage littéraire.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Dublin",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Édimbourg",
+          "label": "GPE",
+          "start": 10,
+          "end": 19
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Dublin",
+          "lat": 53.3493795,
+          "lon": -6.2605593,
+          "country": "IE"
+        },
+        {
+          "text": "Édimbourg",
+          "lat": 55.9533456,
+          "lon": -3.1883749,
+          "country": "GB"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Dublin",
+        "country": "IE"
+      }
+    },
+    {
+      "text": "Le vol du Caire à Nairobi a été retardé de six heures.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Caire",
+          "label": "GPE",
+          "start": 10,
+          "end": 15
+        },
+        {
+          "text": "Nairobi",
+          "label": "GPE",
+          "start": 18,
+          "end": 25
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Caire",
+          "lat": 30.0332516,
+          "lon": 31.5621651,
+          "country": "EG"
+        },
+        {
+          "text": "Nairobi",
+          "lat": -1.302398,
+          "lon": 36.8288509,
+          "country": "KE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Caire",
+        "country": "EG"
+      }
+    },
+    {
+      "text": "Lagos et Johannesburg sont des pôles économiques majeurs en Afrique.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Lagos",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Johannesburg",
+          "label": "GPE",
+          "start": 9,
+          "end": 21
+        },
+        {
+          "text": "Afrique",
+          "label": "LOC",
+          "start": 60,
+          "end": 67
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Lagos",
+          "lat": 6.4550575,
+          "lon": 3.3941795,
+          "country": "NG"
+        },
+        {
+          "text": "Johannesburg",
+          "lat": -26.205,
+          "lon": 28.049722,
+          "country": "ZA"
+        },
+        {
+          "text": "Afrique",
+          "lat": 11.5024338,
+          "lon": 17.7578122,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Lagos",
+        "country": "NG"
+      }
+    },
+    {
+      "text": "Marrakech est une destination touristique populaire pour ses marchés.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Marrakech",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Marrakech",
+          "lat": 31.6258257,
+          "lon": -7.9891608,
+          "country": "MA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Marrakech",
+        "country": "MA"
+      }
+    },
+    {
+      "text": "Le désert du Sahara s'étend à travers le nord de l'Afrique.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Sahara",
+          "label": "LOC",
+          "start": 13,
+          "end": 19
+        },
+        {
+          "text": "Afrique",
+          "label": "LOC",
+          "start": 51,
+          "end": 58
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Sahara",
+          "lat": 22.25,
+          "lon": 9.8,
+          "country": "DZ"
+        },
+        {
+          "text": "Afrique",
+          "lat": 11.5024338,
+          "lon": 17.7578122,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Sahara",
+        "country": "DZ"
+      }
+    },
+    {
+      "text": "Le Kilimandjaro est le plus haut sommet d'Afrique.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Kilimandjaro",
+          "label": "LOC",
+          "start": 3,
+          "end": 15
+        },
+        {
+          "text": "Afrique",
+          "label": "LOC",
+          "start": 42,
+          "end": 49
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Kilimandjaro",
+          "lat": -3.0786534,
+          "lon": 37.4198556,
+          "country": "TZ"
+        },
+        {
+          "text": "Afrique",
+          "lat": 11.5024338,
+          "lon": 17.7578122,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Kilimandjaro",
+        "country": "TZ"
+      }
+    },
+    {
+      "text": "Le Nil traverse l'Égypte et le Soudan.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Nil",
+          "label": "LOC",
+          "start": 3,
+          "end": 6
+        },
+        {
+          "text": "Égypte",
+          "label": "GPE",
+          "start": 18,
+          "end": 24
+        },
+        {
+          "text": "Soudan",
+          "label": "GPE",
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Nil",
+          "lat": 22.724378,
+          "lon": 32.1053309,
+          "country": "EG"
+        },
+        {
+          "text": "Égypte",
+          "lat": 26.2540493,
+          "lon": 29.2675469,
+          "country": "EG"
+        },
+        {
+          "text": "Soudan",
+          "lat": 14.5844444,
+          "lon": 29.4917691,
+          "country": "SD"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Égypte",
+        "country": "EG"
+      }
+    },
+    {
+      "text": "Tokyo et Séoul sont reliées par des vols directs.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Tokyo",
+          "label": "GPE",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "Séoul",
+          "label": "GPE",
+          "start": 9,
+          "end": 14
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Tokyo",
+          "lat": 35.6768601,
+          "lon": 139.7638947,
+          "country": "JP"
+        },
+        {
+          "text": "Séoul",
+          "lat": 37.5666791,
+          "lon": 126.9782914,
+          "country": "KR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Tokyo",
+        "country": "JP"
+      }
+    },
+    {
+      "text": "Les marchés à Shanghai et à Hong Kong attirent les investisseurs.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Shanghai",
+          "label": "GPE",
+          "start": 14,
+          "end": 22
+        },
+        {
+          "text": "Hong Kong",
+          "label": "GPE",
+          "start": 28,
+          "end": 37
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Shanghai",
+          "lat": 31.2312707,
+          "lon": 121.4700152,
+          "country": "CN"
+        },
+        {
+          "text": "Hong Kong",
+          "lat": 22.2792968,
+          "lon": 114.1628907,
+          "country": "CN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Shanghai",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "Mumbai est la capitale financière de l'Inde.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Mumbai",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Inde",
+          "label": "GPE",
+          "start": 39,
+          "end": 43
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mumbai",
+          "lat": 19.054999,
+          "lon": 72.8692035,
+          "country": "IN"
+        },
+        {
+          "text": "Inde",
+          "lat": 22.3511148,
+          "lon": 78.6677428,
+          "country": "IN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Mumbai",
+        "country": "IN"
+      }
+    },
+    {
+      "text": "Singapour et Dubaï sont des plaques tournantes du commerce international.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Singapour",
+          "label": "GPE",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "text": "Dubaï",
+          "label": "GPE",
+          "start": 13,
+          "end": 18
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Singapour",
+          "lat": 1.2899175,
+          "lon": 103.8519072,
+          "country": "SG"
+        },
+        {
+          "text": "Dubaï",
+          "lat": 25.2647227,
+          "lon": 55.2924146,
+          "country": "AE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Singapour",
+        "country": "SG"
+      }
+    },
+    {
+      "text": "La Grande Muraille de Chine est visible depuis l'espace selon la légende.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Grande Muraille de Chine",
+          "label": "LOC",
+          "start": 3,
+          "end": 27
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Grande Muraille de Chine",
+          "lat": 40.6943878,
+          "lon": 117.1832377,
+          "country": "CN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Grande Muraille de Chine",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "Bangkok et Singapour sont les villes les plus visitées d'Asie du Sud-Est.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Bangkok",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        },
+        {
+          "text": "Singapour",
+          "label": "GPE",
+          "start": 11,
+          "end": 20
+        },
+        {
+          "text": "Asie du Sud-Est",
+          "label": "LOC",
+          "start": 57,
+          "end": 72
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Bangkok",
+          "lat": 13.7524938,
+          "lon": 100.4935089,
+          "country": "TH"
+        },
+        {
+          "text": "Singapour",
+          "lat": 1.2899175,
+          "lon": 103.8519072,
+          "country": "SG"
+        },
+        {
+          "text": "Asie du Sud-Est",
+          "lat": 49.2189027,
+          "lon": 4.0216072,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Bangkok",
+        "country": "TH"
+      }
+    },
+    {
+      "text": "Le Yangtsé est le plus long fleuve d'Asie.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Yangtsé",
+          "label": "LOC",
+          "start": 3,
+          "end": 10
+        },
+        {
+          "text": "Asie",
+          "label": "LOC",
+          "start": 37,
+          "end": 41
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Yangtsé",
+          "lat": 30.5641456,
+          "lon": 114.2917049,
+          "country": "CN"
+        },
+        {
+          "text": "Asie",
+          "lat": 51.2086975,
+          "lon": 89.2343748,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Yangtsé",
+        "country": "CN"
+      }
+    },
+    {
+      "text": "New York et Chicago sont reliées par le rail et les airs.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "New York",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "Chicago",
+          "label": "GPE",
+          "start": 12,
+          "end": 19
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "New York",
+          "lat": 40.7127281,
+          "lon": -74.0060152,
+          "country": "US"
+        },
+        {
+          "text": "Chicago",
+          "lat": 41.8755616,
+          "lon": -87.6244212,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "New York",
+        "country": "US"
+      }
+    },
+    {
+      "text": "La forêt amazonienne s'étend sur neuf pays en Amérique du Sud.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "forêt amazonienne",
+          "label": "LOC",
+          "start": 3,
+          "end": 20
+        },
+        {
+          "text": "Amérique du Sud",
+          "label": "LOC",
+          "start": 46,
+          "end": 61
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Amérique du Sud",
+          "lat": -21.0002179,
+          "lon": -61.0006565,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Amérique du Sud",
+        "country": null
+      }
+    },
+    {
+      "text": "Buenos Aires et Rio de Janeiro sont célèbres pour leur culture vibrante.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Buenos Aires",
+          "label": "GPE",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "Rio de Janeiro",
+          "label": "GPE",
+          "start": 16,
+          "end": 30
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Buenos Aires",
+          "lat": -34.6095579,
+          "lon": -58.3887904,
+          "country": "AR"
+        },
+        {
+          "text": "Rio de Janeiro",
+          "lat": -22.9110137,
+          "lon": -43.2093727,
+          "country": "BR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Buenos Aires",
+        "country": "AR"
+      }
+    },
+    {
+      "text": "Mexico et Lima ont de riches traditions culinaires.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Mexico",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Lima",
+          "label": "GPE",
+          "start": 10,
+          "end": 14
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mexico",
+          "lat": 23.6585116,
+          "lon": -102.0077097,
+          "country": "MX"
+        },
+        {
+          "text": "Lima",
+          "lat": -12.0459808,
+          "lon": -77.0305912,
+          "country": "PE"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Mexico",
+        "country": "MX"
+      }
+    },
+    {
+      "text": "Santiago est la capitale du Chili.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Santiago",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "Chili",
+          "label": "GPE",
+          "start": 28,
+          "end": 33
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Santiago",
+          "lat": 9.8694792,
+          "lon": -83.7980749,
+          "country": "CR"
+        },
+        {
+          "text": "Chili",
+          "lat": -31.7613365,
+          "lon": -71.3187697,
+          "country": "CL"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Santiago",
+        "country": "CR"
+      }
+    },
+    {
+      "text": "Le Mississippi est une voie navigable majeure aux États-Unis.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Mississippi",
+          "label": "LOC",
+          "start": 3,
+          "end": 14
+        },
+        {
+          "text": "États-Unis",
+          "label": "GPE",
+          "start": 50,
+          "end": 60
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Mississippi",
+          "lat": 32.9715285,
+          "lon": -89.7348497,
+          "country": "US"
+        },
+        {
+          "text": "États-Unis",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "États-Unis",
+        "country": "US"
+      }
+    },
+    {
+      "text": "Toronto est la plus grande ville du Canada.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Toronto",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        },
+        {
+          "text": "Canada",
+          "label": "GPE",
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Toronto",
+          "lat": 43.6534817,
+          "lon": -79.3839347,
+          "country": "CA"
+        },
+        {
+          "text": "Canada",
+          "lat": 61.0666922,
+          "lon": -107.991707,
+          "country": "CA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Toronto",
+        "country": "CA"
+      }
+    },
+    {
+      "text": "La cordillère des Andes longe la côte ouest de l'Amérique du Sud.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Andes",
+          "label": "LOC",
+          "start": 18,
+          "end": 23
+        },
+        {
+          "text": "Amérique du Sud",
+          "label": "LOC",
+          "start": 49,
+          "end": 64
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Andes",
+          "lat": 5.6556134,
+          "lon": -75.8776753,
+          "country": "CO"
+        },
+        {
+          "text": "Amérique du Sud",
+          "lat": -21.0002179,
+          "lon": -61.0006565,
+          "country": null
+        }
+      ],
+      "expected_event_location": {
+        "text": "Andes",
+        "country": "CO"
+      }
+    },
+    {
+      "text": "Sydney et Melbourne sont les plus grandes villes d'Australie.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Sydney",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        },
+        {
+          "text": "Melbourne",
+          "label": "GPE",
+          "start": 10,
+          "end": 19
+        },
+        {
+          "text": "Australie",
+          "label": "GPE",
+          "start": 51,
+          "end": 60
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Sydney",
+          "lat": -33.8698439,
+          "lon": 151.2082848,
+          "country": "AU"
+        },
+        {
+          "text": "Melbourne",
+          "lat": -37.8142454,
+          "lon": 144.9631732,
+          "country": "AU"
+        },
+        {
+          "text": "Australie",
+          "lat": -24.7761086,
+          "lon": 134.755,
+          "country": "AU"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Sydney",
+        "country": "AU"
+      }
+    },
+    {
+      "text": "Auckland est la porte d'entrée de la Nouvelle-Zélande.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Auckland",
+          "label": "GPE",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "Nouvelle-Zélande",
+          "label": "GPE",
+          "start": 37,
+          "end": 53
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Auckland",
+          "lat": -36.852095,
+          "lon": 174.7631803,
+          "country": "NZ"
+        },
+        {
+          "text": "Nouvelle-Zélande",
+          "lat": -41.5000831,
+          "lon": 172.8344077,
+          "country": "NZ"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Auckland",
+        "country": "NZ"
+      }
+    },
+    {
+      "text": "La Grande Barrière de Corail est l'une des merveilles naturelles du monde.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Grande Barrière de Corail",
+          "label": "LOC",
+          "start": 3,
+          "end": 28
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Grande Barrière de Corail",
+          "lat": -16.35,
+          "lon": 145.9,
+          "country": "AU"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Grande Barrière de Corail",
+        "country": "AU"
+      }
+    },
+    {
+      "text": "Jakarta et Manille sont des villes en pleine croissance en Asie du Sud-Est.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Jakarta",
+          "label": "GPE",
+          "start": 0,
+          "end": 7
+        },
+        {
+          "text": "Manille",
+          "label": "GPE",
+          "start": 11,
+          "end": 18
+        },
+        {
+          "text": "Asie du Sud-Est",
+          "label": "LOC",
+          "start": 59,
+          "end": 74
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Jakarta",
+          "lat": -6.1754049,
+          "lon": 106.827168,
+          "country": "ID"
+        },
+        {
+          "text": "Manille",
+          "lat": 14.5904492,
+          "lon": 120.9803621,
+          "country": "PH"
+        },
+        {
+          "text": "Asie du Sud-Est",
+          "lat": 49.2189027,
+          "lon": 4.0216072,
+          "country": "FR"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Jakarta",
+        "country": "ID"
+      }
+    },
+    {
+      "text": "Los Angeles et San Francisco sont sur la côte ouest des États-Unis.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Los Angeles",
+          "label": "GPE",
+          "start": 0,
+          "end": 11
+        },
+        {
+          "text": "San Francisco",
+          "label": "GPE",
+          "start": 15,
+          "end": 28
+        },
+        {
+          "text": "États-Unis",
+          "label": "GPE",
+          "start": 56,
+          "end": 66
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Los Angeles",
+          "lat": 34.0536909,
+          "lon": -118.242766,
+          "country": "US"
+        },
+        {
+          "text": "San Francisco",
+          "lat": 37.7879363,
+          "lon": -122.4075201,
+          "country": "US"
+        },
+        {
+          "text": "États-Unis",
+          "lat": 39.7837304,
+          "lon": -100.445882,
+          "country": "US"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Los Angeles",
+        "country": "US"
+      }
+    },
+    {
+      "text": "Le Cap est connu pour son littoral magnifique et sa montagne de la Table.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Le Cap",
+          "label": "GPE",
+          "start": 0,
+          "end": 6
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Le Cap",
+          "lat": -33.9288301,
+          "lon": 18.4172197,
+          "country": "ZA"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Le Cap",
+        "country": "ZA"
+      }
+    },
+    {
+      "text": "Le désert de Gobi connaît des températures extrêmes entre l'été et l'hiver.",
+      "language": "fr",
+      "entities": [
+        {
+          "text": "Gobi",
+          "label": "LOC",
+          "start": 13,
+          "end": 17
+        }
+      ],
+      "expected_geocoded_locations": [
+        {
+          "text": "Gobi",
+          "lat": 43.0,
+          "lon": 107.0,
+          "country": "MN"
+        }
+      ],
+      "expected_event_location": {
+        "text": "Gobi",
+        "country": "MN"
+      }
+    }
+  ]
+}
