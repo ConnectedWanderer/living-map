@@ -175,6 +175,7 @@ def _geocode(text: str) -> GeocodedLocation | None:
 @dataclass
 class GeoResult:
     locations: list[GeocodedLocation] = field(default_factory=list)
+    failures: list[EntityMention] = field(default_factory=list)
 
 
 class GeoPipeline:
@@ -185,6 +186,7 @@ class GeoPipeline:
 
     def run(self, entities: list[EntityMention]) -> GeoResult:
         locations = []
+        failures = []
         for entity in entities:
             result = self._geocode_fn(entity.text)
             if result is not None:
@@ -197,7 +199,9 @@ class GeoPipeline:
                         type=entity.label,
                     )
                 )
-        return GeoResult(locations=locations)
+            else:
+                failures.append(entity)
+        return GeoResult(locations=locations, failures=failures)
 ```
 
 ### Stage 4: Event Location Inference
@@ -211,28 +215,83 @@ class GeoPipeline:
 3. **Context** - Prepositions ("in", "at", "near") indicate event location
 
 ```python
-def infer_event_location(locations: list[dict], text: str) -> dict | None:
-    if not locations:
-        return None
+import re
+from dataclasses import dataclass, field
 
-    scored_locations = []
-    for i, loc in enumerate(locations):
-        position_score = 1.0 / (i + 1)  # Earlier = higher score
-        type_score = 1.5 if loc.get("label") == "GPE" else 1.0
+import pycountry
 
-        scored_locations.append({
-            **loc,
-            "final_score": position_score * type_score
-        })
+from src.models import EventLocation, GeocodedLocation, ScoredLocation
 
-    best = max(scored_locations, key=lambda x: x["final_score"])
-    return {
-        "text": best["text"],
-        "lat": best.get("lat"),
-        "lon": best.get("lon"),
-        "country": best.get("country"),
-        "confidence": min(best["final_score"] * 0.5, 1.0)
-    }
+_BOOST_PREPOSITIONS = frozenset({"in", "at", "near"})
+_PREPOSITION_BOOST = 1.3
+
+
+@dataclass
+class DisambiguateResult:
+    event_location: EventLocation | None = None
+    all_locations: list[ScoredLocation] = field(default_factory=list)
+
+
+def _country_name(code: str) -> str:
+    country = pycountry.countries.get(alpha_2=code)
+    return country.name if country else code
+
+
+def _preposition_boost(loc_text: str, text: str) -> float:
+    """Return boost multiplier if a boost preposition precedes loc_text in text."""
+    text_lower = text.lower()
+    loc_lower = loc_text.lower()
+    pos = text_lower.find(loc_lower)
+    if pos <= 0:
+        return 1.0
+    before = text_lower[:pos].rstrip()
+    if not before:
+        return 1.0
+    words = before.split()
+    if not words:
+        return 1.0
+    prev_word = re.sub(r"[^a-z]", "", words[-1])
+    return _PREPOSITION_BOOST if prev_word in _BOOST_PREPOSITIONS else 1.0
+
+
+class DisambiguatePipeline:
+    """Infers the primary event location from a list of geocoded locations."""
+
+    def run(self, locations: list[GeocodedLocation], text: str) -> DisambiguateResult:
+        if not locations:
+            return DisambiguateResult()
+
+        scored = []
+        for i, loc in enumerate(locations):
+            position_score = 1.0 / (i + 1)
+            type_multiplier = 2.5 if loc.type == "GPE" else 1.0
+            boost = _preposition_boost(loc.text, text)
+            final_score = position_score * type_multiplier * boost
+
+            scored.append(
+                ScoredLocation(
+                    text=loc.text,
+                    lat=loc.lat,
+                    lon=loc.lon,
+                    country=loc.country,
+                    country_name=_country_name(loc.country),
+                    type=loc.type,
+                    score=final_score,
+                )
+            )
+
+        best = max(scored, key=lambda x: x.score)
+        return DisambiguateResult(
+            event_location=EventLocation(
+                text=best.text,
+                lat=best.lat,
+                lon=best.lon,
+                country=best.country,
+                country_name=best.country_name,
+                confidence=min(best.score * 0.5, 1.0),
+            ),
+            all_locations=scored,
+        )
 ```
 
 ## Output Format
@@ -275,14 +334,18 @@ The `GeocodingMetadata` block replicates pipeline diagnostics and includes `all_
 
 All pipeline stages exchange typed dataclasses rather than raw dicts:
 
-| Record             | Fields                                                            |
-| ------------------ | ----------------------------------------------------------------- |
-| `EntityMention`    | `text`, `label`, `start`, `end`                                   |
-| `GeocodedLocation` | `text`, `lat`, `lon`, `country`, `type?`                          |
-| `ScoredLocation`   | `text`, `lat`, `lon`, `country`, `country_name`, `type?`, `score` |
-| `GeocodeResult`    | `lat`, `lon`, `country`, `country_name`, `score`                  |
-| `EntityResult`     | `text`, `type`, `start`, `end`, `geocoded`, `geocoding?`          |
-| `EventLocation`    | `text`, `lat`, `lon`, `country`, `country_name`, `confidence`     |
+| Record               | Fields                                                                                                                             |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `EntityMention`      | `text`, `label`, `start`, `end`                                                                                                    |
+| `GeocodedLocation`   | `text`, `lat`, `lon`, `country`, `type?`                                                                                           |
+| `ScoredLocation`     | `text`, `lat`, `lon`, `country`, `country_name`, `type?`, `score`                                                                  |
+| `GeocodeResult`      | `lat`, `lon`, `country`, `country_name`, `score`                                                                                   |
+| `EntityResult`       | `text`, `type`, `start`, `end`, `geocoded`, `geocoding?`                                                                           |
+| `EventLocation`      | `text`, `lat`, `lon`, `country`, `country_name`, `confidence`                                                                      |
+| `GeoResult`          | `locations` (list[GeocodedLocation]), `failures` (list[EntityMention])                                                             |
+| `DisambiguateResult` | `event_location` (EventLocation\|None), `all_locations` (list[ScoredLocation])                                                     |
+| `NerResult`          | `language`, `entities` (list[EntityMention]), `model_name?`                                                                        |
+| `LocationResult`     | `detected_language`, `model_name?`, `event_location?`, `all_entities`, `entities_found`, `entities_geocoded`, `processing_time_ms` |
 
 See the [README.md](../../backend/location-extraction-service/README.md) for the full GeoJSON FeatureCollection response example.
 
@@ -290,21 +353,18 @@ See the [README.md](../../backend/location-extraction-service/README.md) for the
 
 ```mermaid
 flowchart LR
-    subgraph Backend["Backend (Node.js + Express)"]
-        A[Existing Routes] --> B[location-service.ts]
-    end
-
     subgraph LocationService["Location Extraction Service"]
-        B --> C[FastAPI Server]
-        C --> D[spaCy NER]
-        C --> E[geonamescache]
-        D --> F[(GeoNames DB)]
-        E --> F
+        A[FastAPI Server] --> B[LocationPipeline]
+        B --> C[NerPipeline]
+        B --> D[GeoPipeline]
+        B --> E[DisambiguatePipeline]
+        C --> F[(spaCy models)]
+        D --> G[(GeoNames data)]
     end
 
-    style Backend fill:#e3f2fd
     style LocationService fill:#f3e5f5
     style F fill:#fff3e0
+    style G fill:#fff3e0
 ```
 
 ### API Endpoint
@@ -348,6 +408,7 @@ Quality evaluation covers NER (Stages 1-2) and Geocoding + Event Location (Stage
 | NER Models         | en/fr_core_news_sm | latest  | Small models (~10MB), good accuracy for MVP              |
 | Language Detection | langdetect         | latest  | Lightweight, no training needed (seed=0 for determinism) |
 | Geocoder           | geonamescache      | 3.0.1   | Offline, GeoNames data bundled with pip package          |
+| Country lookup     | pycountry          | latest  | ISO country code → country name resolution               |
 | Runtime            | Python 3.14        | latest  | Latest Python with best performance                      |
 | API Server         | FastAPI            | latest  | Fast, async, auto-docs                                   |
 | Container          | Docker             | -       | Isolated, reproducible                                   |
@@ -355,50 +416,44 @@ Quality evaluation covers NER (Stages 1-2) and Geocoding + Event Location (Stage
 ## File Structure
 
 ```
-backend/
+backend/location-extraction-service/
 ├── src/
-│   ├── routes/
-│   │   └── location-extraction.ts   # API endpoint
-│   ├── services/
-│   │   └── location-service.ts      # HTTP client for Python service
-│   └── ...
-├── location-extraction-service/     # Python microservice
-│   ├── src/
-│   │   ├── app.py                   # FastAPI server, /health, /api/extract-location, dependency injection
-│   │   ├── schemas.py               # Pydantic schemas (GeoJSON FeatureCollection, GeoFeature, etc.)
-│   │   ├── models.py                # Typed dataclasses: EntityMention, GeocodedLocation, LocationResult, etc.
-│   │   ├── pipeline.py              # NerPipeline + NerResult + internal detection/NER/model
-│   │   ├── geocoding.py             # GeoPipeline + GeoResult + internal geonamescache wrapper (injectable)
-│   │   ├── disambiguator.py         # DisambiguatePipeline + event location inference (Stage 4)
-│   │   ├── orchestrator.py          # LocationPipeline: composes all 4 stages into single .run()
-│   │   ├── evaluation/              # Pipeline quality evaluation
-│   │   │   ├── __init__.py          # Pure evaluation computation (NER, geocoding, event location)
-│   │   │   ├── runner.py            # Pipeline orchestration + corpus loading + multi-corpus aggregation
-│   │   │   └── __main__.py          # CLI entry point (supports --geocoding flag)
-│   ├── tests/
+│   ├── __init__.py                # Package init
+│   ├── app.py                     # FastAPI server, /health, /api/extract-location, dependency injection
+│   ├── schemas.py                 # Pydantic schemas (GeoJSON FeatureCollection, GeoFeature, etc.)
+│   ├── models.py                  # Typed dataclasses: EntityMention, GeocodedLocation, LocationResult, etc.
+│   ├── pipeline.py                # NerPipeline + NerResult + internal detection/NER/model
+│   ├── geocoding.py               # GeoPipeline + GeoResult + internal geonamescache wrapper (injectable)
+│   ├── disambiguator.py           # DisambiguatePipeline + event location inference (Stage 4)
+│   ├── orchestrator.py            # LocationPipeline: composes all 4 stages into single .run()
+│   └── evaluation/                # Pipeline quality evaluation
+│       ├── __init__.py            # Pure evaluation computation (NER, geocoding, event location)
+│       ├── runner.py              # Pipeline orchestration + corpus loading + multi-corpus aggregation
+│       └── __main__.py            # CLI entry point (supports --geocoding flag)
+├── tests/
+│   ├── conftest.py
+│   ├── unit/
+│   │   ├── test_detector.py
+│   │   ├── test_extractor.py
+│   │   ├── test_disambiguator.py
+│   │   ├── test_geocoding.py
+│   │   └── test_evaluation.py
+│   ├── integration/
 │   │   ├── conftest.py
-│   │   ├── unit/
-│   │   │   ├── test_detector.py
-│   │   │   ├── test_extractor.py
-│   │   │   ├── test_disambiguator.py
-│   │   │   ├── test_geocoding.py
-│   │   │   └── test_evaluation.py
-│   │   ├── integration/
-│   │   │   ├── conftest.py
-│   │   │   ├── test_api.py              # FastAPI integration tests (mock pipeline)
-│   │   │   ├── test_nlp_manager.py
-│   │   │   └── test_pipeline_integration.py
-│   │   └── corpus/                   # Evaluation test corpora
-│   │       ├── en_simple.json
-│   │       ├── en_paragraphs.json
-│   │       ├── en_edge_cases.json
-│   │       ├── fr_simple.json
-│   │       ├── fr_paragraphs.json
-│   │       └── fr_edge_cases.json
-│   ├── Dockerfile
-│   ├── pyproject.toml
-│   └── README.md
-└── ...
+│   │   ├── test_api.py              # FastAPI integration tests (mock pipeline)
+│   │   ├── test_nlp_manager.py      # Tests _get_ner_model caching and fallback
+│   │   ├── test_pipeline_integration.py  # Full 4-stage pipeline integration tests
+│   │   └── test_evaluation_integration.py
+│   └── corpus/                   # Evaluation test corpora
+│       ├── en_simple.json
+│       ├── en_paragraphs.json
+│       ├── en_edge_cases.json
+│       ├── fr_simple.json
+│       ├── fr_paragraphs.json
+│       └── fr_edge_cases.json
+├── Dockerfile
+├── pyproject.toml
+└── README.md
 ```
 
 ## Dockerfile
@@ -434,7 +489,7 @@ These default to small models (~10MB) for fast processing. Override at runtime i
 - [x] Entity-level exact match evaluation protocol (ADR-002)
 - [x] Evaluation corpus (EN + FR, 200+ entities per language)
 - [x] CLI runner for standalone evaluation
-- [x] Wired into NER pipeline for regression detection
+- [x] Standalone CLI evaluation wired into CI pipeline for regression detection
 
 ### Phase 2: Accuracy Improvements
 

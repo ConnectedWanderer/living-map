@@ -15,7 +15,7 @@ class LocationPipeline:
     DisambiguatePipeline (event location inference) behind one seam.
 
     Sub-pipelines are injectable for testing (e.g., a mock GeoPipeline
-    that doesn't require text2geo GeoNames data).
+    that doesn't require geonamescache GeoNames data).
     """
 
     def __init__(

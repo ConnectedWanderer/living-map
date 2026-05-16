@@ -173,6 +173,8 @@ uv run python -m src.evaluation --geocoding
 - [Evaluation Guide](../../docs/evaluation.md)
 - [ADR-001: Location Extraction Approach](../../docs/decisions/ADR-001-location-extraction-approach.md)
 - [ADR-002: NER Evaluation Protocol](../../docs/decisions/ADR-002-ner-evaluation-protocol.md)
+- [ADR-006: Pipeline Architectural Improvements](../../docs/decisions/ADR-006-pipeline-architectural-improvements.md)
+- [ADR-007: Replace text2geo with geonamescache](../../docs/decisions/ADR-007-replace-text2geo-with-geonamescache.md)
 - [ADR-008: Geocoding Evaluation Corpus](../../docs/decisions/ADR-008-geocoding-evaluation-corpus.md)
 
 ## License

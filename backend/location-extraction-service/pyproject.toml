@@ -63,7 +63,7 @@ filterwarnings = [
     "ignore::DeprecationWarning",
 ]
 markers = [
-    "model_dependent: Requires spaCy models and text2geo data to be pre-downloaded.",
+    "model_dependent: Requires spaCy models and geonamescache data to be pre-downloaded.",
 ]
 pythonpath = ["."]
 

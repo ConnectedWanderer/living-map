@@ -9,7 +9,7 @@ pytestmark = pytest.mark.model_dependent
 
 
 class _MockGeoPipeline:
-    """Stand-in for GeoPipeline that returns canned results without text2geo."""
+    """Stand-in for GeoPipeline that returns canned results without geonamescache."""
 
     def __init__(self, entities):
         self.locations = [

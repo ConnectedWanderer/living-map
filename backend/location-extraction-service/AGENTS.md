@@ -5,6 +5,7 @@ For human-oriented documentation, see [README.md](README.md).
 
 For architecture details, see [Architecture Documentation](../../docs/architecture/location-extraction.md).
 For evaluation guide, see [Evaluation Guide](../../docs/evaluation.md).
+For repo-wide code quality conventions (formatting, pre-commit), see [Root AGENTS.md](../../AGENTS.md).
 
 ## Quick Commands
 
@@ -19,9 +20,6 @@ uv run python -m pytest --cov=src --cov-report=term-missing
 bash scripts/ci.sh          # full suite
 bash scripts/ci.sh --fast   # unit only
 
-# Lint & format
-uv run ruff check . && uv run ruff format .
-
 # Evaluation
 uv run python -m src.evaluation
 uv run python -m src.evaluation --geocoding
@@ -30,6 +28,9 @@ uv run python -m src.evaluation path/to/corpus.json
 # Corpus offset check/fix
 uv run python scripts/fix_corpus_offsets.py --check
 uv run python scripts/fix_corpus_offsets.py
+
+# Corpus annotation (adds geocoding ground truth via Nominatim)
+uv run python scripts/annotate_geocoding.py
 
 # Docker
 docker-compose up --build
@@ -75,6 +76,7 @@ Python syntax:
 
 ```
 src/
+├── __init__.py            # Package init
 ├── app.py               # FastAPI server + DI
 ├── schemas.py           # Pydantic GeoJSON schemas
 ├── models.py            # Typed dataclasses

@@ -60,9 +60,9 @@ Define `EntityMention` and `GeocodedLocation` dataclasses for exchange between p
 
 Extract a `run_pipeline_on_corpus()` function from `evaluate_corpus()` so pipeline orchestration and metric computation are independently reusable. `evaluate_corpus()` becomes a thin composition of the two.
 
-### 5. Stages 3-4 Evaluation (Future)
+### 5. Stages 3-4 Evaluation
 
-Add `expected_geocoded_locations` and `expected_event_location` fields to corpus samples and extend the evaluation runner. This is deferred until improvements 1-4 are in place, as they provide the infrastructure needed.
+Add `expected_geocoded_locations` and `expected_event_location` fields to corpus samples and extend the evaluation runner. Implemented via `run_full_pipeline_on_corpus()`, `evaluate_geocoding_corpus()`, `run_geocoding_pipeline_on_corpus()`, and `evaluate_geocoding_decoupled_corpus()` in `runner.py`. The decoupled path feeds ground-truth entities directly into GeoPipeline, measuring geocoding accuracy independently of NER quality.
 
 ## Consequences
 
