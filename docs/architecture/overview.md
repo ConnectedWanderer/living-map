@@ -6,26 +6,34 @@ A real-time web application displaying geographical events on an interactive map
 
 ## Technology Stack
 
-| Layer               | Technology        | Notes                                            |
-| ------------------- | ----------------- | ------------------------------------------------ |
-| Frontend            | Vue 3 + Vite      | Lightweight, mobile-optimized                    |
-| Map                 | MapLibre GL JS    | Open-source, OSM tiles                           |
-| State Management    | Pinia             | Official Vue recommendation                      |
-| Backend             | Node.js + Express | Lightweight API for data aggregation             |
-| Location Extraction | Python + FastAPI  | NLP service for extracting coordinates from text |
-| External Data       | External APIs     | Real news/event feeds (mock-feed for testing)    |
+| Layer               | Technology           | Notes                                             |
+| ------------------- | -------------------- | ------------------------------------------------- |
+| Frontend            | Vue 3 + Vite         | Lightweight, mobile-optimized                     |
+| Map                 | MapLibre GL JS       | Open-source, OSM tiles                            |
+| State Management    | Pinia                | Official Vue recommendation                       |
+| Serving API         | Node.js + Express    | Read-only API, reads from PostgreSQL              |
+| Ingestion Worker    | Node.js              | Cron-triggered batch ingestion from external APIs |
+| Location Extraction | Python + FastAPI     | NLP service for extracting coordinates from text  |
+| Database            | PostgreSQL + PostGIS | Geospatial persistence, spatial indexes           |
+| External Data       | External APIs        | Real news/event feeds (mock-feed for testing)     |
 
 ## High-Level Architecture
 
 ```mermaid
-graph LR
-    A[Browser<br/>Vue App] --> B[Backend<br/>Express]
-    B --> C[External APIs<br/>or mock-feed]
-    B --> D[Location Extraction<br/>Python + FastAPI]
-    B --> E[(Cache<br/>In-Memory)]
+flowchart TD
+    subgraph Ingestion["Batch Ingestion (cron)"]
+        IW[Ingestion Worker] -->|poll| API[External APIs<br/>or mock-feed]
+        IW -->|POST /api/extract-location| LE[Location Extraction<br/>Python + FastAPI]
+        IW -->|INSERT| DB[(PostgreSQL<br/>+ PostGIS)]
+    end
+
+    subgraph Serving["Request Serving"]
+        F[Browser<br/>Vue + MapLibre] -->|GET /events| SA[Serving API<br/>Node.js + Express]
+        SA -->|SELECT| DB
+    end
 ```
 
-**Note**: `mock-feed` (port 3001) is a standalone service that simulates an external RSS feed for testing. The Location Extraction service is described in detail in [location-extraction.md](./location-extraction.md).
+**Note**: `mock-feed` (port 3001) provides test data. Location Extraction is detailed in [location-extraction.md](./location-extraction.md). PostgreSQL runs as a separate container with PostGIS extension for geospatial queries.
 
 ## Frontend Architecture (planned)
 
@@ -44,72 +52,106 @@ frontend/
 
 ```
 backend/
-├── src/ (planned)
-│   ├── routes/          # API endpoints
-│   ├── services/        # External API integrations
-│   │   └── location-service.ts   # HTTP client for location extraction
-│   ├── cache/           # Caching layer
-│   └── utils/           # Helpers
-├── mock-feed/           # Mock external RSS feed (for testing)
+├── api/                          # Serving API (Express)
 │   ├── src/
-│   │   ├── routes/      # /feed endpoint
-│   │   └── utils/       # Generator, RSS builder
-│   ├── README.md        # End-user documentation
-│   └── AGENTS.md        # AI agent instructions
+│   │   ├── routes/               # GET /events, etc.
+│   │   ├── services/             # External integrations
+│   │   ├── db/                   # PostgreSQL client + queries
+│   │   └── utils/                # Helpers
+│   └── package.json
+├── ingestion-worker/             # Node.js batch ingestion service
+│   ├── src/
+│   │   ├── index.js              # Entry point, cron scheduler
+│   │   ├── sources/              # Source adapters (mock-feed, RSS, …)
+│   │   ├── dedup.js              # source_id + content hash dedup
+│   │   └── config.js             # Per-source schedule config
+│   └── package.json
+├── mock-feed/                    # Mock external RSS feed (for testing)
+│   ├── src/
+│   │   ├── routes/               # /feed endpoint
+│   │   └── utils/                # Generator, RSS builder
+│   ├── README.md
+│   └── AGENTS.md
 ├── location-extraction-service/  # Python NLP microservice
-│   ├── src/             # FastAPI application
+│   ├── src/                      # FastAPI application
 │   ├── Dockerfile
 │   ├── pyproject.toml
 │   └── README.md
-└── .env                 # Configuration (PORT, external API URLs)
+├── migrations/                   # DB schema migrations (Alembic)
+├── docker-compose.yml            # Services: api, ingestion-worker, postgres,
+│                                 #   location-extraction, mock-feed
+└── .env                          # Configuration
 ```
 
 ## Data Flow
 
+The system has two independent cycles:
+
+### Ingestion Cycle (batch, cron-triggered)
+
+```mermaid
+sequenceDiagram
+    participant C as Cron
+    participant IW as Ingestion Worker
+    participant API as External APIs
+    participant LE as Location Extraction
+    participant DB as PostgreSQL
+
+    C->>IW: Trigger (per-source schedule)
+    IW->>API: Fetch raw articles
+    API-->>IW: Return articles
+    IW->>DB: Check dedup (source_id / content hash)
+    alt New article
+        IW->>LE: POST /api/extract-location
+        LE-->>IW: Return GeoJSON coordinates
+        IW->>DB: INSERT enriched event
+    end
+```
+
+1. Cron triggers Ingestion Worker per source schedule (configurable)
+2. Worker fetches raw articles from external API (or mock-feed)
+3. Worker checks dedup: primary key `source_id`, fallback content hash
+4. For new articles, Worker POSTs to Location Extraction service
+5. Worker INSERTs enriched event (text + coordinates) into PostgreSQL
+
+### Serving Cycle (request-response)
+
 ```mermaid
 sequenceDiagram
     participant F as Frontend
-    participant B as Backend
-    participant L as Location Extraction
-    participant E as External APIs
-    participant C as Cache
+    participant SA as Serving API
+    participant DB as PostgreSQL
 
-    F->>B: Request events
-    B->>C: Check cache
-    alt Cache hit
-        C-->>B: Return cached data
-    else Cache miss
-        B->>E: Fetch raw articles
-        E-->>B: Return article text
-        B->>L: Extract locations
-        L-->>B: Return geo-coordinates
-        B->>C: Cache normalized events
-    end
-    B-->>F: Return events with lat/lon
-    F->>F: Render on MapLibre map
+    F->>SA: GET /events
+    SA->>DB: SELECT events (with optional bounding box filter)
+    DB-->>SA: Event rows
+    SA-->>F: GeoJSON FeatureCollection
+    F->>F: Render markers on MapLibre map
 ```
 
-1. Frontend requests events from backend API
-2. Backend checks cache for existing data
-3. If cache miss, fetches from external sources
-4. For each article, Location Extraction service processes text → coordinates
-5. Backend normalizes and caches the enriched data
-6. Frontend renders events as markers on MapLibre map
-7. Polling mechanism refreshes data every 60 seconds
+1. Frontend requests events via GET /events (with optional bounding box)
+2. Serving API queries PostgreSQL for matching events
+3. API returns GeoJSON FeatureCollection to frontend
+4. Frontend renders markers on MapLibre map
 
 ## Key Design Decisions
 
-| Decision            | Choice                 | Rationale                                                |
-| ------------------- | ---------------------- | -------------------------------------------------------- |
-| Map Library         | MapLibre GL JS         | Open-source, no API key, OSM tiles                       |
-| Real-time           | Polling (60s)          | MVP simplicity, sufficient for low-update-frequency data |
-| Caching             | In-memory (node-cache) | Simple, effective for MVP scale                          |
-| Responsive          | Mobile-first CSS       | Essential for mobile-friendly requirement                |
-| Location Extraction | spaCy + geonamescache  | Offline NLP, zero API costs, global coverage             |
+| Decision            | Choice                     | Rationale                                                |
+| ------------------- | -------------------------- | -------------------------------------------------------- |
+| Map Library         | MapLibre GL JS             | Open-source, no API key, OSM tiles                       |
+| Data Freshness      | Batch ingestion (cron)     | Sufficient for news-cycle data, simpler than queue       |
+| Persistence         | PostgreSQL + PostGIS       | Geospatial queries, concurrent writes, survives restarts |
+| Ingestion Worker    | Node.js                    | Pure I/O orchestration, consistent with serving API      |
+| Services            | Separate (ingestion + API) | Independent scaling, failure isolation                   |
+| Deduplication       | source_id + content hash   | Handles both stable and unstable source IDs              |
+| Responsive          | Mobile-first CSS           | Essential for mobile-friendly requirement                |
+| Location Extraction | spaCy + geonamescache      | Offline NLP, zero API costs, global coverage             |
 
 ## Constraints & Assumptions
 
 - Public, read-only access (no authentication)
 - Small scale (< 1000 concurrent users)
 - External API sources: mock-feed (RSS) for testing, real feeds to be added later
-- Data freshness: 60-second polling interval acceptable
+- Data freshness: batch ingestion runs at configurable per-source intervals
+- PostgreSQL + PostGIS: geospatial persistence, spatial indexes for bounding box queries
+- Ingestion failure does not affect serving (stale data served until next successful cycle)
