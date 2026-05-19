@@ -77,7 +77,7 @@ backend/
 │   ├── Dockerfile
 │   ├── pyproject.toml
 │   └── README.md
-├── migrations/                   # DB schema migrations (Alembic)
+├── migrations/                   # DB schema migrations (node-pg-migrate)
 ├── docker-compose.yml            # Services: api, ingestion-worker, postgres,
 │                                 #   location-extraction, mock-feed
 └── .env                          # Configuration

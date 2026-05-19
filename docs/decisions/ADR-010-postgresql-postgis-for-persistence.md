@@ -52,7 +52,7 @@ CREATE TABLE events (
     published_at    TIMESTAMPTZ NOT NULL,
     ingested_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    location        GEOGRAPHY(Point, 4326), -- PostGIS geospatial point
+    location        GEOMETRY(Point, 4326), -- PostGIS geometry for bbox queries
     location_name   TEXT,                   -- resolved place name
     country         TEXT,                   -- ISO country code
     event_type      TEXT,                   -- e.g., 'earthquake', 'protest'
@@ -87,7 +87,7 @@ CREATE INDEX idx_events_published_at ON events (published_at DESC);
 
 - Geospatial queries (bounding box, radius, point-in-polygon) via PostGIS GiST indexes
 - Concurrent reads and writes from separate services
-- Schema migrations with Alembic for controlled evolution
+- Schema migrations with node-pg-migrate for controlled evolution (see ADR-014)
 - Durability — data survives restarts, supports historical queries
 - Rich type system (JSONB, arrays, timestamps with timezone)
 - Extension ecosystem (pgvector, TimescaleDB) available for future needs
