@@ -62,8 +62,7 @@ backend/ingestion-worker/
 │   │   ├── test-scheduler.js
 │   │   ├── test-runner.js
 │   │   ├── test-normalizer.js
-│   │   ├── test-enrich.js
-│   │   └── test-config.js
+│   │   └── test-enrich.js
 │   └── integration/
 │       ├── test-mock-feed-adapter.js
 │       └── test-full-cycle.js
