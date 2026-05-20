@@ -34,9 +34,13 @@ export async function updateLocation(
   sourceId: string,
   geoJson: GeoJsonFeatureCollection,
 ): Promise<void> {
+  const feature = geoJson.features[0];
+  if (!feature?.geometry?.coordinates) return;
+
+  const [lon, lat] = feature.geometry.coordinates as [number, number];
   await pool.query(
-    `UPDATE events SET location = $1, updated_at = now()
-     WHERE source = $2 AND source_id = $3`,
-    [JSON.stringify(geoJson), source, sourceId],
+    `UPDATE events SET location = ST_SetSRID(ST_MakePoint($1, $2), 4326), updated_at = now()
+     WHERE source = $3 AND source_id = $4`,
+    [lon, lat, source, sourceId],
   );
 }

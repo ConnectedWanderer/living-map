@@ -59,5 +59,15 @@ describe("full cycle integration", () => {
       ["full-cycle-test"],
     );
     assert.strictEqual(Number(result.rows[0].count), 2);
+
+    const geoResult = await pool.query(
+      "SELECT location FROM events WHERE source = $1 AND source_id = $2",
+      ["full-cycle-test", articles[0].source_id],
+    );
+    const loc = geoResult.rows[0].location;
+    assert.ok(loc);
+    assert.strictEqual(loc.type, "Point");
+    assert.ok(Array.isArray(loc.coordinates));
+    assert.strictEqual(loc.coordinates.length, 2);
   });
 });

@@ -87,7 +87,9 @@ describe("db integration", () => {
       ["integration-test", "int-test-location"],
     );
 
-    assert.ok(result.rows[0].location);
-    assert.strictEqual(result.rows[0].location.type, "FeatureCollection");
+    const loc = result.rows[0].location;
+    assert.ok(loc);
+    assert.strictEqual(loc.type, "Point");
+    assert.deepStrictEqual(loc.coordinates, [2.35, 48.86]);
   });
 });
