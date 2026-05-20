@@ -15,32 +15,33 @@ flow: SourceAdapter → Normalizer → Dedup (INSERT ON CONFLICT) → Location E
 ```
 backend/ingestion-worker/
 ├── src/
-│   ├── index.js            # Entry: init logger, load sources, start scheduler, health endpoint
-│   ├── scheduler.js        # node-cron: register per-source cron jobs
-│   ├── runner.js           # Per-source cycle: fetch → normalize → dedup → enrich → write
-│   ├── normalizer.js       # Pure function: raw article → {source_id, title, description, url, published_at, source}
-│   ├── enrich.js           # Location Extraction client: POST /api/extract-location, retry logic
-│   ├── db.js               # pg pool: INSERT ON CONFLICT, UPDATE location
-│   ├── config.js           # Load enabled sources from PostgreSQL `sources` table
-│   ├── logger.js           # pino structured logger wrapper
+│   ├── index.ts            # Entry: init logger, load sources, start scheduler, health endpoint
+│   ├── scheduler.ts        # node-cron: register per-source cron jobs
+│   ├── runner.ts           # Per-source cycle: fetch → normalize → dedup → enrich → write
+│   ├── normalizer.ts       # Pure function: raw article → {source_id, title, description, url, published_at, source}
+│   ├── enrich.ts           # Location Extraction client: POST /api/extract-location, retry logic
+│   ├── db.ts               # pg pool: INSERT ON CONFLICT, UPDATE location
+│   ├── config.ts           # Load enabled sources from PostgreSQL `sources` table
+│   ├── logger.ts           # pino structured logger wrapper
 │   └── sources/
-│       ├── adapter.js      # Abstract adapter interface docs (JSDoc type def)
-│       └── mock-feed.js    # Fetch mock-feed RSS, parse, normalize
+│       ├── adapter.ts      # Abstract adapter interface + type defs
+│       └── mock-feed.ts    # Fetch mock-feed RSS, parse, normalize
 ├── tests/
-│   ├── helpers.js          # Shared: DB pool creation, migration runner
+│   ├── helpers.ts          # Shared: DB pool creation, migration runner
 │   ├── unit/               # Fast, mocked I/O
-│   │   ├── normalizer.test.js
-│   │   ├── enrich.test.js
-│   │   ├── runner.test.js
-│   │   ├── scheduler.test.js
-│   │   └── index.test.js
+│   │   ├── normalizer.test.ts
+│   │   ├── enrich.test.ts
+│   │   ├── runner.test.ts
+│   │   ├── scheduler.test.ts
+│   │   └── index.test.ts
 │   └── integration/        # Real I/O, Docker services
-│       ├── helpers.js      # Integration: Docker compose lifecycle, service URLs
-│       ├── mock-feed.test.js
-│       ├── enrich.test.js
-│       ├── db.test.js
-│       ├── config.test.js
-│       └── full-cycle.test.js
+│       ├── helpers.ts      # Integration: Docker compose lifecycle, service URLs
+│       ├── mock-feed.test.ts
+│       ├── enrich.test.ts
+│       ├── db.test.ts
+│       ├── config.test.ts
+│       └── full-cycle.test.ts
+├── tsconfig.json
 ├── package.json
 ├── AGENTS.md
 └── CONTEXT.md               ← this file
@@ -48,134 +49,156 @@ backend/ingestion-worker/
 
 ### Module Contracts
 
-#### `src/normalizer.js`
+All source files are TypeScript (`.ts`). Types defined per module below.
 
-```js
-/**
- * Normalize a raw article from any source adapter to standard shape.
- * @param {object} raw - Raw article from adapter
- * @param {string} source - Source name (e.g. "mock-feed")
- * @returns {{source_id: string, title: string, description: string, url: string, published_at: string, source: string}}
- *
- * source_id source priority:
- *   1. raw.guid (RSS guid)
- *   2. SHA-256(raw.title + raw.pubDate) if neither exists
- */
-export function normalizeArticle(raw, source)
+#### `src/normalizer.ts`
+
+```ts
+interface RawArticle {
+  guid?: string;
+  title: string;
+  description?: string;
+  link: string;
+  pubDate: string;
+}
+
+interface NormalizedArticle {
+  source_id: string;
+  title: string;
+  description: string | undefined;
+  url: string;
+  published_at: string;
+  source: string;
+}
+
+// source_id priority:
+//   1. raw.guid (RSS guid)
+//   2. SHA-256(raw.title + raw.pubDate) if no guid
+function normalizeArticle(raw: RawArticle, source: string): NormalizedArticle;
 ```
 
-#### `src/sources/mock-feed.js`
+#### `src/sources/mock-feed.ts`
 
-```js
-/**
- * Fetch articles from mock-feed RSS endpoint.
- * @param {object} config - { url: string, source: string }
- * @param {object} deps - { fetch: typeof global.fetch } (injectable for tests)
- * @returns {Promise<Array<NormalizedArticle>>}
- */
-export async function fetchArticles(config, deps = { fetch: global.fetch })
+```ts
+interface SourceConfig {
+  url: string;
+  source: string;
+  // adapter-specific options
+}
+
+interface FetchDeps {
+  fetch: typeof global.fetch;
+}
+
+async function fetchArticles(
+  config: SourceConfig,
+  deps?: FetchDeps,
+): Promise<NormalizedArticle[]>;
 ```
 
-#### `src/enrich.js`
+#### `src/enrich.ts`
 
-```js
-/**
- * Send article text to Location Extraction service.
- * Returns GeoJSON FeatureCollection, or null after exhausting retries.
- * @param {string} text - Article title + description
- * @param {object} config - { url: string } (LE service base URL)
- * @returns {Promise<object|null>}
- */
-export async function extractLocation(text, config)
+```ts
+// Sends article text to Location Extraction service.
+// Returns GeoJSON FeatureCollection, or null after exhausting retries.
+async function extractLocation(
+  text: string,
+  config: { url: string },
+): Promise<GeoJSON.FeatureCollection | null>;
 ```
 
-#### `src/db.js`
+#### `src/db.ts`
 
-```js
-/**
- * Batch insert articles, dedup via ON CONFLICT DO NOTHING.
- * @param {import('pg').Pool} pool
- * @param {Array<NormalizedArticle>} articles
- * @returns {Promise<{inserted: number, skipped: number}>}
- */
-export async function insertEvents(pool, articles)
+```ts
+// Batch insert articles, dedup via ON CONFLICT DO NOTHING.
+async function insertEvents(
+  pool: pg.Pool,
+  articles: NormalizedArticle[],
+): Promise<{ inserted: number; skipped: number }>;
 
-/**
- * Update event with location GeoJSON after enrichment.
- * @param {import('pg').Pool} pool
- * @param {string} source
- * @param {string} sourceId
- * @param {object} geoJson - GeoJSON FeatureCollection
- */
-export async function updateLocation(pool, source, sourceId, geoJson)
+// Update event with location GeoJSON after enrichment.
+async function updateLocation(
+  pool: pg.Pool,
+  source: string,
+  sourceId: string,
+  geoJson: GeoJSON.FeatureCollection,
+): Promise<void>;
 ```
 
-#### `src/config.js`
+#### `src/config.ts`
 
-```js
-/**
- * Load enabled source configurations from DB.
- * @param {import('pg').Pool} pool
- * @returns {Promise<Array<{id: number, name: string, type: string, config: object, schedule: string}>>}
- */
-export async function loadSources(pool)
+```ts
+interface SourceRow {
+  id: number;
+  name: string;
+  type: string;
+  config: Record<string, unknown>;
+  schedule: string;
+}
+
+async function loadSources(pool: pg.Pool): Promise<SourceRow[]>;
 ```
 
-#### `src/runner.js`
+#### `src/runner.ts`
 
-```js
-/**
- * Run one full ingestion cycle for a single source.
- * @param {object} sourceConfig - { name, type, config, schedule }
- * @param {object} deps - { fetch, pool, extractLocation, logger }
- * @returns {Promise<void>}
- */
-export async function runSource(sourceConfig, deps)
+```ts
+interface RunnerDeps {
+  fetch: typeof global.fetch;
+  pool: pg.Pool;
+  extractLocation: typeof extractLocation;
+  logger: pino.Logger;
+}
+
+async function runSource(
+  sourceConfig: SourceRow,
+  deps: RunnerDeps,
+): Promise<void>;
 ```
 
-#### `src/scheduler.js`
+#### `src/scheduler.ts`
 
-```js
-/**
- * Register cron jobs for all sources.
- * @param {Array<object>} sources - Source configs from loadSources()
- * @param {Function} runFn - async (sourceConfig) => void
- * @returns {() => void} - Stop function to cancel all cron jobs
- */
-export function startScheduler(sources, runFn)
+```ts
+// Register cron jobs for all sources. Returns stop function.
+function startScheduler(
+  sources: SourceRow[],
+  runFn: (source: SourceRow) => Promise<void>,
+): () => void;
 ```
 
-#### `src/index.js`
+#### `src/index.ts`
 
-```js
-/**
- * Entry point. Init logger, load sources, start scheduler, start health server.
- * @param {object} env - { PORT, DATABASE_URL, LOCATION_EXTRACTION_URL, LOG_LEVEL }
- */
-export async function main(env)
+```ts
+interface Env {
+  PORT?: string;
+  DATABASE_URL?: string;
+  LOCATION_EXTRACTION_URL?: string;
+  LOG_LEVEL?: string;
+}
+
+async function main(env: Env): Promise<void>;
 ```
 
-### `src/logger.js`
+### `src/logger.ts`
 
-Wrapper around `pino`:
-
-```js
-export function createLogger(level = 'info')  // → pino.Logger
+```ts
+function createLogger(level?: string): pino.Logger;
 ```
 
 ## Decisions
 
-| Decision        | Choice                      | Rationale                        |
-| --------------- | --------------------------- | -------------------------------- |
-| Package manager | npm (ADR-013)               | Consistent with mock-feed        |
-| Module system   | ESM (`"type": "module"`)    | Same as mock-feed                |
-| Test runner     | `node:test` + `node:assert` | Zero dep, Node built-in          |
-| DB library      | `pg` (node-postgres)        | Pool management, battle-tested   |
-| Scheduling      | `node-cron`                 | In-process, no external dep      |
-| Logging         | `pino`                      | Structured JSON, Docker-friendly |
-| XML             | `fast-xml-parser`           | RSS parsing                      |
-| HTTP            | `undici` (built-in `fetch`) | No extra dep                     |
-| Migration       | node-pg-migrate (ADR-014)   | DB schema versioning             |
+| Decision        | Choice                       | Rationale                                   |
+| --------------- | ---------------------------- | ------------------------------------------- |
+| Language        | TypeScript (ADR-015)         | Module contracts enforced at compile time   |
+| Package manager | npm (ADR-013)                | Consistent with mock-feed                   |
+| Module system   | ESM (`"type": "module"`)     | Same as mock-feed                           |
+| Runtime flag    | `--experimental-strip-types` | Run `.ts` directly, no build step (ADR-015) |
+| Test runner     | `node:test` + `node:assert`  | Zero dep, Node built-in                     |
+| DB library      | `pg` (node-postgres)         | Pool management, battle-tested              |
+| Scheduling      | `node-cron`                  | In-process, no external dep                 |
+| Logging         | `pino`                       | Structured JSON, Docker-friendly            |
+| XML             | `fast-xml-parser`            | RSS parsing                                 |
+| HTTP            | `undici` (built-in `fetch`)  | No extra dep                                |
+| Migration       | node-pg-migrate (ADR-014)    | DB schema versioning                        |
 
 ## Database Schema
 
@@ -225,50 +248,51 @@ Each cycle: **RED** (write failing test) → **GREEN** (minimal implementation) 
 
 ### Setup (Cycle 0)
 
-| Step | Action                                                                                                                                |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 0a   | `backend/ingestion-worker/package.json` — ESM, deps: `pg`, `node-cron`, `pino`, `fast-xml-parser`, devDeps: none (node:test built-in) |
-| 0b   | `backend/migrations/001_create-events-and-sources.js` — node-pg-migrate with `pgm.createTable()` for `sources` and `events`           |
-| 0c   | `tests/helpers.js` — `createTestPool()`, `runMigrations()`, `cleanTables()`                                                           |
-| 0d   | `tests/integration/helpers.js` — `ensureServices()`, `MOCK_FEED_URL`, `LE_URL`, `DATABASE_URL`                                        |
-| 0e   | `npm install` in `backend/ingestion-worker/`                                                                                          |
+| Step | Action                                                                                                                      |
+| ---- | --------------------------------------------------------------------------------------------------------------------------- |
+| 0a   | `backend/ingestion-worker/package.json` — ESM, deps: `pg`, `node-cron`, `pino`, `fast-xml-parser`                           |
+| 0b   | `backend/migrations/001_create-events-and-sources.js` — node-pg-migrate with `pgm.createTable()` for `sources` and `events` |
+| 0c   | `tests/helpers.ts` — `createTestPool()`, `runMigrations()`, `cleanTables()`                                                 |
+| 0d   | `tests/integration/helpers.ts` — `ensureServices()`, `MOCK_FEED_URL`, `LE_URL`, `DATABASE_URL`                              |
+| 0e   | `tsconfig.json` — strict TS config, `allowImportingTsExtensions`, `noEmit`                                                  |
+| 0f   | `npm install` with devDeps: `typescript`, `@types/node`, `@types/pg` in `backend/ingestion-worker/`                         |
 
 ### Unit Cycles (fast, mocked I/O)
 
 | #   | RED: write this test                                                                                                                                                                                                                                                                              | GREEN: write this src                                                                                                 | What it proves                                |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| 1   | `tests/unit/normalizer.test.js` — `normalizeArticle({guid:"abc", title:"X", description:"Y", link:"http://...", pubDate:"2026-01-01"}, "mock-feed")` returns `{source_id:"abc", title:"X", description:"Y", url:"http://...", published_at:"2026-01-01T00:00:00.000Z", source:"mock-feed"}`       | `src/normalizer.js` — extract `guid` → `source_id`, map fields                                                        | Pure function, stable ID                      |
+| 1   | `tests/unit/normalizer.test.ts` — `normalizeArticle({guid:"abc", title:"X", description:"Y", link:"http://...", pubDate:"2026-01-01"}, "mock-feed")` returns `{source_id:"abc", title:"X", description:"Y", url:"http://...", published_at:"2026-01-01T00:00:00.000Z", source:"mock-feed"}`       | `src/normalizer.ts` — extract `guid` → `source_id`, map fields                                                        | Pure function, stable ID                      |
 | 2   | Same file, new test: no `guid` → `source_id` = SHA-256(title + published_at)                                                                                                                                                                                                                      | Same module: add `crypto.createHash('sha256')` fallback                                                               | Content hash fallback                         |
-| 3   | `tests/unit/enrich.test.js` — mock `fetch` returns `{ok:true, json: async() => geoJson}` → `extractLocation("text", {url})` returns geoJson                                                                                                                                                       | `src/enrich.js` — POST to `${url}/api/extract-location`, parse response                                               | Basic HTTP client                             |
+| 3   | `tests/unit/enrich.test.ts` — mock `fetch` returns `{ok:true, json: async() => geoJson}` → `extractLocation("text", {url})` returns geoJson                                                                                                                                                       | `src/enrich.ts` — POST to `${url}/api/extract-location`, parse response                                               | Basic HTTP client                             |
 | 4   | Same file: mock `fetch` fails 3 times (network errors) → returns `null`                                                                                                                                                                                                                           | Same module: retry loop 3 attempts, exponential backoff 1s/4s/16s                                                     | Retry + graceful degradation                  |
-| 5   | `tests/unit/runner.test.js` — inject mock adapter returns articles, mock `insertEvents` returns inserted, mock `extractLocation` returns geoJson, mock `updateLocation` succeeds, mock logger → `runSource(config, deps)` asserts effect counts (N enrich, M updates, summary log) not call order | `src/runner.js` — orchestrate: fetch → insert → filter new → enrich each → update each → log summary                  | Orchestration wiring, effect-count assertions |
+| 5   | `tests/unit/runner.test.ts` — inject mock adapter returns articles, mock `insertEvents` returns inserted, mock `extractLocation` returns geoJson, mock `updateLocation` succeeds, mock logger → `runSource(config, deps)` asserts effect counts (N enrich, M updates, summary log) not call order | `src/runner.ts` — orchestrate: fetch → insert → filter new → enrich each → update each → log summary                  | Orchestration wiring, effect-count assertions |
 | 6   | Same file: insert returns 0 inserted → `extractLocation` never called                                                                                                                                                                                                                             | Same module                                                                                                           | Skip enrichment on duplicates                 |
-| 7   | `tests/unit/scheduler.test.js` — mock `cron.schedule()`, mock `runFn` → `startScheduler([source1, source2], runFn)` calls `cron.schedule()` twice                                                                                                                                                 | `src/scheduler.js` — loop sources, `cron.schedule(source.schedule, () => runFn(source))`                              | Cron registration                             |
-| 8   | `tests/unit/index.test.js` — mock all deps, `main()` starts scheduler + health server responding `{status:"ok"}`                                                                                                                                                                                  | `src/index.js` — init logger, load config, start scheduler, create express app on $PORT, `GET /health` returns status | Entry point wiring                            |
+| 7   | `tests/unit/scheduler.test.ts` — mock `cron.schedule()`, mock `runFn` → `startScheduler([source1, source2], runFn)` calls `cron.schedule()` twice                                                                                                                                                 | `src/scheduler.ts` — loop sources, `cron.schedule(source.schedule, () => runFn(source))`                              | Cron registration                             |
+| 8   | `tests/unit/index.test.ts` — mock all deps, `main()` starts scheduler + health server responding `{status:"ok"}`                                                                                                                                                                                  | `src/index.ts` — init logger, load config, start scheduler, create express app on $PORT, `GET /health` returns status | Entry point wiring                            |
 
 ### Integration Cycles (real I/O, Docker services)
 
 | #   | RED: write this test                                                                                                                                                     | GREEN: implement                                                                                                           | Infrastructure                       |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| 9   | `tests/integration/mock-feed.test.js` — `fetchArticles({url:"http://localhost:3001/feed?count=3", source:"mock-feed"})` returns 3 normalized articles with correct shape | `src/sources/mock-feed.js` — fetch RSS XML, parse with `fast-xml-parser`, normalize each `<item>` via `normalizeArticle()` | Docker: mock-feed on :3001           |
-| 10  | `tests/integration/enrich.test.js` — `extractLocation("Flood in Paris", {url:"http://localhost:8000"})` returns `{type:"FeatureCollection", features:[...]}`             | Already implemented in unit cycles. Integration confirms real service.                                                     | Docker: location-extraction on :8000 |
-| 11  | `tests/integration/db.test.js` — migrate DB, `insertEvents(realPool, articles)` returns actual inserted count, verify row exists, `updateLocation()` updates row         | Integration confirms real SQL (no unit mock).                                                                              | Docker: PostgreSQL                   |
-| 12  | `tests/integration/config.test.js` — seed `sources` table, `loadSources(realPool)` returns correct config                                                                | Integration confirms real config loading (no unit mock).                                                                   | Docker: PostgreSQL                   |
-| 13  | `tests/integration/full-cycle.test.js` — seed `sources` row for mock-feed, call `runSource(config, realDeps)`, verify events table has enriched rows with location       | Wiring of all real modules                                                                                                 | Docker: PG + mock-feed + LE          |
+| 9   | `tests/integration/mock-feed.test.ts` — `fetchArticles({url:"http://localhost:3001/feed?count=3", source:"mock-feed"})` returns 3 normalized articles with correct shape | `src/sources/mock-feed.ts` — fetch RSS XML, parse with `fast-xml-parser`, normalize each `<item>` via `normalizeArticle()` | Docker: mock-feed on :3001           |
+| 10  | `tests/integration/enrich.test.ts` — `extractLocation("Flood in Paris", {url:"http://localhost:8000"})` returns `{type:"FeatureCollection", features:[...]}`             | Already implemented in unit cycles. Integration confirms real service.                                                     | Docker: location-extraction on :8000 |
+| 11  | `tests/integration/db.test.ts` — migrate DB, `insertEvents(realPool, articles)` returns actual inserted count, verify row exists, `updateLocation()` updates row         | Integration confirms real SQL (no unit mock).                                                                              | Docker: PostgreSQL                   |
+| 12  | `tests/integration/config.test.ts` — seed `sources` table, `loadSources(realPool)` returns correct config                                                                | Integration confirms real config loading (no unit mock).                                                                   | Docker: PostgreSQL                   |
+| 13  | `tests/integration/full-cycle.test.ts` — seed `sources` row for mock-feed, call `runSource(config, realDeps)`, verify events table has enriched rows with location       | Wiring of all real modules                                                                                                 | Docker: PG + mock-feed + LE          |
 
 ## Integration Test Infrastructure
 
 Each integration test uses `tests/integration/helpers.js` which provides:
 
-```js
+```ts
 // Before all integration tests:
 //   1. Check Docker services are healthy (mock-feed:3001, LE:8000, PG:5432)
 //   2. Run migrations against test DB
 //   3. Export service URLs
 
-export const MOCK_FEED_URL = "http://localhost:3001";
-export const LE_URL = "http://localhost:8000";
-export const DATABASE_URL =
+export const MOCK_FEED_URL: string = "http://localhost:3001";
+export const LE_URL: string = "http://localhost:8000";
+export const DATABASE_URL: string =
   process.env.DATABASE_URL ||
   "postgres://livingmap:livingmap@localhost:5432/livingmap_test";
 ```
@@ -283,13 +307,16 @@ Docker services expected running:
 
 ```bash
 # Unit tests only (fast)
-node --test tests/unit/*.test.js
+node --test --experimental-strip-types tests/unit/*.test.ts
 
 # Integration tests (requires Docker services)
-node --test tests/integration/*.test.js
+node --test --experimental-strip-types tests/integration/*.test.ts
 
 # All tests
-node --test tests/**/*.test.js
+node --test --experimental-strip-types tests/**/*.test.ts
+
+# Type-check (no emit)
+tsc --noEmit
 ```
 
 ## Checklist Per Cycle
@@ -305,33 +332,51 @@ node --test tests/**/*.test.js
 
 ## Progress
 
-| Cycle | Module            | Test file                            | Src file                 | Status  | Notes                                           |
-| ----- | ----------------- | ------------------------------------ | ------------------------ | ------- | ----------------------------------------------- |
-| 0     | setup             | —                                    | —                        | pending | Scaffold, package.json, migration, test helpers |
-| 1     | normalizer        | tests/unit/normalizer.test.js        | src/normalizer.js        | pending | Stable guid → source_id                         |
-| 2     | normalizer        | tests/unit/normalizer.test.js        | src/normalizer.js        | pending | Content hash fallback (no guid)                 |
-| 3     | enrich            | tests/unit/enrich.test.js            | src/enrich.js            | pending | Mock fetch returns GeoJSON                      |
-| 4     | enrich            | tests/unit/enrich.test.js            | src/enrich.js            | pending | Retry 3x then return null                       |
-| 5     | runner            | tests/unit/runner.test.js            | src/runner.js            | pending | Effect-count assertions                         |
-| 6     | runner            | tests/unit/runner.test.js            | src/runner.js            | pending | Skip enrich on duplicate                        |
-| 7     | scheduler         | tests/unit/scheduler.test.js         | src/scheduler.js         | pending | Cron registration per source                    |
-| 8     | index             | tests/unit/index.test.js             | src/index.js             | pending | Health endpoint + init wiring                   |
-| 9     | mock-feed adapter | tests/integration/mock-feed.test.js  | src/sources/mock-feed.js | pending | Real HTTP to mock-feed                          |
-| 10    | enrich            | tests/integration/enrich.test.js     | src/enrich.js            | pending | Real POST to LE service                         |
-| 11    | db                | tests/integration/db.test.js         | src/db.js                | pending | Real PG insert/update                           |
-| 12    | config            | tests/integration/config.test.js     | src/config.js            | pending | Real PG config loading                          |
-| 13    | full-cycle        | tests/integration/full-cycle.test.js | all modules              | pending | End-to-end with all real services               |
+| Cycle | Module            | Test file                            | Src file                 | Status  | Notes                                       |
+| ----- | ----------------- | ------------------------------------ | ------------------------ | ------- | ------------------------------------------- |
+| 0     | setup             | —                                    | —                        | done    | Scaffold, tsconfig, migration, test helpers |
+| 1     | normalizer        | tests/unit/normalizer.test.ts        | src/normalizer.ts        | done    | Stable guid → source_id                     |
+| 2     | normalizer        | tests/unit/normalizer.test.ts        | src/normalizer.ts        | done    | Content hash fallback (no guid)             |
+| 3     | enrich            | tests/unit/enrich.test.js            | src/enrich.js            | pending | Mock fetch returns GeoJSON                  |
+| 4     | enrich            | tests/unit/enrich.test.js            | src/enrich.js            | pending | Retry 3x then return null                   |
+| 5     | runner            | tests/unit/runner.test.js            | src/runner.js            | pending | Effect-count assertions                     |
+| 6     | runner            | tests/unit/runner.test.js            | src/runner.js            | pending | Skip enrich on duplicate                    |
+| 7     | scheduler         | tests/unit/scheduler.test.js         | src/scheduler.js         | pending | Cron registration per source                |
+| 8     | index             | tests/unit/index.test.js             | src/index.js             | pending | Health endpoint + init wiring               |
+| 9     | mock-feed adapter | tests/integration/mock-feed.test.js  | src/sources/mock-feed.js | pending | Real HTTP to mock-feed                      |
+| 10    | enrich            | tests/integration/enrich.test.js     | src/enrich.js            | pending | Real POST to LE service                     |
+| 11    | db                | tests/integration/db.test.js         | src/db.js                | pending | Real PG insert/update                       |
+| 12    | config            | tests/integration/config.test.js     | src/config.js            | pending | Real PG config loading                      |
+| 13    | full-cycle        | tests/integration/full-cycle.test.js | all modules              | pending | End-to-end with all real services           |
 
 ## Last Session
 
-**Date:** —
-**Cycles completed:** none
-**Cycles attempted:** none
-**Outcome:** Removed Cycles 5-8 (db + config unit tests) — mock at pg driver level too brittle. Runner test (now Cycle 5) changed to effect-count assertions instead of call-order.
-**Blockers:** none
-**Files created/modified:** CONTEXT.md (this file), docs/architecture/ingestion-worker.md
-**Tests passing:** —
-**Next action:** Start Cycle 0 — scaffold project structure, write `package.json`, migration file, and test helpers.
+**Date:** 2026-05-20
+**Cycles completed:** 0, 1, 2
+**Cycles attempted:** 0, 1, 2
+**Outcome:** Cycles 0-2 done in JS. Then converted to TS per ADR-015:
+
+- ADR-015 written
+- All existing `.js` files converted to `.ts` with type annotations
+- `tsconfig.json` created
+- `typescript`, `@types/node`, `@types/pg` added as devDeps
+- `--experimental-strip-types` flag added to all scripts
+- Tests pass with TS (2/2), `tsc --noEmit` clean
+- Docs updated: `overview.md`, `ingestion-worker.md`
+  **Blockers:** none
+  **Files created/modified:**
+- docs/decisions/ADR-015-typescript-for-node-services.md (new)
+- backend/ingestion-worker/tsconfig.json (new)
+- backend/ingestion-worker/src/normalizer.ts (new, was .js)
+- backend/ingestion-worker/tests/unit/normalizer.test.ts (new, was .js)
+- backend/ingestion-worker/tests/helpers.ts (new, was .js)
+- backend/ingestion-worker/tests/integration/helpers.ts (new, was .js)
+- backend/ingestion-worker/package.json (updated)
+- docs/architecture/ingestion-worker.md (updated)
+- docs/architecture/overview.md (updated)
+- CONTEXT.md (this file, updated)
+  **Tests passing:** 2/2 (normalizer unit tests with TS)
+  **Next action:** Cycle 3 — enrich.ts basic HTTP client (RED→GREEN).
 
 ## Handoff
 

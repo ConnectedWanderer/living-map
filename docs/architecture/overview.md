@@ -6,16 +6,16 @@ A real-time web application displaying geographical events on an interactive map
 
 ## Technology Stack
 
-| Layer               | Technology           | Notes                                             |
-| ------------------- | -------------------- | ------------------------------------------------- |
-| Frontend            | Vue 3 + Vite         | Lightweight, mobile-optimized                     |
-| Map                 | MapLibre GL JS       | Open-source, OSM tiles                            |
-| State Management    | Pinia                | Official Vue recommendation                       |
-| Serving API         | Node.js + Express    | Read-only API, reads from PostgreSQL              |
-| Ingestion Worker    | Node.js              | Cron-triggered batch ingestion from external APIs |
-| Location Extraction | Python + FastAPI     | NLP service for extracting coordinates from text  |
-| Database            | PostgreSQL + PostGIS | Geospatial persistence, spatial indexes           |
-| External Data       | External APIs        | Real news/event feeds (mock-feed for testing)     |
+| Layer               | Technology                     | Notes                                             |
+| ------------------- | ------------------------------ | ------------------------------------------------- |
+| Frontend            | Vue 3 + Vite                   | Lightweight, mobile-optimized                     |
+| Map                 | MapLibre GL JS                 | Open-source, OSM tiles                            |
+| State Management    | Pinia                          | Official Vue recommendation                       |
+| Serving API         | Node.js + TypeScript + Express | Read-only API, reads from PostgreSQL              |
+| Ingestion Worker    | Node.js + TypeScript           | Cron-triggered batch ingestion from external APIs |
+| Location Extraction | Python + FastAPI               | NLP service for extracting coordinates from text  |
+| Database            | PostgreSQL + PostGIS           | Geospatial persistence, spatial indexes           |
+| External Data       | External APIs                  | Real news/event feeds (mock-feed for testing)     |
 
 ## High-Level Architecture
 
@@ -59,12 +59,13 @@ backend/
 │   │   ├── db/                   # PostgreSQL client + queries
 │   │   └── utils/                # Helpers
 │   └── package.json
-├── ingestion-worker/             # Node.js batch ingestion service
+├── ingestion-worker/             # Node.js + TypeScript batch ingestion service
 │   ├── src/
-│   │   ├── index.js              # Entry point, cron scheduler
+│   │   ├── index.ts              # Entry point, cron scheduler
 │   │   ├── sources/              # Source adapters (mock-feed, RSS, …)
-│   │   ├── dedup.js              # source_id + content hash dedup
-│   │   └── config.js             # Per-source schedule config
+│   │   ├── dedup.ts              # source_id + content hash dedup
+│   │   └── config.ts             # Per-source schedule config
+│   ├── tsconfig.json
 │   └── package.json
 ├── mock-feed/                    # Mock external RSS feed (for testing)
 │   ├── src/
@@ -136,16 +137,16 @@ sequenceDiagram
 
 ## Key Design Decisions
 
-| Decision            | Choice                     | Rationale                                                |
-| ------------------- | -------------------------- | -------------------------------------------------------- |
-| Map Library         | MapLibre GL JS             | Open-source, no API key, OSM tiles                       |
-| Data Freshness      | Batch ingestion (cron)     | Sufficient for news-cycle data, simpler than queue       |
-| Persistence         | PostgreSQL + PostGIS       | Geospatial queries, concurrent writes, survives restarts |
-| Ingestion Worker    | Node.js                    | Pure I/O orchestration, consistent with serving API      |
-| Services            | Separate (ingestion + API) | Independent scaling, failure isolation                   |
-| Deduplication       | source_id + content hash   | Handles both stable and unstable source IDs              |
-| Responsive          | Mobile-first CSS           | Essential for mobile-friendly requirement                |
-| Location Extraction | spaCy + geonamescache      | Offline NLP, zero API costs, global coverage             |
+| Decision            | Choice                     | Rationale                                                     |
+| ------------------- | -------------------------- | ------------------------------------------------------------- |
+| Map Library         | MapLibre GL JS             | Open-source, no API key, OSM tiles                            |
+| Data Freshness      | Batch ingestion (cron)     | Sufficient for news-cycle data, simpler than queue            |
+| Persistence         | PostgreSQL + PostGIS       | Geospatial queries, concurrent writes, survives restarts      |
+| Ingestion Worker    | Node.js + TypeScript       | Pure I/O orchestration, consistent with serving API (ADR-015) |
+| Services            | Separate (ingestion + API) | Independent scaling, failure isolation                        |
+| Deduplication       | source_id + content hash   | Handles both stable and unstable source IDs                   |
+| Responsive          | Mobile-first CSS           | Essential for mobile-friendly requirement                     |
+| Location Extraction | spaCy + geonamescache      | Offline NLP, zero API costs, global coverage                  |
 
 ## Constraints & Assumptions
 

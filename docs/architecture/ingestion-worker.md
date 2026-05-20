@@ -44,28 +44,35 @@ flowchart TD
 ```
 backend/ingestion-worker/
 ├── src/
-│   ├── index.js            # Entry point: init logger, load sources, start scheduler
-│   ├── scheduler.js        # node-cron scheduler: register per-source cron jobs
-│   ├── runner.js           # Per-source run: fetch → normalize → dedup → enrich → write
+│   ├── index.ts            # Entry point: init logger, load sources, start scheduler
+│   ├── scheduler.ts        # node-cron scheduler: register per-source cron jobs
+│   ├── runner.ts           # Per-source run: fetch → normalize → dedup → enrich → write
 │   ├── sources/
-│   │   ├── adapter.js      # Abstract adapter interface / base class
-│   │   ├── mock-feed.js    # Adapter: fetch mock-feed, return normalized articles
-│   │   ├── rss.js          # Adapter: fetch RSS feed, parse XML, return normalized articles
+│   │   ├── adapter.ts      # Abstract adapter interface / type defs
+│   │   ├── mock-feed.ts    # Adapter: fetch mock-feed, return normalized articles
+│   │   ├── rss.ts          # Adapter: fetch RSS feed, parse XML, return normalized articles
 │   │   └── ...             # Future source adapters
-│   ├── normalizer.js       # Adapter output → {source_id, title, description, url, published_at}
-│   ├── enrich.js           # Location Extraction client: POST /api/extract-location, retry logic
-│   ├── db.js               # pg client pool, INSERT/UPDATE queries
-│   ├── config.js           # Source config loader: read sources table from PostgreSQL
-│   └── logger.js           # Structured JSON logger (pino)
+│   ├── normalizer.ts       # Adapter output → {source_id, title, description, url, published_at}
+│   ├── enrich.ts           # Location Extraction client: POST /api/extract-location, retry logic
+│   ├── db.ts               # pg client pool, INSERT/UPDATE queries
+│   ├── config.ts           # Source config loader: read sources table from PostgreSQL
+│   └── logger.ts           # Structured JSON logger (pino)
 ├── tests/
+│   ├── helpers.ts          # Shared: DB pool creation, migration runner
 │   ├── unit/
-│   │   ├── test-scheduler.js
-│   │   ├── test-runner.js
-│   │   ├── test-normalizer.js
-│   │   └── test-enrich.js
+│   │   ├── normalizer.test.ts
+│   │   ├── enrich.test.ts
+│   │   ├── runner.test.ts
+│   │   ├── scheduler.test.ts
+│   │   └── index.test.ts
 │   └── integration/
-│       ├── test-mock-feed-adapter.js
-│       └── test-full-cycle.js
+│       ├── helpers.ts      # Integration: Docker compose lifecycle, service URLs
+│       ├── mock-feed.test.ts
+│       ├── enrich.test.ts
+│       ├── db.test.ts
+│       ├── config.test.ts
+│       └── full-cycle.test.ts
+├── tsconfig.json
 ├── package.json
 └── AGENTS.md
 ```
@@ -74,12 +81,25 @@ backend/ingestion-worker/
 
 Each adapter in `src/sources/*` exports a single async function:
 
-```js
-/**
- * @param {object} config - Per-source config row from DB
- * @returns {Promise<Array<{source_id: string, title: string, description: string, url: string, published_at: string}>>}
- */
-export async function fetchArticles(config) { ... }
+```ts
+interface SourceConfig {
+  url: string;
+  source: string;
+  // adapter-specific options
+}
+
+interface NormalizedArticle {
+  source_id: string;
+  title: string;
+  description?: string;
+  url: string;
+  published_at: string;
+  source: string;
+}
+
+async function fetchArticles(
+  config: SourceConfig,
+): Promise<NormalizedArticle[]>;
 ```
 
 - `source_id`: extracted from external ID, or computed SHA-256(title + published_at)
@@ -131,15 +151,16 @@ sequenceDiagram
 
 ## Technology Stack
 
-| Component   | Technology                                | Rationale                                           |
-| ----------- | ----------------------------------------- | --------------------------------------------------- |
-| Runtime     | Node.js                                   | Pure I/O orchestration, consistent with serving API |
-| HTTP client | `undici` (built-in fetch)                 | No external dep, Node.js native                     |
-| Scheduler   | `node-cron`                               | In-process cron, matches batch interval needs       |
-| Database    | `pg` (node-postgres)                      | PostgreSQL client, pool management                  |
-| Logging     | `pino`                                    | Structured JSON, low overhead, Docker-friendly      |
-| XML parsing | `fast-xml-parser`                         | RSS feed parsing (for RSS adapter)                  |
-| Testing     | Node built-in `node:test` + `node:assert` | Zero-dependency test runner                         |
+| Component   | Technology                                  | Rationale                                           |
+| ----------- | ------------------------------------------- | --------------------------------------------------- |
+| Runtime     | Node.js (with `--experimental-strip-types`) | Pure I/O orchestration, consistent with serving API |
+| Language    | TypeScript                                  | Module contracts enforced at compile time (ADR-015) |
+| HTTP client | `undici` (built-in fetch)                   | No external dep, Node.js native                     |
+| Scheduler   | `node-cron`                                 | In-process cron, matches batch interval needs       |
+| Database    | `pg` (node-postgres)                        | PostgreSQL client, pool management                  |
+| Logging     | `pino`                                      | Structured JSON, low overhead, Docker-friendly      |
+| XML parsing | `fast-xml-parser`                           | RSS feed parsing (for RSS adapter)                  |
+| Testing     | Node built-in `node:test` + `node:assert`   | Zero-dependency test runner                         |
 
 ## API Endpoints
 
@@ -169,15 +190,16 @@ Worker exposes health endpoint on internal port (configurable, default 3003).
 
 ## Key Design Decisions
 
-| Decision             | Choice                          | Rationale                                    |
-| -------------------- | ------------------------------- | -------------------------------------------- |
-| In-process scheduler | node-cron                       | No external cron dependency, self-contained  |
-| Source config in DB  | sources table                   | Dynamic source registration without restart  |
-| Abstract adapter     | async function contract         | Each source: same shape, swap via config row |
-| PostgreSQL dedup     | ON CONFLICT DO NOTHING          | Atomic, no race window (ADR-012)             |
-| Structured logging   | pino                            | Production-ready, docker log processing      |
-| Health endpoint      | GET /health                     | Docker compose healthcheck, orchestration    |
-| Retry per source     | Exponential backoff, 3 attempts | Transient failures recover within same cycle |
+| Decision             | Choice                          | Rationale                                           |
+| -------------------- | ------------------------------- | --------------------------------------------------- |
+| Language             | TypeScript                      | Module contracts enforced at compile time (ADR-015) |
+| In-process scheduler | node-cron                       | No external cron dependency, self-contained         |
+| Source config in DB  | sources table                   | Dynamic source registration without restart         |
+| Abstract adapter     | async function contract         | Each source: same shape, swap via config row        |
+| PostgreSQL dedup     | ON CONFLICT DO NOTHING          | Atomic, no race window (ADR-012)                    |
+| Structured logging   | pino                            | Production-ready, docker log processing             |
+| Health endpoint      | GET /health                     | Docker compose healthcheck, orchestration           |
+| Retry per source     | Exponential backoff, 3 attempts | Transient failures recover within same cycle        |
 
 ## Docker
 
@@ -194,7 +216,7 @@ WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY src/ ./src/
 EXPOSE 3003
-CMD ["node", "src/index.js"]
+CMD ["node", "--experimental-strip-types", "src/index.ts"]
 ```
 
 ## Implementation Phases
@@ -202,15 +224,15 @@ CMD ["node", "src/index.js"]
 ### Phase 1: Core Worker (MVP)
 
 - [ ] Project scaffolding (package.json, src/, tests/)
-- [ ] `config.js` — read sources from PostgreSQL
-- [ ] `sources/adapter.js` — normalizer contract
-- [ ] `sources/mock-feed.js` — fetch mock-feed RSS, parse, normalize
-- [ ] `db.js` — pg pool, INSERT ON CONFLICT, UPDATE
-- [ ] `enrich.js` — Location Extraction client
-- [ ] `runner.js` — orchestrate per-source cycle
-- [ ] `scheduler.js` — node-cron registration
-- [ ] `logger.js` — pino structured logging
-- [ ] `index.js` — entry point, health endpoint
+- [ ] `config.ts` — read sources from PostgreSQL
+- [ ] `sources/adapter.ts` — normalizer contract + types
+- [ ] `sources/mock-feed.ts` — fetch mock-feed RSS, parse, normalize
+- [ ] `db.ts` — pg pool, INSERT ON CONFLICT, UPDATE
+- [ ] `enrich.ts` — Location Extraction client
+- [ ] `runner.ts` — orchestrate per-source cycle
+- [ ] `scheduler.ts` — node-cron registration
+- [ ] `logger.ts` — pino structured logging
+- [ ] `index.ts` — entry point, health endpoint
 - [ ] Dockerfile
 - [ ] Unit tests for each module
 - [ ] Integration test: full mock-feed cycle
