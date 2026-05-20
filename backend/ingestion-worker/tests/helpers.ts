@@ -26,8 +26,8 @@ export async function runMigrations(pool: pg.Pool): Promise<void> {
   const client = await pool.connect();
   try {
     await client.query("SELECT 1");
-    execSync("npx node-pg-migrate up", {
-      cwd: path.resolve(__dirname, "../.."),
+    execSync("npx node-pg-migrate up --migrations-dir ../migrations", {
+      cwd: path.resolve(__dirname, ".."),
       env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL },
       stdio: "pipe",
     });
@@ -37,6 +37,5 @@ export async function runMigrations(pool: pg.Pool): Promise<void> {
 }
 
 export async function cleanTables(pool: pg.Pool): Promise<void> {
-  await pool.query("DELETE FROM events");
-  await pool.query("DELETE FROM sources");
+  await pool.query("TRUNCATE events, sources CASCADE");
 }

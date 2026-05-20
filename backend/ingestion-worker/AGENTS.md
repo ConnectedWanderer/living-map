@@ -12,11 +12,11 @@ For repo-wide code quality conventions (formatting, pre-commit), see [Root AGENT
 # Unit tests only (fast)
 node --test --experimental-strip-types tests/unit/*.test.ts
 
-# Integration tests (requires Docker services)
-node --test --experimental-strip-types tests/integration/*.test.ts
+# Integration tests (auto-manages Docker via orchestrator)
+npm run test:int
 
-# All tests
-node --test --experimental-strip-types tests/**/*.test.ts
+# All tests (unit + integration via orchestrator)
+npm run test:all
 
 # Type-check (no emit)
 tsc --noEmit
@@ -32,7 +32,7 @@ docker-compose up --build
 
 ### TDD Approach
 
-Follow the cycle plan in [CONTEXT.md](CONTEXT.md). Each cycle:
+Each cycle:
 
 1. **RED** — Write a failing test for one behavior
 2. **GREEN** — Write minimal code to pass
@@ -80,33 +80,30 @@ src/
     └── mock-feed.ts    # Fetch mock-feed RSS, parse, normalize
 ```
 
-See [CONTEXT.md](CONTEXT.md) for full module contracts and the cycle plan.
-
 ## Troubleshooting
 
-| Symptom                        | Fix                                                        |
-| ------------------------------ | ---------------------------------------------------------- |
-| Dependencies not found         | `npm install`                                              |
-| Type errors                    | `tsc --noEmit` to check                                    |
-| Integration tests fail         | Ensure Docker services are running (pg, mock-feed, LE)     |
-| node-cron jobs not firing      | Check cron expressions in `sources` table                  |
-| Location enrichment returns [] | Verify Location Extraction service is healthy on port 8000 |
+| Symptom                        | Fix                                                                                                          |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Dependencies not found         | `npm install`                                                                                                |
+| Type errors                    | `tsc --noEmit` to check                                                                                      |
+| Integration tests fail         | Run `npm run test:int` to auto-start Docker. Debug logs: `docker compose -f ../docker-compose.test.yml logs` |
+| node-cron jobs not firing      | Check cron expressions in `sources` table                                                                    |
+| Location enrichment returns [] | Verify Location Extraction service is healthy on port 8000                                                   |
 
 ## npm Commands Reference
 
-| Command             | Description                                   |
-| ------------------- | --------------------------------------------- |
-| `npm install`       | Install all dependencies                      |
-| `npm start`         | Run service (node --experimental-strip-types) |
-| `npm test`          | Run unit tests only                           |
-| `npm run test:all`  | Run all tests (unit + integration)            |
-| `npm run test:int`  | Run integration tests only (requires Docker)  |
-| `npm run typecheck` | Type-check with `tsc --noEmit`                |
+| Command             | Description                                              |
+| ------------------- | -------------------------------------------------------- |
+| `npm install`       | Install all dependencies                                 |
+| `npm start`         | Run service (node --experimental-strip-types)            |
+| `npm test`          | Run unit tests only                                      |
+| `npm run test:all`  | All tests (unit + integration via orchestrator)          |
+| `npm run test:int`  | Integration tests (auto-manages Docker via orchestrator) |
+| `npm run typecheck` | Type-check with `tsc --noEmit`                           |
 
 ## Related Documentation
 
 - [README.md](README.md) — End-user documentation (setup, API, Docker)
-- [CONTEXT.md](CONTEXT.md) — TDD cycle plan, progress, module contracts
 - [Architecture Documentation](../../docs/architecture/ingestion-worker.md) — Deep design doc
 - [ADR-013](../../docs/decisions/ADR-013-npm-package-manager.md) — npm package manager choice
 - [ADR-014](../../docs/decisions/ADR-014-node-pg-migrate-for-db-migrations.md) — node-pg-migrate for DB migrations

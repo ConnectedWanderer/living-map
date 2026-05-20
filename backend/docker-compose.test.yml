@@ -1,0 +1,35 @@
+services:
+  postgres-test:
+    image: postgis/postgis:16-3.4
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: livingmap
+      POSTGRES_PASSWORD: livingmap
+      POSTGRES_DB: livingmap_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U livingmap -d livingmap_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mock-feed:
+    build: ./mock-feed
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', r => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  location-extraction:
+    build: ./location-extraction-service
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

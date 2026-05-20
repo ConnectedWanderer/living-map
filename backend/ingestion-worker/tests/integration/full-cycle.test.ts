@@ -1,6 +1,6 @@
-import { describe, it, before, after } from "node:test";
+import { describe, it, before, after, beforeEach } from "node:test";
 import assert from "node:assert";
-import { createTestPool, runMigrations, cleanTables, closePool } from "../helpers.ts";
+import { createTestPool, cleanTables, closePool } from "../helpers.ts";
 import { MOCK_FEED_URL, LE_URL, ensureServices } from "./helpers.ts";
 import type pg from "pg";
 
@@ -10,24 +10,14 @@ describe("full cycle integration", () => {
   before(async () => {
     await ensureServices();
     pool = await createTestPool();
-    await runMigrations(pool);
-
-    await pool.query(
-      `INSERT INTO sources (name, type, config, schedule, enabled)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [
-        "full-cycle-test",
-        "mock-feed",
-        JSON.stringify({ url: `${MOCK_FEED_URL}/feed?count=2`, source: "full-cycle-test" }),
-        "*/5 * * * *",
-        true,
-      ],
-    );
   });
 
   after(async () => {
-    await cleanTables(pool);
     await closePool(pool);
+  });
+
+  beforeEach(async () => {
+    await cleanTables(pool);
   });
 
   it("runs end-to-end: fetch, insert, enrich, update", async () => {

@@ -69,7 +69,7 @@ The service runs on a cron schedule defined per source in the `sources` PostgreS
 | `PORT`                    | `3000`                                                    | Health endpoint port            |
 | `LOG_LEVEL`               | `info`                                                    | Pino log level                  |
 
-Sources are configured via the `sources` PostgreSQL table — see [CONTEXT.md](CONTEXT.md) for schema.
+Sources are configured via the `sources` PostgreSQL table — see [`backend/migrations/001_create-events-and-sources.js`](../../migrations/001_create-events-and-sources.js) for the schema.
 
 ## API
 
@@ -88,15 +88,14 @@ curl http://localhost:3000/health
 ```bash
 npm run typecheck    # TypeScript check (no emit)
 npm test             # Unit tests
-npm run test:all     # All tests (unit + integration)
-npm run test:int     # Integration tests (requires Docker)
+npm run test:all     # All tests (unit + integration via orchestrator)
+npm run test:int     # Integration tests (auto-manages Docker via orchestrator)
 ```
 
 Formatting is handled repo-wide via pre-commit hooks — see [Root AGENTS.md](../../AGENTS.md).
 
 ## Related Documentation
 
-- [CONTEXT.md](CONTEXT.md) — TDD cycle plan, progress, module contracts
 - [Architecture Documentation](../../docs/architecture/ingestion-worker.md)
 - [ADR-013: npm Package Manager](../../docs/decisions/ADR-013-npm-package-manager.md)
 - [ADR-014: node-pg-migrate for DB Migrations](../../docs/decisions/ADR-014-node-pg-migrate-for-db-migrations.md)

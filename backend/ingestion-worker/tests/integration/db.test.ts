@@ -1,7 +1,7 @@
-import { describe, it, before, after } from "node:test";
+import { describe, it, before, after, beforeEach } from "node:test";
 import assert from "node:assert";
 import { insertEvents, updateLocation } from "../../src/db.ts";
-import { createTestPool, runMigrations, cleanTables, closePool } from "../helpers.ts";
+import { createTestPool, cleanTables, closePool } from "../helpers.ts";
 import type pg from "pg";
 
 describe("db integration", () => {
@@ -9,12 +9,14 @@ describe("db integration", () => {
 
   before(async () => {
     pool = await createTestPool();
-    await runMigrations(pool);
   });
 
   after(async () => {
-    await cleanTables(pool);
     await closePool(pool);
+  });
+
+  beforeEach(async () => {
+    await cleanTables(pool);
   });
 
   it("inserts events and returns inserted count", async () => {
