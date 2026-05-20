@@ -1,0 +1,24 @@
+{
+  "name": "ingestion-worker",
+  "version": "1.0.0",
+  "description": "Cron-triggered service that polls sources, normalizes, deduplicates, enriches, and persists events",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types src/index.ts",
+    "test": "node --test --experimental-strip-types tests/unit/*.test.ts",
+    "test:all": "node --test --experimental-strip-types tests/**/*.test.ts",
+    "test:int": "node --test --experimental-strip-types tests/integration/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pg": "^8.20.0",
+    "node-cron": "^4.2.1",
+    "pino": "^10.3.1",
+    "fast-xml-parser": "^5.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "@types/node": "^25.7.0",
+    "@types/pg": "^8.20.0"
+  }
+}

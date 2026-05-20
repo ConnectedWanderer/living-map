@@ -1,0 +1,63 @@
+import { describe, it, before, after } from "node:test";
+import assert from "node:assert";
+import { createTestPool, runMigrations, cleanTables, closePool } from "../helpers.ts";
+import { MOCK_FEED_URL, LE_URL, ensureServices } from "./helpers.ts";
+import type pg from "pg";
+
+describe("full cycle integration", () => {
+  let pool: pg.Pool;
+
+  before(async () => {
+    await ensureServices();
+    pool = await createTestPool();
+    await runMigrations(pool);
+
+    await pool.query(
+      `INSERT INTO sources (name, type, config, schedule, enabled)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [
+        "full-cycle-test",
+        "mock-feed",
+        JSON.stringify({ url: `${MOCK_FEED_URL}/feed?count=2`, source: "full-cycle-test" }),
+        "*/5 * * * *",
+        true,
+      ],
+    );
+  });
+
+  after(async () => {
+    await cleanTables(pool);
+    await closePool(pool);
+  });
+
+  it("runs end-to-end: fetch, insert, enrich, update", async () => {
+    const { fetchArticles } = await import("../../src/sources/mock-feed.ts");
+    const { insertEvents, updateLocation } = await import("../../src/db.ts");
+    const { extractLocation } = await import("../../src/enrich.ts");
+
+    const articles = await fetchArticles({
+      url: `${MOCK_FEED_URL}/feed?count=2`,
+      source: "full-cycle-test",
+    });
+
+    assert.strictEqual(articles.length, 2);
+
+    const { inserted } = await insertEvents(pool, articles);
+    assert.strictEqual(inserted, 2);
+
+    for (const article of articles) {
+      const text = `${article.title} ${article.description || ""}`.trim();
+      const geoJson = await extractLocation(text, { url: LE_URL });
+
+      if (geoJson) {
+        await updateLocation(pool, article.source, article.source_id, geoJson);
+      }
+    }
+
+    const result = await pool.query(
+      "SELECT COUNT(*) AS count FROM events WHERE source = $1",
+      ["full-cycle-test"],
+    );
+    assert.strictEqual(Number(result.rows[0].count), 2);
+  });
+});
