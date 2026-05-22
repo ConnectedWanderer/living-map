@@ -6,24 +6,13 @@ import { startScheduler } from "./scheduler.ts";
 import { runSource } from "./runner.ts";
 import { extractLocation } from "./enrich.ts";
 import { insertEvents, updateLocation } from "./db.ts";
-import { fetchArticles as mockFeedFetch } from "./sources/mock-feed.ts";
-import type { NormalizedArticle } from "./normalizer.ts";
-import type { FetchDeps } from "./sources/adapter.ts";
+import { getAdapter } from "./sources/registry.ts";
 
 interface Env {
   PORT?: string;
   DATABASE_URL?: string;
   LOCATION_EXTRACTION_URL?: string;
   LOG_LEVEL?: string;
-}
-
-function createFetchArticles(type: string): (config: Record<string, unknown>, deps?: FetchDeps) => Promise<NormalizedArticle[]> {
-  switch (type) {
-    case "mock-feed":
-      return (config, deps) => mockFeedFetch(config as never, deps);
-    default:
-      throw new Error(`Unknown source type: ${type}`);
-  }
 }
 
 export async function main(env: Env): Promise<http.Server> {
@@ -36,7 +25,7 @@ export async function main(env: Env): Promise<http.Server> {
     runSource(source, {
       fetch: global.fetch,
       pool,
-      fetchArticles: createFetchArticles(source.type),
+      fetchArticles: getAdapter(source.type),
       insertEvents,
       updateLocation,
       extractLocation: (text) =>

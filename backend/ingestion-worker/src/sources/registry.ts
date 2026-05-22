@@ -1,0 +1,24 @@
+import type { NormalizedArticle } from "../normalizer.ts";
+import type { FetchDeps } from "./adapter.ts";
+import { fetchArticles as mockFeedFetch } from "./mock-feed.ts";
+
+type FetchArticlesFn = (
+  config: Record<string, unknown>,
+  deps?: FetchDeps,
+) => Promise<NormalizedArticle[]>;
+
+const registry = new Map<string, FetchArticlesFn>();
+
+export function registerAdapter(type: string, fn: FetchArticlesFn): void {
+  registry.set(type, fn);
+}
+
+export function getAdapter(type: string): FetchArticlesFn {
+  const fn = registry.get(type);
+  if (!fn) {
+    throw new Error(`Unknown source type: ${type}`);
+  }
+  return fn;
+}
+
+registerAdapter("mock-feed", (config, deps) => mockFeedFetch(config as never, deps));
