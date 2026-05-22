@@ -1,6 +1,6 @@
-import type { NormalizedArticle } from "../normalizer.ts";
-import type { FetchDeps } from "./adapter.ts";
-import { fetchArticles as mockFeedFetch } from "./mock-feed.ts";
+import type { NormalizedArticle } from '../normalizer.ts';
+import type { FetchDeps } from './adapter.ts';
+import { fetchArticles as mockFeedFetch } from './mock-feed.ts';
 
 type FetchArticlesFn = (
   config: Record<string, unknown>,
@@ -9,10 +9,12 @@ type FetchArticlesFn = (
 
 const registry = new Map<string, FetchArticlesFn>();
 
+/** Register a fetch function for a given source type. */
 export function registerAdapter(type: string, fn: FetchArticlesFn): void {
   registry.set(type, fn);
 }
 
+/** Get the registered fetch function for a source type. Throws if unknown. */
 export function getAdapter(type: string): FetchArticlesFn {
   const fn = registry.get(type);
   if (!fn) {
@@ -21,4 +23,4 @@ export function getAdapter(type: string): FetchArticlesFn {
   return fn;
 }
 
-registerAdapter("mock-feed", (config, deps) => mockFeedFetch(config as never, deps));
+registerAdapter('mock-feed', (config, deps) => mockFeedFetch(config as never, deps));

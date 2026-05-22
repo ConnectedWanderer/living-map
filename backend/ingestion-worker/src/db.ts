@@ -1,7 +1,8 @@
-import type pg from "pg";
-import type { NormalizedArticle } from "./normalizer.ts";
-import type { GeoJsonFeatureCollection } from "./enrich.ts";
+import type pg from 'pg';
+import type { GeoJsonFeatureCollection } from './enrich.ts';
+import type { NormalizedArticle } from './normalizer.ts';
 
+/** Batch insert articles with ON CONFLICT deduplication. Returns inserted/skipped counts. */
 export async function insertEvents(
   pool: pg.Pool,
   articles: NormalizedArticle[],
@@ -15,7 +16,14 @@ export async function insertEvents(
        VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (source, source_id) DO NOTHING
        RETURNING id`,
-      [article.source, article.source_id, article.title, article.description, article.url, article.published_at],
+      [
+        article.source,
+        article.source_id,
+        article.title,
+        article.description,
+        article.url,
+        article.published_at,
+      ],
     );
 
     if (result.rowCount && result.rowCount > 0) {
@@ -28,6 +36,7 @@ export async function insertEvents(
   return { inserted, skipped };
 }
 
+/** Update an event's location column with extracted GeoJSON coordinates. */
 export async function updateLocation(
   pool: pg.Pool,
   source: string,

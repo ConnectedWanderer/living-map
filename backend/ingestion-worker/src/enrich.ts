@@ -1,7 +1,8 @@
+/** A GeoJSON FeatureCollection returned by the location extraction service. */
 export interface GeoJsonFeatureCollection {
-  type: "FeatureCollection";
+  type: 'FeatureCollection';
   features: Array<{
-    type: "Feature";
+    type: 'Feature';
     geometry: { type: string; coordinates: unknown };
     properties: Record<string, unknown>;
   }>;
@@ -9,6 +10,7 @@ export interface GeoJsonFeatureCollection {
 
 const RETRY_DELAYS = [1000, 4000, 16000];
 
+/** POST text to the location extraction service with exponential retry. */
 export async function extractLocation(
   text: string,
   config: { url: string },
@@ -16,8 +18,8 @@ export async function extractLocation(
   for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
     try {
       const response = await fetch(`${config.url}/api/extract-location`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
 
@@ -30,7 +32,7 @@ export async function extractLocation(
       if (attempt === RETRY_DELAYS.length) {
         return null;
       }
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS[attempt]));
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS[attempt]));
     }
   }
 

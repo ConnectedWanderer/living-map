@@ -87,12 +87,17 @@ curl http://localhost:3000/health
 
 ```bash
 npm run typecheck    # TypeScript check (no emit)
+npm run lint         # Lint with Biome
+npm run format       # Format with Biome
+npm run check        # Biome check + JSDoc verification
+npm run check:docs   # JSDoc verification only
+npm run lint:ci      # CI lint + JSDoc (fails on violations, no writes)
 npm test             # Unit tests
 npm run test:all     # All tests (unit + integration via orchestrator)
 npm run test:int     # Integration tests (auto-manages Docker via orchestrator)
 ```
 
-Formatting is handled repo-wide via pre-commit hooks — see [Root AGENTS.md](../../AGENTS.md).
+Linting and formatting are integrated repo-wide via pre-commit hooks — see [Root AGENTS.md](../../AGENTS.md).
 
 ## Related Documentation
 

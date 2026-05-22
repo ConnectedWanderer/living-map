@@ -1,7 +1,7 @@
-import { XMLParser } from "fast-xml-parser";
-import type { SourceConfig, FetchDeps } from "./adapter.ts";
-import type { NormalizedArticle } from "../normalizer.ts";
-import { normalizeArticle } from "../normalizer.ts";
+import { XMLParser } from 'fast-xml-parser';
+import type { NormalizedArticle } from '../normalizer.ts';
+import { normalizeArticle } from '../normalizer.ts';
+import type { FetchDeps, SourceConfig } from './adapter.ts';
 
 interface RssItem {
   title?: string;
@@ -21,6 +21,7 @@ interface RssRoot {
   };
 }
 
+/** Fetch and parse an RSS feed from the configured URL. */
 export async function fetchArticles(
   config: SourceConfig,
   deps?: FetchDeps,
@@ -41,18 +42,18 @@ export async function fetchArticles(
     return [];
   }
 
-  const items = Array.isArray(channel.item) ? channel.item : (channel.item ? [channel.item] : []);
+  const items = Array.isArray(channel.item) ? channel.item : channel.item ? [channel.item] : [];
 
   return items.map((item) =>
     normalizeArticle(
       {
         guid: item.guid,
-        title: item.title || "",
+        title: item.title || '',
         description: item.description,
-        link: item.link || "",
+        link: item.link || '',
         pubDate: item.pubDate || new Date().toISOString(),
       },
       config.source,
-    )
+    ),
   );
 }

@@ -1,17 +1,17 @@
-import { describe, it, before } from "node:test";
-import assert from "node:assert";
-import { fetchArticles } from "../../src/sources/mock-feed.ts";
-import { MOCK_FEED_URL, ensureServices } from "./helpers.ts";
+import assert from 'node:assert';
+import { before, describe, it } from 'node:test';
+import { fetchArticles } from '../../src/sources/mock-feed.ts';
+import { ensureServices, MOCK_FEED_URL } from './helpers.ts';
 
-describe("mock-feed adapter", () => {
+describe('mock-feed adapter', () => {
   before(async () => {
     await ensureServices();
   });
 
-  it("fetches and normalizes articles from mock-feed", async () => {
+  it('fetches and normalizes articles from mock-feed', async () => {
     const articles = await fetchArticles({
       url: `${MOCK_FEED_URL}/feed?count=3`,
-      source: "mock-feed",
+      source: 'mock-feed',
     });
 
     assert.strictEqual(articles.length, 3);
@@ -20,7 +20,7 @@ describe("mock-feed adapter", () => {
       assert.ok(article.title);
       assert.ok(article.url);
       assert.ok(article.published_at);
-      assert.strictEqual(article.source, "mock-feed");
+      assert.strictEqual(article.source, 'mock-feed');
     }
   });
 });

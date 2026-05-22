@@ -1,10 +1,10 @@
-import { describe, it, before, after, beforeEach } from "node:test";
-import assert from "node:assert";
-import { createTestPool, cleanTables, closePool } from "../helpers.ts";
-import { MOCK_FEED_URL, LE_URL, ensureServices } from "./helpers.ts";
-import type pg from "pg";
+import assert from 'node:assert';
+import { after, before, beforeEach, describe, it } from 'node:test';
+import type pg from 'pg';
+import { cleanTables, closePool, createTestPool } from '../helpers.ts';
+import { ensureServices, LE_URL, MOCK_FEED_URL } from './helpers.ts';
 
-describe("full cycle integration", () => {
+describe('full cycle integration', () => {
   let pool: pg.Pool;
 
   before(async () => {
@@ -20,14 +20,14 @@ describe("full cycle integration", () => {
     await cleanTables(pool);
   });
 
-  it("runs end-to-end: fetch, insert, enrich, update", async () => {
-    const { fetchArticles } = await import("../../src/sources/mock-feed.ts");
-    const { insertEvents, updateLocation } = await import("../../src/db.ts");
-    const { extractLocation } = await import("../../src/enrich.ts");
+  it('runs end-to-end: fetch, insert, enrich, update', async () => {
+    const { fetchArticles } = await import('../../src/sources/mock-feed.ts');
+    const { insertEvents, updateLocation } = await import('../../src/db.ts');
+    const { extractLocation } = await import('../../src/enrich.ts');
 
     const articles = await fetchArticles({
       url: `${MOCK_FEED_URL}/feed?count=2`,
-      source: "full-cycle-test",
+      source: 'full-cycle-test',
     });
 
     assert.strictEqual(articles.length, 2);
@@ -36,7 +36,7 @@ describe("full cycle integration", () => {
     assert.strictEqual(inserted, 2);
 
     for (const article of articles) {
-      const text = `${article.title} ${article.description || ""}`.trim();
+      const text = `${article.title} ${article.description || ''}`.trim();
       const geoJson = await extractLocation(text, { url: LE_URL });
 
       if (geoJson) {
@@ -44,19 +44,18 @@ describe("full cycle integration", () => {
       }
     }
 
-    const result = await pool.query(
-      "SELECT COUNT(*) AS count FROM events WHERE source = $1",
-      ["full-cycle-test"],
-    );
+    const result = await pool.query('SELECT COUNT(*) AS count FROM events WHERE source = $1', [
+      'full-cycle-test',
+    ]);
     assert.strictEqual(Number(result.rows[0].count), 2);
 
     const geoResult = await pool.query(
-      "SELECT location FROM events WHERE source = $1 AND source_id = $2",
-      ["full-cycle-test", articles[0].source_id],
+      'SELECT location FROM events WHERE source = $1 AND source_id = $2',
+      ['full-cycle-test', articles[0].source_id],
     );
     const loc = geoResult.rows[0].location;
     assert.ok(loc);
-    assert.strictEqual(loc.type, "Point");
+    assert.strictEqual(loc.type, 'Point');
     assert.ok(Array.isArray(loc.coordinates));
     assert.strictEqual(loc.coordinates.length, 2);
   });

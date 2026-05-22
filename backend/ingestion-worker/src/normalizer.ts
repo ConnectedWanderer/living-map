@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import crypto from 'node:crypto';
 
 interface RawArticle {
   guid?: string;
@@ -8,6 +8,7 @@ interface RawArticle {
   pubDate: string;
 }
 
+/** A normalized article ready for deduplication and enrichment. */
 export interface NormalizedArticle {
   source_id: string;
   title: string;
@@ -17,9 +18,14 @@ export interface NormalizedArticle {
   source: string;
 }
 
+/** Convert a raw source article to a normalized shape with a deterministic source ID. */
 export function normalizeArticle(raw: RawArticle, source: string): NormalizedArticle {
-  const sourceId = raw.guid
-    || crypto.createHash("sha256").update(raw.title + raw.pubDate).digest("hex");
+  const sourceId =
+    raw.guid ||
+    crypto
+      .createHash('sha256')
+      .update(raw.title + raw.pubDate)
+      .digest('hex');
 
   return {
     source_id: sourceId,

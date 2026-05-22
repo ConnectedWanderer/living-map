@@ -33,22 +33,33 @@ fi
 
 # --- Format / Check ---
 
-echo "--- Prettier (Markdown) ---"
+echo "--- Markdown ---"
 if [ "$CHECK" ]; then
   npx --yes prettier@3.8 --check "**/*.md"
 else
   npx --yes prettier@3.8 --write "**/*.md"
 fi
 
-echo "--- Ruff (Python) ---"
-cd backend/location-extraction-service
-if [ "$CHECK" ]; then
-  uv run ruff format --check .
-  uv run ruff check .
-else
-  uv run ruff format .
-  uv run ruff check --fix .
-fi
-cd "$REPO_ROOT"
+echo "--- Python ---"
+(
+  cd backend/location-extraction-service
+  if [ "$CHECK" ]; then
+    uv run ruff format --check .
+    uv run ruff check .
+  else
+    uv run ruff format .
+    uv run ruff check --fix .
+  fi
+)
+
+echo "--- TypeScript ---"
+(
+  cd backend/ingestion-worker
+  if [ "$CHECK" ]; then
+    npm run lint:ci
+  else
+    npm run check
+  fi
+)
 
 echo "--- Done ---"

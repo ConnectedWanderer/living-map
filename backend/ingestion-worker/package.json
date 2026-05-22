@@ -8,7 +8,12 @@
     "test": "node --test --experimental-strip-types tests/unit/*.test.ts",
     "test:all": "npm test && npm run test:int",
     "test:int": "node --experimental-strip-types tests/integration-runner.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint src/ tests/",
+    "format": "biome format --write src/ tests/",
+    "check": "biome check --write src/ tests/ && node scripts/check-jsdoc.mjs",
+    "check:docs": "node scripts/check-jsdoc.mjs",
+    "lint:ci": "biome ci src/ tests/ && node scripts/check-jsdoc.mjs"
   },
   "dependencies": {
     "fast-xml-parser": "^5.8.0",
@@ -17,6 +22,7 @@
     "pino": "^10.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
     "@types/node": "^25.7.0",
     "@types/pg": "^8.20.0",
     "node-pg-migrate": "^8.0.4",
