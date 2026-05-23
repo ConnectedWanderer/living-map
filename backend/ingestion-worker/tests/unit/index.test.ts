@@ -1,30 +1,36 @@
 import assert from 'node:assert';
 import type http from 'node:http';
-import { after, before, describe, it, mock } from 'node:test';
+import { after, before, describe, it } from 'node:test';
 import cron from 'node-cron';
 import pg from 'pg';
 
 describe('main', () => {
   let server: http.Server;
+  let originalPool: typeof pg.Pool;
+  let originalSchedule: typeof cron.schedule;
 
   before(async () => {
-    const mockPool = () => ({
-      query: async () => ({
-        rows: [
-          {
-            id: 1,
-            name: 'test-feed',
-            type: 'mock-feed',
-            config: {},
-            schedule: '*/5 * * * *',
-          },
-        ],
-      }),
-      end: async () => {},
-    });
+    class MockPool {
+      async query() {
+        return {
+          rows: [
+            {
+              id: 1,
+              name: 'test-feed',
+              type: 'mock-feed',
+              config: {},
+              schedule: '*/5 * * * *',
+            },
+          ],
+        };
+      }
+      async end() {}
+    }
 
-    mock.method(pg, 'Pool', mockPool);
-    mock.method(cron, 'schedule', () => ({ stop: () => {} }));
+    originalPool = pg.Pool;
+    pg.Pool = MockPool as unknown as typeof pg.Pool;
+    originalSchedule = cron.schedule;
+    cron.schedule = (() => ({ stop: () => {} })) as unknown as typeof cron.schedule;
 
     const { main } = await import('../../src/index.ts');
     server = await main({
@@ -36,7 +42,8 @@ describe('main', () => {
 
   after(async () => {
     await new Promise<void>((resolve) => server.close(() => resolve()));
-    mock.restoreAll();
+    pg.Pool = originalPool;
+    cron.schedule = originalSchedule;
   });
 
   it('responds to GET /health with status ok', async () => {
