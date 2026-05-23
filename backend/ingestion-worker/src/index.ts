@@ -1,4 +1,5 @@
 import http from 'node:http';
+import cron from 'node-cron';
 import pg from 'pg';
 import { loadSources } from './config.ts';
 import { insertEvents, updateLocation } from './db.ts';
@@ -16,23 +17,29 @@ interface Env {
 }
 
 /** Bootstrap the ingestion worker: pool, sources, scheduler, and health server. */
-export async function main(env: Env): Promise<http.Server> {
+export async function main(
+  env: Env,
+  deps?: { pool?: pg.Pool; schedule?: typeof cron.schedule },
+): Promise<http.Server> {
   const logger = createLogger(env.LOG_LEVEL);
-  const pool = new pg.Pool({ connectionString: env.DATABASE_URL });
+  const pool = deps?.pool ?? new pg.Pool({ connectionString: env.DATABASE_URL });
 
   const sources = await loadSources(pool);
 
-  const _stop = startScheduler(sources, (source) =>
-    runSource(source, {
-      fetch: global.fetch,
-      pool,
-      fetchArticles: getAdapter(source.type),
-      insertEvents,
-      updateLocation,
-      extractLocation: (text) => extractLocation(text, { url: env.LOCATION_EXTRACTION_URL || '' }),
-      locationExtractionUrl: env.LOCATION_EXTRACTION_URL || '',
-      logger,
-    }),
+  const _stop = startScheduler(
+    sources,
+    (source) =>
+      runSource(source, {
+        fetch: global.fetch,
+        pool,
+        fetchArticles: getAdapter(source.type),
+        insertEvents,
+        updateLocation,
+        extractLocation: (text) => extractLocation(text, { url: env.LOCATION_EXTRACTION_URL || '' }),
+        locationExtractionUrl: env.LOCATION_EXTRACTION_URL || '',
+        logger,
+      }),
+    deps?.schedule,
   );
 
   const server = http.createServer((req, res) => {

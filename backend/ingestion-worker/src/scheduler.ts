@@ -5,9 +5,10 @@ import type { SourceRow } from './config.ts';
 export function startScheduler(
   sources: SourceRow[],
   runFn: (source: SourceRow) => Promise<void>,
+  scheduleFn: typeof cron.schedule = cron.schedule,
 ): () => void {
   const tasks = sources.map((source) =>
-    cron.schedule(source.schedule, () => {
+    scheduleFn(source.schedule, () => {
       runFn(source);
     }),
   );
