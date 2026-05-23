@@ -13,11 +13,14 @@ const RETRY_DELAYS = [1000, 4000, 16000];
 /** POST text to the location extraction service with exponential retry. */
 export async function extractLocation(
   text: string,
-  config: { url: string },
+  config: { url: string; fetch?: typeof global.fetch; wait?: (ms: number) => Promise<void> },
 ): Promise<GeoJsonFeatureCollection | null> {
+  const doFetch = config.fetch ?? global.fetch;
+  const doWait = config.wait ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+
   for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
     try {
-      const response = await fetch(`${config.url}/api/extract-location`, {
+      const response = await doFetch(`${config.url}/api/extract-location`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
@@ -32,7 +35,7 @@ export async function extractLocation(
       if (attempt === RETRY_DELAYS.length) {
         return null;
       }
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS[attempt]));
+      await doWait(RETRY_DELAYS[attempt]);
     }
   }
 

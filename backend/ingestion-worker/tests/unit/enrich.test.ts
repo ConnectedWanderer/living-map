@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import { afterEach, beforeEach, describe, it } from 'node:test';
+import { describe, it } from 'node:test';
 import { extractLocation } from '../../src/enrich.ts';
 
 const geoJson = {
@@ -13,43 +13,33 @@ const geoJson = {
   ],
 };
 
-let originalFetch: typeof global.fetch;
-
 describe('extractLocation', () => {
-  beforeEach(() => {
-    originalFetch = global.fetch;
-  });
-
-  afterEach(() => {
-    global.fetch = originalFetch;
-  });
-
   it('POSTs text to /api/extract-location and returns GeoJSON on success', async () => {
-    global.fetch = async (_url: RequestInfo | URL, _init?: RequestInit) => {
+    const mockFetch = async (_url: RequestInfo | URL, _init?: RequestInit) => {
       return { ok: true, json: async () => geoJson } as Response;
     };
 
-    const result = await extractLocation('Flood in Paris', { url: 'http://localhost:8000' });
+    const result = await extractLocation('Flood in Paris', {
+      url: 'http://localhost:8000',
+      fetch: mockFetch,
+    });
 
     assert.deepStrictEqual(result, geoJson);
   });
 
   it('returns null after exhausting retries when fetch always fails', async () => {
     let callCount = 0;
-    global.fetch = async () => {
+    const mockFetch = async () => {
       callCount++;
       throw new Error('Network error');
     };
+    const mockWait = async () => {};
 
-    const origSetTimeout = global.setTimeout;
-    global.setTimeout = ((fn: (...args: unknown[]) => void) => {
-      fn();
-      return {} as ReturnType<typeof setTimeout>;
-    }) as typeof global.setTimeout;
-
-    const result = await extractLocation('Flood in Paris', { url: 'http://localhost:8000' });
-
-    global.setTimeout = origSetTimeout;
+    const result = await extractLocation('Flood in Paris', {
+      url: 'http://localhost:8000',
+      fetch: mockFetch,
+      wait: mockWait,
+    });
 
     assert.strictEqual(result, null);
     assert.strictEqual(callCount, 4);
