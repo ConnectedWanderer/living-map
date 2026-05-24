@@ -1,4 +1,4 @@
-ARG DEPS_IMAGE
+ARG DEPS_IMAGE=living-map/le-deps
 FROM ${DEPS_IMAGE} AS deps
 
 FROM python:3.14-slim
