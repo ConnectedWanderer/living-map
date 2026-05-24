@@ -1,5 +1,5 @@
 import http from 'node:http';
-import cron from 'node-cron';
+import type cron from 'node-cron';
 import pg from 'pg';
 import { loadSources } from './config.ts';
 import { insertEvents, updateLocation } from './db.ts';
@@ -35,7 +35,8 @@ export async function main(
         fetchArticles: getAdapter(source.type),
         insertEvents,
         updateLocation,
-        extractLocation: (text) => extractLocation(text, { url: env.LOCATION_EXTRACTION_URL || '' }),
+        extractLocation: (text) =>
+          extractLocation(text, { url: env.LOCATION_EXTRACTION_URL || '' }),
         locationExtractionUrl: env.LOCATION_EXTRACTION_URL || '',
         logger,
       }),

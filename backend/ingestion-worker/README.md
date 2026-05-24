@@ -69,7 +69,7 @@ The service runs on a cron schedule defined per source in the `sources` PostgreS
 | `PORT`                    | `3000`                                                    | Health endpoint port            |
 | `LOG_LEVEL`               | `info`                                                    | Pino log level                  |
 
-Sources are configured via the `sources` PostgreSQL table — see [`backend/migrations/001_create-events-and-sources.js`](../../migrations/001_create-events-and-sources.js) for the schema.
+Sources are configured via the `sources` PostgreSQL table — see [`backend/migrations/001_schema.js`](../../migrations/001_schema.js) for the schema.
 
 ## API
 

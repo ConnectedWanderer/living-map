@@ -19,17 +19,23 @@ Adding a module: create in `src/`, add tests, integrate in `src/runner.ts`, upda
 - **`console.log`**: banned — use `logger.info()` from pino
 - **No mocks at system boundaries**: HTTP and DB mocked only in unit tests
 
+## Integration Testing
+
+Integration tests use Testcontainers (no Docker Compose in test code):
+
+- `npm run test:int` — runner builds shared containers from Dockerfiles, per-file PostGIS via `withPostgres()` in `setup.ts`.
+
 ## Troubleshooting
 
-| Symptom                        | Fix                                                                                                          |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Dependencies not found         | `npm install`                                                                                                |
-| Type errors                    | `tsc --noEmit` to check                                                                                      |
-| Integration tests fail         | Run `npm run test:int` to auto-start Docker. Debug logs: `docker compose -f ../docker-compose.test.yml logs` |
-| node-cron jobs not firing      | Check cron expressions in `sources` table                                                                    |
-| Location enrichment returns [] | Verify Location Extraction service is healthy on port 8000                                                   |
+| Symptom                        | Fix                                                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Dependencies not found         | `npm install`                                                                                                            |
+| Type errors                    | `tsc --noEmit` to check                                                                                                  |
+| Integration tests fail         | Run `npm run test:int` to auto-start Testcontainers. Debug logs: inspect container logs via `docker logs <container-id>` |
+| node-cron jobs not firing      | Check cron expressions in `sources` table                                                                                |
+| Location enrichment returns [] | Verify Location Extraction service is healthy on port 8000                                                               |
 
 ## Related Documentation
 
 - [README.md](README.md), [Architecture Doc](../../docs/architecture/ingestion-worker.md)
-- [ADR-013](../../docs/decisions/ADR-013-npm-package-manager.md), [ADR-014](../../docs/decisions/ADR-014-node-pg-migrate-for-db-migrations.md), [ADR-015](../../docs/decisions/ADR-015-typescript-for-node-services.md)
+- [ADR-013](../../docs/decisions/ADR-013-npm-package-manager.md), [ADR-014](../../docs/decisions/ADR-014-node-pg-migrate-for-db-migrations.md), [ADR-015](../../docs/decisions/ADR-015-typescript-for-node-services.md), [ADR-018](../../docs/decisions/ADR-018-testcontainers-for-integration-testing.md)

@@ -1,11 +1,14 @@
 import assert from 'node:assert';
 import { before, describe, it } from 'node:test';
 import { extractLocation } from '../../src/enrich.ts';
-import { ensureServices, LE_URL } from './helpers.ts';
+import { LE_URL } from './helpers.ts';
 
 describe('enrich integration', () => {
   before(async () => {
-    await ensureServices();
+    const resp = await fetch(`${LE_URL}/health`);
+    if (!resp.ok) {
+      throw new Error(`Location Extraction service not healthy at ${LE_URL}`);
+    }
   });
 
   it('extracts location from text via real LE service', async () => {

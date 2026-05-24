@@ -4,8 +4,9 @@
 
 Required tools:
 
-- **Node.js** (v18+) + npm
+- **Node.js** (v22+) + npm
 - **uv** — see https://docs.astral.sh/uv/
+- **docker**, **docker-compose**, **docker-buildx** (to use current builder for docker images)
 
 ## Code quality
 
@@ -33,4 +34,11 @@ Each component follows a consistent documentation structure:
 | ----------- | --------- | ----------------------------------------------------------------------------------------------------------------- |
 | `README.md` | Humans    | What, why, quick start, API usage, config, deployment                                                             |
 | `AGENTS.md` | AI agents | Commands, code conventions, patterns, troubleshooting. Thin — references README + `docs/` rather than duplicating |
-| `docs/`     | Both      | Deep architecture, ADRs, evaluation guides                                                                        |
+| `docs/`     | Both      | Deep architecture, ADRs, evaluation guides, glossary                                                              |
+
+For project-specific abbreviations and domain terms, see [docs/glossary.md](docs/glossary.md).
+
+## Integration Testing
+
+- use Testcontainer instead of custom docker compose in Python and Node
+- see `backend/ingestion-worker/tests/integration/setup.ts` for an example of Testcontainer usage

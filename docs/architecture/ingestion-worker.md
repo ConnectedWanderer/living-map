@@ -58,20 +58,22 @@ backend/ingestion-worker/
 │   ├── config.ts           # Source config loader: read sources table from PostgreSQL
 │   └── logger.ts           # Structured JSON logger (pino)
 ├── tests/
-│   ├── helpers.ts          # Shared: DB pool creation, migration runner
+│   ├── helpers.ts          # Shared: parameterized pool/migration helpers
 │   ├── unit/
 │   │   ├── normalizer.test.ts
 │   │   ├── enrich.test.ts
 │   │   ├── runner.test.ts
 │   │   ├── scheduler.test.ts
 │   │   └── index.test.ts
-│   └── integration/
-│       ├── helpers.ts      # Integration: Docker compose lifecycle, service URLs
-│       ├── mock-feed.test.ts
-│       ├── enrich.test.ts
-│       ├── db.test.ts
-│       ├── config.test.ts
-│       └── full-cycle.test.ts
+│   ├── integration/
+│   │   ├── setup.ts        # withPostgres() — Testcontainers PostGIS container
+│   │   ├── helpers.ts      # Service URLs from environment
+│   │   ├── mock-feed.test.ts
+│   │   ├── enrich.test.ts
+│   │   ├── db.test.ts
+│   │   ├── config.test.ts
+│   │   └── full-cycle.test.ts
+│   └── integration-runner.ts  # Testcontainers orchestration (shared LE + mock-feed)
 ├── tsconfig.json
 ├── package.json
 └── AGENTS.md

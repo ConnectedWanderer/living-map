@@ -1,0 +1,23 @@
+FROM python:3.14-slim
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    UV_COMPILE_BYTECODE=1 \
+    SPACY_EN_MODEL=en_core_web_sm \
+    SPACY_FR_MODEL=fr_core_news_sm
+
+RUN pip install --no-cache-dir uv
+
+COPY pyproject.toml uv.lock ./
+
+RUN uv sync --frozen --no-dev
+
+RUN --mount=type=cache,target=/root/.cache \
+    uv pip install pip --no-deps && \
+    uv run --no-sync python -m spacy download ${SPACY_EN_MODEL} && \
+    uv run --no-sync python -m spacy download ${SPACY_FR_MODEL} && \
+    uv pip uninstall pip setuptools -y && \
+    find /app/.venv -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null; \
+    find /app/.venv -name '*.pyc' -delete

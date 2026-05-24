@@ -1,5 +1,4 @@
 import assert from 'node:assert';
-import type http from 'node:http';
 import { describe, it } from 'node:test';
 import { main } from '../../src/index.ts';
 

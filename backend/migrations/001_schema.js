@@ -1,4 +1,6 @@
 exports.up = (pgm) => {
+  pgm.createExtension("postgis", { ifNotExists: true });
+
   pgm.createTable("sources", {
     id: { type: "serial", primaryKey: true },
     name: { type: "text", notNull: true, unique: true },
@@ -18,7 +20,7 @@ exports.up = (pgm) => {
     description: { type: "text" },
     url: { type: "text" },
     published_at: { type: "timestamptz" },
-    location: { type: "jsonb" },
+    location: { type: "geometry(Point, 4326)" },
     location_name: { type: "text" },
     created_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
     updated_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
@@ -27,9 +29,12 @@ exports.up = (pgm) => {
   pgm.addConstraint("events", "uq_events_source_source_id", {
     unique: ["source", "source_id"],
   });
+
+  pgm.createIndex("events", "location", { method: "gist" });
 };
 
 exports.down = (pgm) => {
   pgm.dropTable("events");
   pgm.dropTable("sources");
+  pgm.dropExtension("postgis", { ifExists: true });
 };

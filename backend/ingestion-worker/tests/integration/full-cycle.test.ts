@@ -1,19 +1,31 @@
 import assert from 'node:assert';
 import { after, before, beforeEach, describe, it } from 'node:test';
 import type pg from 'pg';
-import { cleanTables, closePool, createTestPool } from '../helpers.ts';
-import { ensureServices, LE_URL, MOCK_FEED_URL } from './helpers.ts';
+import { cleanTables } from '../helpers.ts';
+import { LE_URL, MOCK_FEED_URL } from './helpers.ts';
+import { withPostgres } from './setup.ts';
 
 describe('full cycle integration', () => {
   let pool: pg.Pool;
+  let stop: () => Promise<void>;
 
   before(async () => {
-    await ensureServices();
-    pool = await createTestPool();
+    const resp = await fetch(`${MOCK_FEED_URL}/feed?count=1`);
+    if (!resp.ok) {
+      throw new Error(`Mock feed not healthy at ${MOCK_FEED_URL}`);
+    }
+    const leResp = await fetch(`${LE_URL}/health`);
+    if (!leResp.ok) {
+      throw new Error(`Location Extraction service not healthy at ${LE_URL}`);
+    }
+
+    const ctx = await withPostgres();
+    pool = ctx.pool;
+    stop = ctx.stop;
   });
 
   after(async () => {
-    await closePool(pool);
+    await stop();
   });
 
   beforeEach(async () => {
@@ -35,14 +47,11 @@ describe('full cycle integration', () => {
     const { inserted } = await insertEvents(pool, articles);
     assert.strictEqual(inserted, 2);
 
-    for (const article of articles) {
-      const text = `${article.title} ${article.description || ''}`.trim();
-      const geoJson = await extractLocation(text, { url: LE_URL });
+    const geoJson = await extractLocation('Flood in Paris', { url: LE_URL });
+    assert.ok(geoJson);
+    assert.ok(Array.isArray(geoJson.features));
 
-      if (geoJson) {
-        await updateLocation(pool, article.source, article.source_id, geoJson);
-      }
-    }
+    await updateLocation(pool, articles[0].source, articles[0].source_id, geoJson);
 
     const result = await pool.query('SELECT COUNT(*) AS count FROM events WHERE source = $1', [
       'full-cycle-test',
@@ -50,7 +59,7 @@ describe('full cycle integration', () => {
     assert.strictEqual(Number(result.rows[0].count), 2);
 
     const geoResult = await pool.query(
-      'SELECT location FROM events WHERE source = $1 AND source_id = $2',
+      'SELECT ST_AsGeoJSON(location)::jsonb AS location FROM events WHERE source = $1 AND source_id = $2',
       ['full-cycle-test', articles[0].source_id],
     );
     const loc = geoResult.rows[0].location;

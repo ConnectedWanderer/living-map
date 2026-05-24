@@ -2,17 +2,21 @@ import assert from 'node:assert';
 import { after, before, beforeEach, describe, it } from 'node:test';
 import type pg from 'pg';
 import { insertEvents, updateLocation } from '../../src/db.ts';
-import { cleanTables, closePool, createTestPool } from '../helpers.ts';
+import { cleanTables } from '../helpers.ts';
+import { withPostgres } from './setup.ts';
 
 describe('db integration', () => {
   let pool: pg.Pool;
+  let stop: () => Promise<void>;
 
   before(async () => {
-    pool = await createTestPool();
+    const ctx = await withPostgres();
+    pool = ctx.pool;
+    stop = ctx.stop;
   });
 
   after(async () => {
-    await closePool(pool);
+    await stop();
   });
 
   beforeEach(async () => {
@@ -85,7 +89,7 @@ describe('db integration', () => {
     await updateLocation(pool, 'integration-test', 'int-test-location', geoJson);
 
     const result = await pool.query(
-      'SELECT location FROM events WHERE source = $1 AND source_id = $2',
+      'SELECT ST_AsGeoJSON(location)::jsonb AS location FROM events WHERE source = $1 AND source_id = $2',
       ['integration-test', 'int-test-location'],
     );
 

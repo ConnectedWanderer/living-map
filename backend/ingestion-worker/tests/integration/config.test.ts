@@ -2,17 +2,21 @@ import assert from 'node:assert';
 import { after, before, beforeEach, describe, it } from 'node:test';
 import type pg from 'pg';
 import { loadSources } from '../../src/config.ts';
-import { cleanTables, closePool, createTestPool } from '../helpers.ts';
+import { cleanTables } from '../helpers.ts';
+import { withPostgres } from './setup.ts';
 
 describe('config integration', () => {
   let pool: pg.Pool;
+  let stop: () => Promise<void>;
 
   before(async () => {
-    pool = await createTestPool();
+    const ctx = await withPostgres();
+    pool = ctx.pool;
+    stop = ctx.stop;
   });
 
   after(async () => {
-    await closePool(pool);
+    await stop();
   });
 
   beforeEach(async () => {

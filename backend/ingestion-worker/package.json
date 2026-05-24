@@ -8,6 +8,10 @@
     "test": "node --test --experimental-strip-types tests/unit/*.test.ts",
     "test:all": "npm test && npm run test:int",
     "test:int": "node --experimental-strip-types tests/integration-runner.ts",
+    "docker:build:mock-feed": "docker build -t living-map/mock-feed:latest ../mock-feed",
+    "docker:build:le-deps": "docker build -f ../location-extraction-service/Dockerfile.deps -t living-map/le-deps:latest ../location-extraction-service && docker buildx prune -af",
+    "docker:build:le": "docker build --build-arg DEPS_IMAGE=living-map/le-deps:latest -t living-map/location-extraction:latest ../location-extraction-service",
+    "docker:build": "npm run docker:build:mock-feed && npm run docker:build:le-deps && npm run docker:build:le",
     "typecheck": "tsc --noEmit",
     "lint": "biome lint src/ tests/",
     "format": "biome format --write src/ tests/",
@@ -23,9 +27,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
+    "@testcontainers/postgresql": "^12.0.0",
     "@types/node": "^25.7.0",
     "@types/pg": "^8.20.0",
     "node-pg-migrate": "^8.0.4",
+    "testcontainers": "^12.0.0",
     "typescript": "^6.0.3"
   }
 }

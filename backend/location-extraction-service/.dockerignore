@@ -1,0 +1,14 @@
+.git
+.gitignore
+.venv
+.ruff_cache
+.python-version
+CONTEXT.md
+AGENTS.md
+README.md
+tests/
+scripts/
+*.md
+.env*
+docker-compose.yml
+Dockerfile.deps

@@ -1,11 +1,14 @@
 import assert from 'node:assert';
 import { before, describe, it } from 'node:test';
 import { fetchArticles } from '../../src/sources/mock-feed.ts';
-import { ensureServices, MOCK_FEED_URL } from './helpers.ts';
+import { MOCK_FEED_URL } from './helpers.ts';
 
 describe('mock-feed adapter', () => {
   before(async () => {
-    await ensureServices();
+    const resp = await fetch(`${MOCK_FEED_URL}/feed?count=1`);
+    if (!resp.ok) {
+      throw new Error(`Mock feed not healthy at ${MOCK_FEED_URL}`);
+    }
   });
 
   it('fetches and normalizes articles from mock-feed', async () => {
