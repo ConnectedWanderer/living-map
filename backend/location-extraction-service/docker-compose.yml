@@ -1,5 +1,6 @@
 services:
   location-extraction:
+    container_name: location-extraction-service
     image: living-map/location-extraction-service
     pull_policy: build
     build:

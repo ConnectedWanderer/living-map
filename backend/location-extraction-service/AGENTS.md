@@ -33,7 +33,7 @@ uv run python scripts/fix_corpus_offsets.py
 uv run python scripts/annotate_geocoding.py
 
 # Docker
-docker-compose up --build
+docker compose up
 ```
 
 ## Development Workflow
