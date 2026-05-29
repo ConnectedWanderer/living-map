@@ -40,7 +40,7 @@ describe('runSource', () => {
 
     const deps = {
       fetch: async () => new Response(),
-      pool: {} as unknown as import('pg').Pool,
+      pool: {},
       fetchArticles: async () => articles,
       insertEvents: async () => ({ inserted: 2, skipped: 0 }),
       updateLocation: async () => {
@@ -50,67 +50,67 @@ describe('runSource', () => {
         extractCalls++;
         return geoJson;
       },
-      locationExtractionUrl: 'http://le:8000',
+      locationExtractionUrl: 'http://location-extraction:8000',
       logger: {
-        info: (obj: unknown) => {
+        info: (obj) => {
           logInfoCalls.push(obj);
         },
         error: () => {},
         warn: () => {},
-      } as unknown as import('pino').Logger,
+      },
     };
 
-    await runSource(config, deps);
+  await runSource(config, deps);
 
-    assert.strictEqual(extractCalls, 2);
-    assert.strictEqual(updateCalls, 2);
-    assert.strictEqual(logInfoCalls.length, 1);
-  });
+  assert.strictEqual(extractCalls, 2);
+  assert.strictEqual(updateCalls, 2);
+  assert.strictEqual(logInfoCalls.length, 1);
+});
 
-  it('skips enrichment when all articles are duplicates', async () => {
-    const articles = [
-      {
-        source_id: 'a1',
-        title: 'Article A',
-        description: undefined,
-        url: 'http://a',
-        published_at: '2026-01-01T00:00:00.000Z',
-        source: 'mock-feed',
-      },
-    ];
+it('skips enrichment when all articles are duplicates', async () => {
+  const articles = [
+    {
+      source_id: 'a1',
+      title: 'Article A',
+      description: undefined,
+      url: 'http://a',
+      published_at: '2026-01-01T00:00:00.000Z',
+      source: 'mock-feed',
+    },
+  ];
 
-    const config = {
-      id: 1,
-      name: 'test',
-      type: 'mock-feed',
-      config: { url: 'http://feed', source: 'mock-feed' },
-      schedule: '*/5 * * * *',
-    };
+  const config = {
+    id: 1,
+    name: 'test',
+    type: 'mock-feed',
+    config: { url: 'http://feed', source: 'mock-feed' },
+    schedule: '*/5 * * * *',
+  };
 
-    let extractCalls = 0;
-    let updateCalls = 0;
-    const logInfoCalls: unknown[] = [];
+  let extractCalls = 0;
+  let updateCalls = 0;
+  const logInfoCalls: unknown[] = [];
 
-    const deps = {
-      fetch: async () => new Response(),
-      pool: {} as unknown as import('pg').Pool,
-      fetchArticles: async () => articles,
-      insertEvents: async () => ({ inserted: 0, skipped: 1 }),
-      updateLocation: async () => {
-        updateCalls++;
-      },
-      extractLocation: async () => {
-        extractCalls++;
-        return null;
-      },
-      locationExtractionUrl: 'http://le:8000',
+  const deps = {
+    fetch: async () => new Response(),
+    pool: {},
+    fetchArticles: async () => articles,
+    insertEvents: async () => ({ inserted: 0, skipped: 1 }),
+    updateLocation: async () => {
+      updateCalls++;
+    },
+    extractLocation: async () => {
+      extractCalls++;
+      return null;
+    },
+    locationExtractionUrl: 'http://location-extraction:8000',
       logger: {
-        info: (obj: unknown) => {
+        info: (obj) => {
           logInfoCalls.push(obj);
         },
         error: () => {},
         warn: () => {},
-      } as unknown as import('pino').Logger,
+      },
     };
 
     await runSource(config, deps);

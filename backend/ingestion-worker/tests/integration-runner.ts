@@ -5,15 +5,13 @@
  *   1. Validate that required Docker images exist.
  *   2. Start shared containers (mock-feed, LES) via Testcontainers.
  *   3. Run all `tests/integration/*.test.ts` files as a Node.js child
- *      process with MOCK_FEED_URL and LE_URL injected into the environment.
- *   4. Tear down containers in reverse order on completion (pass or fail).
- *
- * Each test file manages its own PostGIS database via @testcontainers/postgresql
- * (see setup.ts).  Only the two shared services live in the runner.
+ *      process with MOCK_FEED_URL and LOCATION_EXTRACTION_SERVICE_URL
+ *      injected into the environment.
+ *   4. Tear down containers on completion (pass or fail).
  */
 
 import { spawn, execSync } from 'node:child_process';
-import { readdir } from 'node:fs/promises';
+import { readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GenericContainer, type StartedTestContainer, Wait } from 'testcontainers';
@@ -23,11 +21,10 @@ const ingestionWorkerDir = resolve(__dirname, '..');
 const integrationDir = resolve(__dirname, 'integration');
 
 const MOCK_FEED_PORT = 3001;
-const LE_PORT = 8000;
+const LOCATION_EXTRACTION_SERVICE_PORT = 8000;
 
 const MOCK_FEED_TAG = 'living-map/mock-feed:latest';
-const LE_DEPS_TAG = 'living-map/le-deps:latest';
-const LE_TAG = 'living-map/location-extraction:latest';
+const LOCATION_EXTRACTION_SERVICE_TAG = 'living-map/location-extraction-service:latest';
 
 function imageExists(tag: string): boolean {
   try {
@@ -60,12 +57,14 @@ function startLocationExtractionService(): Promise<{
   url: string;
   container: StartedTestContainer;
 }> {
-  return new GenericContainer(LE_TAG)
-    .withExposedPorts(LE_PORT)
-    .withWaitStrategy(Wait.forHttp('/health', LE_PORT).withStartupTimeout(120_000))
+  return new GenericContainer(LOCATION_EXTRACTION_SERVICE_TAG)
+    .withExposedPorts(LOCATION_EXTRACTION_SERVICE_PORT)
+    .withWaitStrategy(
+      Wait.forHttp('/health', LOCATION_EXTRACTION_SERVICE_PORT).withStartupTimeout(120_000),
+    )
     .start()
     .then((container) => ({
-      url: `http://localhost:${container.getMappedPort(LE_PORT)}`,
+      url: `http://localhost:${container.getMappedPort(LOCATION_EXTRACTION_SERVICE_PORT)}`,
       container,
     }));
 }
@@ -89,9 +88,8 @@ function spawnWithOutput(
   });
 }
 
-async function getTestFiles(): Promise<string[]> {
-  const files = await readdir(integrationDir);
-  return files
+function getTestFiles(): string[] {
+  return readdirSync(integrationDir)
     .filter((f) => f.endsWith('.test.ts'))
     .map((f) => resolve(integrationDir, f))
     .sort();
@@ -99,8 +97,7 @@ async function getTestFiles(): Promise<string[]> {
 
 async function main(): Promise<void> {
   requireImage(MOCK_FEED_TAG, 'npm run docker:build:mock-feed');
-  requireImage(LE_DEPS_TAG, 'npm run docker:build:le-deps');
-  requireImage(LE_TAG, 'npm run docker:build:le');
+  requireImage(LOCATION_EXTRACTION_SERVICE_TAG, 'npm run docker:build:location-extraction-service');
 
   const containers: StartedTestContainer[] = [];
 
@@ -111,21 +108,23 @@ async function main(): Promise<void> {
     console.log(`[runner] mock-feed ready at ${mockFeed.url}`);
 
     console.log('[runner] Starting location-extraction-service (waiting for /health) ...');
-    const le = await startLocationExtractionService();
-    containers.push(le.container);
-    console.log(`[runner] location-extraction-service ready at ${le.url}`);
+    const locationExtraction = await startLocationExtractionService();
+    containers.push(locationExtraction.container);
+    console.log(`[runner] location-extraction-service ready at ${locationExtraction.url}`);
 
     const testEnv = {
       MOCK_FEED_URL: mockFeed.url,
-      LE_URL: le.url,
+      LOCATION_EXTRACTION_SERVICE_URL: locationExtraction.url,
     };
 
-    const testFiles = await getTestFiles();
+    const testFiles = getTestFiles();
     console.log(`[runner] Running ${testFiles.length} integration test file(s):`);
     for (const file of testFiles) {
       console.log(`  - ${file}`);
     }
-    console.log(`[runner] MOCK_FEED_URL=${mockFeed.url}, LE_URL=${le.url}`);
+    console.log(
+      `[runner] MOCK_FEED_URL=${mockFeed.url}, LOCATION_EXTRACTION_SERVICE_URL=${locationExtraction.url}`,
+    );
 
     const exitCode = await spawnWithOutput(
       process.execPath,
@@ -136,9 +135,7 @@ async function main(): Promise<void> {
     console.log(`[runner] Tests completed with exit code ${exitCode}`);
     process.exit(exitCode);
   } finally {
-    if (containers.length > 0) {
-      console.log('[runner] Tearing down containers ...');
-    }
+    console.log('[runner] Cleaning up ...');
     for (const container of containers.reverse()) {
       await container.stop();
     }

@@ -27,6 +27,9 @@ services:
     build: ./location-extraction-service
     ports:
       - "8000:8000"
+    environment:
+      - SPACY_EN_MODEL=en_core_web_sm
+      - SPACY_FR_MODEL=fr_core_news_sm
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
