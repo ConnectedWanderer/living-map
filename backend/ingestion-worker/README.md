@@ -43,7 +43,7 @@ npm start
 
 ```bash
 # Build and run (from project root)
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Architecture

@@ -1,15 +1,19 @@
-version: '3.8'
-
 services:
   location-extraction:
-    build: .
+    container_name: location-extraction-service
+    image: living-map/location-extraction-service
+    pull_policy: build
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
       - HOST=0.0.0.0
       - PORT=8000
       - LOG_LEVEL=INFO
-      - UV_COMPILE_BYTECODE=1
+      - SPACY_EN_MODEL=en_core_web_sm
+      - SPACY_FR_MODEL=fr_core_news_sm
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s

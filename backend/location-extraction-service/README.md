@@ -43,11 +43,7 @@ uv run python -m pytest
 
 ```bash
 # Build and run
-docker-compose up -d
-
-# Or build image manually
-docker build -t location-extraction-service .
-docker run -p 8000:8000 location-extraction-service
+docker compose up -d
 ```
 
 ## API Usage

@@ -11,4 +11,3 @@ scripts/
 *.md
 .env*
 docker-compose.yml
-Dockerfile.deps

@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import { after, before, beforeEach, describe, it } from 'node:test';
 import type pg from 'pg';
 import { cleanTables } from '../helpers.ts';
-import { LE_URL, MOCK_FEED_URL } from './helpers.ts';
+import { LOCATION_EXTRACTION_SERVICE_URL, MOCK_FEED_URL } from './helpers.ts';
 import { withPostgres } from './setup.ts';
 
 describe('full cycle integration', () => {
@@ -14,9 +14,9 @@ describe('full cycle integration', () => {
     if (!resp.ok) {
       throw new Error(`Mock feed not healthy at ${MOCK_FEED_URL}`);
     }
-    const leResp = await fetch(`${LE_URL}/health`);
+    const leResp = await fetch(`${LOCATION_EXTRACTION_SERVICE_URL}/health`);
     if (!leResp.ok) {
-      throw new Error(`Location Extraction service not healthy at ${LE_URL}`);
+      throw new Error(`Location Extraction service not healthy at ${LOCATION_EXTRACTION_SERVICE_URL}`);
     }
 
     const ctx = await withPostgres();
@@ -47,7 +47,7 @@ describe('full cycle integration', () => {
     const { inserted } = await insertEvents(pool, articles);
     assert.strictEqual(inserted, 2);
 
-    const geoJson = await extractLocation('Flood in Paris', { url: LE_URL });
+    const geoJson = await extractLocation('There was a severe flood in Paris that damaged many buildings.', { url: LOCATION_EXTRACTION_SERVICE_URL });
     assert.ok(geoJson);
     assert.ok(Array.isArray(geoJson.features));
 
