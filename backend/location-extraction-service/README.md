@@ -185,8 +185,8 @@ Large Wikipedia-derived corpora are **not** committed to git. They are generated
 
 | Corpus                 | Language | Samples | Command                     |
 | ---------------------- | -------- | ------- | --------------------------- |
-| `en_wikiann.json`      | EN       | ~7K     | `uv run convert-en-wikiann` |
-| `fr_wikiner_gold.json` | FR       | ~3.8K   | `uv run convert-wikiner-fr` |
+| `en_wikiann.json`      | EN       | ~7K     | `uv run python -m src.evaluation.converters.en_wikiann` |
+| `fr_wikiner_gold.json` | FR       | ~3.8K   | `uv run python -m src.evaluation.converters.wikiner_fr` |
 
 The evaluation runner also auto-generates these if `datasets` is installed and the files are missing. Hand-written corpora always work without any setup.
 

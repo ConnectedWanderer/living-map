@@ -5,8 +5,8 @@ text from tokens, converts BIOES integer tags to entity-level spans,
 filters to LOC entities, and writes in the existing corpus JSON format.
 
 Usage:
-    uv run convert-wikiner-fr
-    uv run python -c "from scripts.convert_wikiner_fr import convert; convert('path/to/output.json')"
+    uv run python -m src.evaluation.converters.wikiner_fr
+    uv run python -m src.evaluation.converters.wikiner_fr path/to/output.json
 
 """
 

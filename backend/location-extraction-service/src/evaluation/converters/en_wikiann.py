@@ -5,8 +5,8 @@ text from tokens, extracts LOC entity spans from the ``spans`` field, and
 writes in the existing corpus JSON format.
 
 Usage:
-    uv run convert-en-wikiann
-    uv run python -c "from scripts.convert_en_wikiann import convert; convert('path/to/output.json')"
+    uv run python -m src.evaluation.converters.en_wikiann
+    uv run python -m src.evaluation.converters.en_wikiann path/to/output.json
 
 """
 
