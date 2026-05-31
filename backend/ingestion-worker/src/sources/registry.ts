@@ -24,3 +24,4 @@ export function getAdapter(type: string): FetchArticlesFn {
 }
 
 registerAdapter('mock-feed', (config, deps) => mockFeedFetch(config as never, deps));
+registerAdapter('rss', (config, deps) => mockFeedFetch(config as never, deps));

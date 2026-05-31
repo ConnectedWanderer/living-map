@@ -34,6 +34,7 @@ Integration tests use Testcontainers (no Docker Compose in test code):
 | Integration tests fail         | Run `npm run test:int` to auto-start Testcontainers. Debug logs: inspect container logs via `docker logs <container-id>` |
 | node-cron jobs not firing      | Check cron expressions in `sources` table                                                                                |
 | Location enrichment returns [] | Verify Location Extraction service is healthy on port 8000                                                               |
+| Want to test without waiting   | `curl -X POST http://localhost:3000/trigger` — runs all sources immediately                                              |
 
 ## Related Documentation
 

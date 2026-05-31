@@ -31,6 +31,17 @@ exports.up = (pgm) => {
   });
 
   pgm.createIndex("events", "location", { method: "gist" });
+
+  pgm.sql(`
+    INSERT INTO sources (name, type, config, schedule, enabled)
+    VALUES (
+      'nyt-world',
+      'rss',
+      '{"url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "source": "nyt-world"}',
+      '*/15 * * * *',
+      true
+    ) ON CONFLICT (name) DO NOTHING;
+  `);
 };
 
 exports.down = (pgm) => {

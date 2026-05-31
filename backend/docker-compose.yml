@@ -2,26 +2,43 @@ include:
   - path: ./location-extraction-service/docker-compose.yml
 
 services:
-  postgres-test:
+  postgres:
     image: postgis/postgis:16-3.4
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: livingmap
       POSTGRES_PASSWORD: livingmap
-      POSTGRES_DB: livingmap_test
+      POSTGRES_DB: livingmap
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U livingmap -d livingmap_test"]
+      test: ["CMD-SHELL", "pg_isready -U livingmap -d livingmap"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  mock-feed:
-    build: ./mock-feed
+  migrate:
+    image: node:22-alpine
+    environment:
+      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap
+    volumes:
+      - ./migrations:/migrations
+    command:
+      - sh
+      - -c
+      - "npx --yes node-pg-migrate@8.0.4 up --migration-file-language js --migration-dir /migrations"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ingestion-worker:
+    build: ./ingestion-worker
     ports:
-      - "3001:3001"
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', r => process.exit(r.statusCode === 200 ? 0 : 1))"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap
+      LOCATION_EXTRACTION_URL: http://location-extraction:8000
+      PORT: "3000"
+      LOG_LEVEL: info
+    depends_on:
+      migrate:
+        condition: service_completed_successfully

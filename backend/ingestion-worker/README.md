@@ -83,6 +83,20 @@ curl http://localhost:3000/health
 { "status": "ok" }
 ```
 
+### Manual Trigger
+
+Trigger an immediate ingestion cycle for all enabled sources:
+
+```bash
+curl -X POST http://localhost:3000/trigger
+```
+
+```json
+{ "status": "ok" }
+```
+
+Runs each source's fetch → normalize → dedup → enrich → persist cycle once, independent of the cron schedule. Returns after all sources complete.
+
 ## Code Quality
 
 ```bash
