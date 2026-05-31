@@ -13,3 +13,7 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# Generated large-scale evaluation corpora (regenerated on demand)
+tests/corpus/en_wikiann.json
+tests/corpus/fr_wikiner_gold.json

@@ -153,15 +153,42 @@ uv run ruff format .    # Format
 
 ## Evaluation
 
-See the [Evaluation Guide](../../docs/evaluation.md) for details on running NER and geocoding quality evaluations:
+Six hand-written corpora (138 samples) live in `tests/corpus/` and work out of the box. Large-scale corpora (NER only) are generated lazily on first run — see [Evaluation Guide](../../docs/evaluation.md) for details.
+
+### Prerequisites
 
 ```bash
-# Full evaluation (NER + Geocoding)
+# Install dev dependencies (includes datasets + tqdm for corpus generation)
+uv sync --dev
+```
+
+### Run
+
+```bash
+# Full evaluation (NER + Geocoding) on all corpora
+#   → auto-generates large corpora (en_wikiann.json, fr_wikiner_gold.json) if missing
 uv run python -m src.evaluation
+
+# NER only
+uv run python -m src.evaluation --ner
 
 # Geocoding only (decoupled from NER)
 uv run python -m src.evaluation --geocoding
+
+# Single corpus
+uv run python -m src.evaluation tests/corpus/en_simple.json
 ```
+
+### Large-Scale Corpus Generation
+
+Large Wikipedia-derived corpora are **not** committed to git. They are generated on demand:
+
+| Corpus                 | Language | Samples | Command                     |
+| ---------------------- | -------- | ------- | --------------------------- |
+| `en_wikiann.json`      | EN       | ~7K     | `uv run convert-en-wikiann` |
+| `fr_wikiner_gold.json` | FR       | ~3.8K   | `uv run convert-wikiner-fr` |
+
+The evaluation runner also auto-generates these if `datasets` is installed and the files are missing. Hand-written corpora always work without any setup.
 
 ## Related Documentation
 

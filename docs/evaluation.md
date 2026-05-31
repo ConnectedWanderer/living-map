@@ -25,6 +25,10 @@ uv run python -m src.evaluation --geocoding
 uv run python -m src.evaluation tests/corpus/en_simple.json
 uv run python -m src.evaluation --ner tests/corpus/en_simple.json
 uv run python -m src.evaluation --geocoding tests/corpus/en_simple.json
+
+# Large-scale corpus generation (on-demand, lazy)
+uv run convert-en-wikiann
+uv run convert-wikiner-fr
 ```
 
 ### CLI Flags
@@ -171,14 +175,20 @@ Non-named entities (common nouns like "river" mis-tagged as LOC) should **not** 
 
 ### Available Corpora
 
-| File                 | Language | Focus                                | NER Samples | Geo Entities |
-| -------------------- | -------- | ------------------------------------ | ----------- | ------------ |
-| `en_simple.json`     | EN       | Simple sentences, 1-2 locations      | 45          | ~89          |
-| `en_paragraphs.json` | EN       | News paragraphs, 3-5 locations       | 15          | ~99          |
-| `en_edge_cases.json` | EN       | Empty text, no locations, edge cases | 10          | ~16          |
-| `fr_simple.json`     | FR       | Simple sentences                     | 43          | ~84          |
-| `fr_paragraphs.json` | FR       | News paragraphs                      | 15          | ~90          |
-| `fr_edge_cases.json` | FR       | Edge cases                           | 10          | ~8           |
+> Large-scale corpora (`en_wikiann.json`, `fr_wikiner_gold.json`) are **not committed** to git. They are generated lazily on first `uv run python -m src.evaluation` when the `datasets` library is available — or explicitly via `uv run convert-en-wikiann` / `uv run convert-wikiner-fr`. Hand-written corpora always work without any setup.
+
+| File                        | Language | Focus                                     | NER Samples | Geo Entities |
+| --------------------------- | -------- | ----------------------------------------- | ----------- | ------------ |
+| `en_simple.json`            | EN       | Simple sentences, 1-2 locations           | 45          | ~89          |
+| `en_paragraphs.json`        | EN       | News paragraphs, 3-5 locations            | 15          | ~99          |
+| `en_edge_cases.json`        | EN       | Empty text, no locations, edge cases      | 10          | ~16          |
+| `fr_simple.json`            | FR       | Simple sentences                          | 43          | ~84          |
+| `fr_paragraphs.json`        | FR       | News paragraphs                           | 15          | ~90          |
+| `fr_edge_cases.json`        | FR       | Edge cases                                | 10          | ~8           |
+| `en_wikiann.json` †         | EN       | WikiANN — Wikipedia (7K LOC samples)      | ~7K         | —            |
+| `fr_wikiner_gold.json` †    | FR       | WikiNER-fr-gold — Wikipedia (3.8K samples)| ~3.8K       | —            |
+
+† _NER only — no geocoding annotations. Generated on demand._
 
 ## Adding New Test Cases
 

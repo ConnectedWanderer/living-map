@@ -21,7 +21,13 @@ dev = [
     "pytest-cov>=6.0.0",
     "httpx>=0.28.0",
     "ruff>=0.9.0",
+    "datasets>=4.0.0",
+    "tqdm>=4.67.0",
 ]
+
+[project.scripts]
+convert-en-wikiann = "src.evaluation.converters.en_wikiann:main"
+convert-wikiner-fr = "src.evaluation.converters.wikiner_fr:main"
 
 [tool.ruff]
 target-version = "py314"
@@ -66,6 +72,9 @@ markers = [
     "model_dependent: Requires spaCy models and geonamescache data to be pre-downloaded.",
 ]
 pythonpath = ["."]
+
+[tool.uv]
+package = true
 
 [tool.coverage.run]
 source = ["src"]

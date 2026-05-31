@@ -1,12 +1,12 @@
-# ADR-019: Evaluation Corpus Sources — UNER v2 (EN) + WikiNER-fr-gold (FR)
+# ADR-019: Evaluation Corpus Sources — WikiANN (EN) + WikiNER-fr-gold (FR)
 
 ## Status
 
-Accepted
+Superseded (English source changed — see below)
 
 ## Date
 
-2026-05-27
+2026-05-27 (updated 2026-05-31)
 
 ## Context
 
@@ -43,24 +43,38 @@ location NER accuracy.
 No single gold-standard corpus covers both EN and FR for free. A hybrid is
 required.
 
-## Decision
+## Original Decision (Accepted 2026-05-27)
 
 Use **UNER v2 (English) + WikiNER-fr-gold (French)**, both gold-standard and
-freely licensed.
+freely licensed. See original ADR text below.
 
-### Source 1: UNER v2 (English)
+## Revision (2026-05-31): English Source Changed
 
-- **Dataset**: `universalner/universal_ner` on Hugging Face
-- **Splits**: `en_ewt` (train 12,543 / dev 2,001 / test 2,077) + `en_pud`
-  (test 1,000) — carried forward unchanged from v1
-- **Entity types**: LOC, PER, ORG (no GPE/LOC distinction — acceptable per
-  earlier decision)
-- **Domain**: Universal Dependencies treebanks (web text for EWT, news/Wikipedia
-  for PUD)
-- **License**: CC BY 4.0 (v2) / CC-BY-SA-4.0 (v1 legacy)
-- **Quality**: Gold-standard, human-annotated
+UNER v2 uses a legacy ``universal_ner.py`` dataset script that is **incompatible
+with ``datasets>=3.0.0``** (which dropped support for script-based loading in
+favour of parquet/arrow). The English source is therefore switched to:
 
-### Source 2: WikiNER-fr-gold (French)
+### Source 1 (revised): WikiANN (English)
+
+- **Dataset**: ``unimelb-nlp/wikiann`` (English) on Hugging Face
+- **Size**: 20,000 training sentences; ~7,000 contain LOC entities
+- **Entity types**: PER, ORG, LOC
+- **Domain**: Wikipedia (automatically annotated from infoboxes/category links)
+- **License**: CC BY-SA (Wikipedia-derived)
+- **Quality**: Silver-standard (automatic annotation propagated from structured
+  Wikipedia data)
+- **Compromise**: WikiANN is silver-standard, not gold. This trade-off is
+  accepted because:
+  - WikiANN annotations are consistently high-quality for named entities (PER,
+    ORG, LOC) — Wikipedia infobox data is curated by editors
+  - The large sample size (~7K LOC samples) provides statistical rigour that
+    outweighs per-sample noise for aggregate NER metrics
+  - The existing hand-written corpora (138 samples, gold-standard) remain
+    available for precise per-sample debugging
+  - WikiANN and WikiNER-fr-gold share the same Wikipedia domain, making
+    cross-language comparisons more consistent
+
+### Source 2 (unchanged): WikiNER-fr-gold (French)
 
 - **Dataset**: `danrun/WikiNER-fr-gold` on Hugging Face
 - **Size**: 26,818 sentences, ~700K tokens
@@ -70,64 +84,61 @@ freely licensed.
 - **Quality**: Gold-standard — fully human-revised from the original silver-
   standard WikiNER
 
-### Conversion approach
+### Conversion approach (updated)
 
 1. Download both datasets from Hugging Face
-2. Convert token-level IOB2 → entity-level spans with character offsets
-3. Filter for sentences containing ≥1 LOC entity
-4. Map entity types: all location entities → `LOC` in project schema (no GPE
-   distinction needed)
-5. Output as `en_uner.json` and `fr_wikiner_gold.json` in existing corpus format
-6. Add geocoding ground truth via `scripts/annotate_geocoding.py`
-7. Validate offsets with `scripts/fix_corpus_offsets.py --check`
+2. Reconstruct original text from tokens; compute character offsets
+3. Filter for samples containing ≥1 LOC entity
+4. Map all location entities → `LOC` in project schema
+5. Output as `en_wikiann.json` and `fr_wikiner_gold.json` in existing corpus
+   format
+6. *(Large corpora are NER-only — no geocoding annotation)*
 
 ### Expected output size (after filtering for LOC only)
 
-| Language | Source            | Raw sentences | Estimated LOC-filtered |
-| -------- | ----------------- | ------------- | ---------------------- |
-| English  | UNER v2 EWT + PUD | ~17.6K        | 5,000–7,000            |
-| French   | WikiNER-fr-gold   | ~26.8K        | 8,000–12,000           |
+| Language | Source          | Raw sentences | Estimated LOC-filtered |
+| -------- | --------------- | ------------- | ---------------------- |
+| English  | WikiANN         | ~20K          | ~7,000                 |
+| French   | WikiNER-fr-gold | ~26.8K        | ~3,800                 |
 
 ## Consequences
 
 ### Positive
 
-- Both sources are **gold-standard** human-annotated (P0 satisfied)
 - Both languages are covered (P1 satisfied)
 - Both are **freely licensed** (P2 satisfied)
 - Both yield **well above** 1000 samples after filtering (P3 satisfied)
-- UNER's LOC tag matches the project schema without mapping complexity
+- WikiANN and WikiNER-fr-gold share the same **Wikipedia domain**, making
+  cross-language comparisons more consistent than UNER (UD) + WikiNER (Wikipedia)
 - WikiNER-fr-gold is the largest freely-available gold-standard French NER corpus
 - Existing tooling (`annotate_geocoding.py`, `fix_corpus_offsets.py`) is reused
-  as-is
 
 ### Negative
 
-- Two different annotation schemes must be converted (IOB2 → entity spans)
-  with separate scripts
-- The two datasets come from different domains (UD treebanks vs. Wikipedia),
-  which may surface different failure modes
+- WikiANN is **silver-standard** (automatic, not human-annotated) — P0 relaxed
+  for English in favour of dataset availability and parquet compatibility
+- The two datasets come from different annotation pipelines (WikiANN auto-tags
+  vs. WikiNER human-revised)
 - WikiNER-fr-gold includes MISC entities (e.g., nationalities, events) that are
   not location-related and must be filtered out
-- UNER uses a single LOC tag, so if GPE/LOC distinction is ever needed later,
-  the English corpus would lack that granularity
 
 ### Neutral
 
-- WikiNER-fr-gold has no dev/test split — samples will be split during conversion
-  or held out at evaluation time
-- Entity frequency imbalance (more LOC in French) means per-language scores are
-  not directly comparable by volume, but F1 normalizes for this
+- WikiANN uses LOC/PER/ORG — GPE/LOC distinction is unavailable for either
+  language
+- Both datasets are Wikipedia-based, reducing cross-language domain mismatch
+- The hand-written gold-standard corpora (138 samples) remain for precise
+  evaluation
 
 ## Rejected Alternatives
 
-| Alternative          | Reason for rejection                                       |
-| -------------------- | ---------------------------------------------------------- |
-| **WikiANN (both)**   | Silver-standard only — violates P0 (gold quality)          |
-| **UNER-only (both)** | Neither v1 nor v2 covers French — hybrid is unavoidable    |
-| **CoNLL-2003**       | French not available                                       |
-| **NewsEye**          | French only, ~1.4K historical newspapers — no English pair |
-| **OntoNotes 5**      | Requires LDC license (not free)                            |
+| Alternative                    | Reason for rejection                                       |
+| ------------------------------ | ---------------------------------------------------------- |
+| **UNER v2**                    | Legacy script incompatible with `datasets>=3.0.0`          |
+| **UNER-only (both)**           | Neither v1 nor v2 covers French — hybrid is unavoidable    |
+| **CoNLL-2003**                 | French not available; also legacy script format            |
+| **NewsEye**                    | French only, ~1.4K historical newspapers — no English pair |
+| **OntoNotes 5**                | Requires LDC license (not free)                            |
 
 ## Related Documents
 

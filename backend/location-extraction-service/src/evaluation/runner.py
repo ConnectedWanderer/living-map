@@ -2,6 +2,7 @@
 
 import dataclasses
 import glob
+import importlib
 import json
 import os
 
@@ -13,6 +14,11 @@ from ..pipeline import NerPipeline
 from . import _sum_metrics, evaluate, evaluate_event_location, evaluate_geocoding
 
 DEFAULT_CORPUS_DIR = "tests/corpus"
+
+_GENERATED_CORPORA: dict[str, str] = {
+    "en_wikiann.json": "src.evaluation.converters.en_wikiann",
+    "fr_wikiner_gold.json": "src.evaluation.converters.wikiner_fr",
+}
 
 
 def load_corpus(path: str) -> list[dict]:
@@ -35,7 +41,13 @@ def load_corpus(path: str) -> list[dict]:
 
 
 def discover_corpora(corpus_dir: str = DEFAULT_CORPUS_DIR) -> list[str]:
-    """Find all JSON corpus files in a directory.
+    """Find all JSON corpus files in a directory, generating large corpora if missing.
+
+    Discovers existing files via glob, then checks for expected large corpus
+    files that don't exist yet. If found missing, attempts to import the
+    corresponding conversion module (from ``scripts/``) and generate the
+    corpus on demand. Requires ``datasets`` — if unavailable, silently skips
+    and returns only hand-written corpora.
 
     Args:
         corpus_dir: Directory to search (defaults to tests/corpus).
@@ -44,7 +56,20 @@ def discover_corpora(corpus_dir: str = DEFAULT_CORPUS_DIR) -> list[str]:
         Sorted list of absolute paths to .json files.
 
     """
-    return sorted(glob.glob(os.path.join(corpus_dir, "*.json")))
+    paths = set(glob.glob(os.path.join(corpus_dir, "*.json")))
+
+    for filename, module_path in _GENERATED_CORPORA.items():
+        filepath = os.path.join(corpus_dir, filename)
+        if filepath in paths:
+            continue
+        try:
+            mod = importlib.import_module(module_path)
+            mod.convert(filepath)
+            paths.add(filepath)
+        except ImportError:
+            continue
+
+    return sorted(paths)
 
 
 def run_pipeline_on_corpus(
