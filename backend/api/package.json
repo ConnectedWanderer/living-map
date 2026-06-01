@@ -1,0 +1,33 @@
+{
+  "name": "serving-api",
+  "version": "1.0.0",
+  "description": "Read-only Express server serving MVT tiles from PostGIS",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types src/index.ts",
+    "test": "node --test --experimental-strip-types tests/unit/*.test.ts",
+    "test:int": "node --experimental-strip-types tests/integration-runner.ts",
+    "test:all": "npm test && npm run test:int",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint src/ tests/",
+    "format": "biome format --write src/ tests/",
+    "check": "biome check --write src/ tests/",
+    "lint:ci": "biome ci src/ tests/"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.16",
+    "@testcontainers/postgresql": "^12.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.1",
+    "@types/pg": "^8.20.0",
+    "node-pg-migrate": "^8.0.4",
+    "testcontainers": "^12.0.0",
+    "typescript": "^6.0.3"
+  }
+}

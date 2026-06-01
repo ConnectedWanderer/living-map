@@ -42,3 +42,14 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+
+  api:
+    build: ./api
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap
+      CORS_ORIGIN: "*"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
