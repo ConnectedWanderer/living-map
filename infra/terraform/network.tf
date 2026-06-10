@@ -2,7 +2,7 @@ resource "oci_core_vcn" "main" {
   compartment_id = var.compartment_ocid
   display_name   = "${var.project_name}-vcn"
   cidr_blocks    = [var.vcn_cidr]
-  dns_label      = var.project_name
+  dns_label      = replace(var.project_name, "-", "")
 }
 
 resource "oci_core_internet_gateway" "main" {
