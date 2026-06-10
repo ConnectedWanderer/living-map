@@ -5,8 +5,9 @@ Provisions an Oracle Cloud Always-Free ARM instance (`VM.Standard.A1.Flex`) runn
 ## Prerequisites
 
 - [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.6
+- [Oracle Cloud CLI (`oci`)](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) — used to create the remote state bucket
 - An [Oracle Cloud](https://cloud.oracle.com) account with the Always-Free tier enabled
-- Python 3 (for post-deploy script JSON parsing)
+- Python 3 (for post-deploy script JSON parsing and `oci` CLI dependency)
 - `curl`
 
 ## One-time setup
