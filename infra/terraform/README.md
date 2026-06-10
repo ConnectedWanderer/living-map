@@ -117,7 +117,7 @@ terraform init \
   -backend-config="bucket=living-map-terraform-state" \
   -backend-config="key=infra/terraform.tfstate" \
   -backend-config="region=$(grep ^region terraform.tfvars | cut -d= -f2 | tr -d ' \"')" \
-  -backend-config="endpoint=https://<tenancy-namespace>.compat.objectstorage.<region>.oraclecloud.com"
+  -backend-config="endpoint=https://$(grep ^tenancy_namespace terraform.tfvars | cut -d= -f2 | tr -d ' \"').compat.objectstorage.$(grep ^region terraform.tfvars | cut -d= -f2 | tr -d ' \"').oraclecloud.com"
 
 # 3. Review the plan
 terraform plan
