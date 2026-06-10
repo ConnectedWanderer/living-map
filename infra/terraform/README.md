@@ -52,22 +52,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/living-map -N ""
 
 This creates `~/.ssh/living-map` (private) and `~/.ssh/living-map.pub` (public).
 
-### 4. OCI Customer Secret Key (remote state)
-
-The Terraform state file is stored in an OCI Object Storage bucket using the S3-compatible API. You need a Customer Secret Key.
-
-1. Go to Identity → Users → click your user → **Customer Secret Keys**
-2. Click **Generate Secret Key**, give it a name (e.g. `terraform-state`)
-3. Copy both the **Access Key** and **Secret Key** immediately (shown once)
-
-These are passed at `terraform init` time as environment variables:
-
-```bash
-export AWS_ACCESS_KEY_ID="<access-key>"
-export AWS_SECRET_ACCESS_KEY="<secret-key>"
-```
-
-### 5. Create the state bucket
+### 4. Create the state bucket
 
 The bucket must exist before `terraform init`. Create it with the OCI CLI:
 
@@ -79,6 +64,8 @@ oci os bucket create \
 ```
 
 > **No OCI CLI?** Create the bucket via the OCI Console: Storage → Object Storage → Buckets → **Create Bucket**, name it `living-map-terraform-state`.
+
+The state backend uses Terraform's native `backend "oci"`, which authenticates with the same OCI API key from step 1 — no additional credentials needed.
 
 ## Configuration
 
@@ -108,21 +95,17 @@ DB_PASSWORD=<choose-a-database-password>
 ## Deploy
 
 ```bash
-# 1. Set remote state credentials
-export AWS_ACCESS_KEY_ID="<customer-secret-key>"
-export AWS_SECRET_ACCESS_KEY="<customer-secret-secret>"
-
-# 2. Init Terraform with remote state backend
+# 1. Init Terraform with remote state backend
 terraform init \
   -backend-config="bucket=living-map-terraform-state" \
   -backend-config="key=infra/terraform.tfstate" \
   -backend-config="region=$(grep ^region terraform.tfvars | cut -d= -f2 | tr -d ' \"')" \
-  -backend-config="endpoint=https://$(grep ^tenancy_namespace terraform.tfvars | cut -d= -f2 | tr -d ' \"').compat.objectstorage.$(grep ^region terraform.tfvars | cut -d= -f2 | tr -d ' \"').oraclecloud.com"
+  -backend-config="namespace=$(grep ^tenancy_namespace terraform.tfvars | cut -d= -f2 | tr -d ' \"')"
 
-# 3. Review the plan
+# 2. Review the plan
 terraform plan
 
-# 4. Apply
+# 3. Apply
 terraform apply
 ```
 

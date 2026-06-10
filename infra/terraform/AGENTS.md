@@ -14,16 +14,12 @@ terraform fmt -recursive .
 terraform init -backend=false && terraform validate && rm -rf .terraform/ .terraform.lock.hcl
 
 # Full deploy flow
-# 1. Set OCI Object Storage credentials
-export AWS_ACCESS_KEY_ID="<customer-secret-key>"
-export AWS_SECRET_ACCESS_KEY="<customer-secret-secret>"
-
-# 2. Init with remote state backend
+# 1. Init with remote state backend (uses OCI API key from provider config)
 terraform init \
   -backend-config="bucket=living-map-terraform-state" \
   -backend-config="key=infra/terraform.tfstate" \
   -backend-config="region=<region>" \
-  -backend-config="endpoint=https://<namespace>.compat.objectstorage.<region>.oraclecloud.com"
+  -backend-config="namespace=<tenancy-namespace>"
 
 # 3. Apply
 terraform plan && terraform apply
