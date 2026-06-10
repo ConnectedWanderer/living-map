@@ -28,60 +28,59 @@ flowchart TD
     end
 
     subgraph Serving["Request Serving"]
-        F[Browser<br/>Vue + MapLibre] -->|GET /events| SA[Serving API<br/>Node.js + Express]
+        F[Frontend<br/>nginx + Vue] -->|GET /events| SA[Serving API<br/>Node.js + Express]
         SA -->|SELECT| DB
     end
 ```
 
-**Note**: `mock-feed` (port 3001) provides test data. Location Extraction is detailed in [location-extraction.md](./location-extraction.md). PostgreSQL runs as a separate container with PostGIS extension for geospatial queries.
+**Note**: `mock-feed` (port 3001) provides test data for local development and integration tests (via Testcontainers), but is NOT part of the default docker-compose stack. Location Extraction is detailed in [location-extraction.md](./location-extraction.md). Run all services with `docker compose -f backend/docker-compose.yml up --build` from the repo root.
 
-## Frontend Architecture (planned)
-
-```
-frontend/
-├── src/
-│   ├── components/      # Reusable UI components
-│   ├── views/           # Page-level components
-│   ├── stores/          # Pinia stores
-│   ├── composables/     # Vue composables (hooks)
-│   ├── services/        # API client
-│   └── assets/          # Styles, images
-```
-
-## Backend Architecture
+## Repository Structure
 
 ```
-backend/
-├── api/                          # Serving API (Express)
+.
+├── frontend/                     # Vue 3 + Vite + MapLibre GL JS
 │   ├── src/
-│   │   ├── routes/               # GET /events, etc.
-│   │   ├── services/             # External integrations
-│   │   ├── db/                   # PostgreSQL client + queries
-│   │   └── utils/                # Helpers
+│   │   ├── components/           # Reusable UI components
+│   │   ├── stores/               # Pinia stores
+│   │   ├── services/             # API client
+│   │   └── assets/               # Styles
+│   ├── Dockerfile                # Multi-stage: build + nginx serving
 │   └── package.json
-├── ingestion-worker/             # Node.js + TypeScript batch ingestion service
-│   ├── src/
-│   │   ├── index.ts              # Entry point, cron scheduler
-│   │   ├── sources/              # Source adapters (mock-feed, RSS, …)
-│   │   ├── dedup.ts              # source_id + content hash dedup
-│   │   └── config.ts             # Per-source schedule config
-│   ├── tsconfig.json
-│   └── package.json
-├── mock-feed/                    # Mock external RSS feed (for testing)
-│   ├── src/
-│   │   ├── routes/               # /feed endpoint
-│   │   └── utils/                # Generator, RSS builder
-│   ├── README.md
-│   └── AGENTS.md
-├── location-extraction-service/  # Python NLP microservice
-│   ├── src/                      # FastAPI application
-│   ├── Dockerfile
-│   ├── pyproject.toml
-│   └── README.md
-├── migrations/                   # DB schema migrations (node-pg-migrate)
-├── docker-compose.yml            # Services: api, ingestion-worker, postgres,
-│                                 #   location-extraction, mock-feed
-└── .env                          # Configuration
+├── backend/
+│   ├── api/                      # Serving API (Express)
+│   │   ├── src/
+│   │   │   ├── routes/           # GET /events, etc.
+│   │   │   ├── services/         # External integrations
+│   │   │   ├── db/               # PostgreSQL client + queries
+│   │   │   └── utils/            # Helpers
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   ├── ingestion-worker/         # Node.js + TypeScript batch ingestion
+│   │   ├── src/
+│   │   │   ├── index.ts          # Entry point, cron scheduler
+│   │   │   ├── sources/          # Source adapters (mock-feed, RSS, …)
+│   │   │   ├── dedup.ts          # source_id + content hash dedup
+│   │   │   └── config.ts         # Per-source schedule config
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   ├── mock-feed/                # Mock RSS feed for testing (standalone)
+│   │   ├── src/
+│   │   │   ├── routes/           # /feed endpoint
+│   │   │   └── utils/            # Generator, RSS builder
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   ├── location-extraction-service/  # Python NLP microservice
+│   │   ├── src/                  # FastAPI application
+│   │   ├── Dockerfile
+│   │   └── pyproject.toml
+│   ├── migrations/               # DB schema migrations (node-pg-migrate)
+│   └── docker-compose.yml        # Services: postgres, migrate, api,
+│                                 #   ingestion-worker, location-extraction
+├── docs/                         # Architecture docs, ADRs, glossary
+├── scripts/                      # Formatting and CI scripts
+├── AGENTS.md                     # AI agent instructions
+└── README.md
 ```
 
 ## Data Flow
@@ -119,21 +118,25 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant F as Frontend
+    participant B as Browser
+    participant FE as Frontend (nginx)
     participant SA as Serving API
     participant DB as PostgreSQL
 
-    F->>SA: GET /events
+    B->>FE: Serve static assets
+    FE-->>B: index.html + JS bundle
+    B->>SA: GET /events
     SA->>DB: SELECT events (with optional bounding box filter)
     DB-->>SA: Event rows
-    SA-->>F: GeoJSON FeatureCollection
-    F->>F: Render markers on MapLibre map
+    SA-->>B: GeoJSON FeatureCollection
+    B->>B: Render markers on MapLibre map
 ```
 
-1. Frontend requests events via GET /events (with optional bounding box)
-2. Serving API queries PostgreSQL for matching events
-3. API returns GeoJSON FeatureCollection to frontend
-4. Frontend renders markers on MapLibre map
+1. Browser loads frontend static assets via nginx (or Vite dev server)
+2. Frontend requests events via GET /events (with optional bounding box)
+3. Serving API queries PostgreSQL for matching events
+4. API returns GeoJSON FeatureCollection to frontend
+5. Frontend renders markers on MapLibre map
 
 ## Key Design Decisions
 

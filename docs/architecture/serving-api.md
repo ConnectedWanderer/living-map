@@ -73,7 +73,7 @@ GET /tiles/:z/:x/:y.pbf
 Generates MVT via single PostGIS query. Hides tile envelope math, geometry encoding, and property selection.
 
 ```ts
-async function getTile(z: number, x: number, y: number): Promise<Buffer | null>
+async function getTile(z: number, x: number, y: number): Promise<Buffer | null>;
 ```
 
 Core SQL:
@@ -101,8 +101,8 @@ FROM (
 Manages the `pg.Pool` instance. Hides connection lifecycle, pool sizing, and graceful shutdown.
 
 ```ts
-function getPool(): pg.Pool
-async function closePool(): Promise<void>
+function getPool(): pg.Pool;
+async function closePool(): Promise<void>;
 ```
 
 ## Data Flow
@@ -128,48 +128,48 @@ sequenceDiagram
 
 ## Technology Stack
 
-| Component    | Technology                               | Rationale                                        |
-| ------------ | ---------------------------------------- | ------------------------------------------------ |
-| Runtime      | Node.js 22+                              | Consistent with ingestion-worker                 |
-| Framework    | Express                                  | Lightweight, well-known, sufficient for <1000 users |
-| Language     | TypeScript                               | Module contracts at compile time (ADR-015)       |
-| Database     | `pg` (node-postgres)                     | Pool management, consistent with ingestion-worker |
-| Tile Gen     | PostGIS `ST_AsMVT` + `ST_TileEnvelope`  | Server-side tile generation, zero extra deps     |
-| Testing      | Node built-in `node:test` + `node:assert` | Zero-dependency test runner                      |
+| Component | Technology                                | Rationale                                           |
+| --------- | ----------------------------------------- | --------------------------------------------------- |
+| Runtime   | Node.js 22+                               | Consistent with ingestion-worker                    |
+| Framework | Express                                   | Lightweight, well-known, sufficient for <1000 users |
+| Language  | TypeScript                                | Module contracts at compile time (ADR-015)          |
+| Database  | `pg` (node-postgres)                      | Pool management, consistent with ingestion-worker   |
+| Tile Gen  | PostGIS `ST_AsMVT` + `ST_TileEnvelope`    | Server-side tile generation, zero extra deps        |
+| Testing   | Node built-in `node:test` + `node:assert` | Zero-dependency test runner                         |
 
 ## API Endpoints
 
-| Method | Path                        | Purpose                                                  |
-| ------ | --------------------------- | -------------------------------------------------------- |
-| GET    | /tiles/:z/:x/:y.pbf         | MVT tile for MapLibre vector tile source                 |
-| GET    | /health                     | Docker health check. Returns `{"status":"ok"}`           |
+| Method | Path                | Purpose                                        |
+| ------ | ------------------- | ---------------------------------------------- |
+| GET    | /tiles/:z/:x/:y.pbf | MVT tile for MapLibre vector tile source       |
+| GET    | /health             | Docker health check. Returns `{"status":"ok"}` |
 
 ## Environment Variables
 
-| Variable      | Default                           | Description                     |
-| ------------- | --------------------------------- | ------------------------------- |
-| `PORT`        | `3002`                            | Express listen port             |
-| `DATABASE_URL` | —                                | PostgreSQL connection string    |
-| `CORS_ORIGIN` | `http://localhost:5173`           | Allowed frontend origin for CORS |
+| Variable       | Default                 | Description                      |
+| -------------- | ----------------------- | -------------------------------- |
+| `PORT`         | `3002`                  | Express listen port              |
+| `DATABASE_URL` | —                       | PostgreSQL connection string     |
+| `CORS_ORIGIN`  | `http://localhost:5173` | Allowed frontend origin for CORS |
 
 ## Performance Targets
 
-| Metric           | Target   | Notes                                              |
-| ---------------- | -------- | -------------------------------------------------- |
-| Tile latency     | <50ms    | Single indexed query, small result sets            |
-| Concurrent users | <1000    | Stateless, horizontally scalable via replicas      |
-| Memory per instance | <100MB | No heavy deps, no caching layer                     |
+| Metric              | Target | Notes                                         |
+| ------------------- | ------ | --------------------------------------------- |
+| Tile latency        | <50ms  | Single indexed query, small result sets       |
+| Concurrent users    | <1000  | Stateless, horizontally scalable via replicas |
+| Memory per instance | <100MB | No heavy deps, no caching layer               |
 
 ## Key Design Decisions
 
-| Decision               | Choice                        | Rationale                                           |
-| ---------------------- | ----------------------------- | --------------------------------------------------- |
-| Tile format            | MVT (Mapbox Vector Tile)      | Native MapLibre format, efficient, viewport-culled |
-| No GeoJSON endpoint    | Tiles only                    | Simpler API surface, MapLibre loads tiles natively |
-| Tile generation        | Server-side via PostGIS       | Zero extra services, uses existing PostGIS          |
-| No caching (MVP)       | Direct PostGIS queries        | Sufficient for <1000 users, cheap to add later      |
-| Express over raw http  | Express                       | Route params, CORS middleware, consistent patterns  |
-| Tile properties        | id + title + source + ...     | Enough for popup display, keeps tiles small         |
+| Decision              | Choice                    | Rationale                                          |
+| --------------------- | ------------------------- | -------------------------------------------------- |
+| Tile format           | MVT (Mapbox Vector Tile)  | Native MapLibre format, efficient, viewport-culled |
+| No GeoJSON endpoint   | Tiles only                | Simpler API surface, MapLibre loads tiles natively |
+| Tile generation       | Server-side via PostGIS   | Zero extra services, uses existing PostGIS         |
+| No caching (MVP)      | Direct PostGIS queries    | Sufficient for <1000 users, cheap to add later     |
+| Express over raw http | Express                   | Route params, CORS middleware, consistent patterns |
+| Tile properties       | id + title + source + ... | Enough for popup display, keeps tiles small        |
 
 ## Docker
 

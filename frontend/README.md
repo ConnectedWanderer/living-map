@@ -60,9 +60,9 @@ src/
 
 ## Configuration
 
-| Variable      | Default                    | Description                  |
-| ------------- | -------------------------- | ---------------------------- |
-| `VITE_API_URL`| (not set, uses Vite proxy) | Future: direct API base URL  |
+| Variable       | Default                    | Description                 |
+| -------------- | -------------------------- | --------------------------- |
+| `VITE_API_URL` | (not set, uses Vite proxy) | Future: direct API base URL |
 
 Dev server proxy is configured in `vite.config.ts` — `/tiles` → `http://localhost:3002`.
 

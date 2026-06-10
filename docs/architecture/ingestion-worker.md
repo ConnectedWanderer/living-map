@@ -166,10 +166,10 @@ sequenceDiagram
 
 ## API Endpoints
 
-| Method | Path      | Purpose                                                                    |
-| ------ | --------- | -------------------------------------------------------------------------- |
-| GET    | /health   | Docker health check. Returns `{"status":"ok","sources":3,"lastRun":"..."}` |
-| POST   | /trigger  | Run one ingestion cycle for all enabled sources immediately                |
+| Method | Path     | Purpose                                                                    |
+| ------ | -------- | -------------------------------------------------------------------------- |
+| GET    | /health  | Docker health check. Returns `{"status":"ok","sources":3,"lastRun":"..."}` |
+| POST   | /trigger | Run one ingestion cycle for all enabled sources immediately                |
 
 Worker exposes endpoints on internal port (configurable, default 3000). The `POST /trigger` endpoint runs each source's fetch → normalize → dedup → enrich → persist cycle once, independent of cron. Returns `{"status":"ok"}` after all sources complete, or `{"status":"error","message":"..."}` on failure.
 

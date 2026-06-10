@@ -10,13 +10,13 @@ TDD: red-green-refactor, one behavior at a time, vertical slices only.
 
 To add a test: create `src/<module>/<name>.test.ts` using Vitest + `@vue/test-utils`.
 
-| Command                | Description              |
-| ---------------------- | ------------------------ |
-| `npm run dev`          | Start Vite dev server    |
-| `npm test`             | Run all tests            |
-| `npm run test:watch`   | Run tests in watch mode  |
-| `npm run typecheck`    | TypeScript check (noEmit)|
-| `npm run build`        | Typecheck + production build |
+| Command              | Description                  |
+| -------------------- | ---------------------------- |
+| `npm run dev`        | Start Vite dev server        |
+| `npm test`           | Run all tests                |
+| `npm run test:watch` | Run tests in watch mode      |
+| `npm run typecheck`  | TypeScript check (noEmit)    |
+| `npm run build`      | Typecheck + production build |
 
 ## Code Conventions
 
@@ -44,14 +44,14 @@ src/
 
 ## Troubleshooting
 
-| Symptom                          | Fix                                                                                        |
-| -------------------------------- | ------------------------------------------------------------------------------------------ |
-| `vitest` not found               | `npm install`                                                                              |
-| Type errors                      | `npx vue-tsc -b` to check                                                                  |
-| MapLibre init error in tests     | Mock `maplibre-gl` at top of test file using `vi.mock`                                     |
-| No tiles loading in dev          | Backend API must be running on port 3002. Check Vite proxy config in `vite.config.ts`      |
-| Pinia "getActivePinia" error     | Call `setActivePinia(createPinia())` in `beforeEach` of store/component tests              |
-| Build fails (typecheck)          | Run `vue-tsc -b` to find errors. Test files excluded from typecheck via `tsconfig.app.json` |
+| Symptom                      | Fix                                                                                         |
+| ---------------------------- | ------------------------------------------------------------------------------------------- |
+| `vitest` not found           | `npm install`                                                                               |
+| Type errors                  | `npx vue-tsc -b` to check                                                                   |
+| MapLibre init error in tests | Mock `maplibre-gl` at top of test file using `vi.mock`                                      |
+| No tiles loading in dev      | Backend API must be running on port 3002. Check Vite proxy config in `vite.config.ts`       |
+| Pinia "getActivePinia" error | Call `setActivePinia(createPinia())` in `beforeEach` of store/component tests               |
+| Build fails (typecheck)      | Run `vue-tsc -b` to find errors. Test files excluded from typecheck via `tsconfig.app.json` |
 
 ## Related Documentation
 

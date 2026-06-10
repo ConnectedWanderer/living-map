@@ -6,12 +6,12 @@ Vue 3 + Vite + MapLibre GL JS v4+ with globe projection. Single full-screen map 
 
 ## Technology Stack
 
-| Layer            | Technology                    | Notes                                               |
-| ---------------- | ----------------------------- | --------------------------------------------------- |
-| Framework        | Vue 3 + Vite + TypeScript     | Lightweight, fast dev server                        |
-| Map              | MapLibre GL JS v4+            | MVT tiles, globe projection, OSM raster tiles       |
-| State Management | Pinia                         | Selected feature only — no event cache              |
-| Styling          | Scoped CSS + `main.css`       | MVP — no design system                              |
+| Layer            | Technology                | Notes                                         |
+| ---------------- | ------------------------- | --------------------------------------------- |
+| Framework        | Vue 3 + Vite + TypeScript | Lightweight, fast dev server                  |
+| Map              | MapLibre GL JS v4+        | MVT tiles, globe projection, OSM raster tiles |
+| State Management | Pinia                     | Selected feature only — no event cache        |
+| Styling          | Scoped CSS + `main.css`   | MVP — no design system                        |
 
 ## Project Structure
 
@@ -56,11 +56,13 @@ flowchart TD
 The only deep module in the MVP. Hides all MapLibre GL JS complexity behind a self-contained component.
 
 **Interfaces:**
+
 - Props: none
 - Emits: none (popup is managed internally)
 - Slots: none
 
 **Responsibilities:**
+
 - Initialize MapLibre with globe projection and OSM raster tiles
 - Add vector tile source pointing at the Serving API
 - Add circle layer (uniform color `#ff6b6b`, radius 6px, opacity 0.8)
@@ -69,6 +71,7 @@ The only deep module in the MVP. Hides all MapLibre GL JS complexity behind a se
 - Clean up MapLibre instance on unmount (resize observer, event listeners)
 
 **Hidden complexity:**
+
 - MapLibre instance creation and lifecycle (resize observer, cleanup/destroy)
 - Projection configuration and auto-transition from globe to Mercator at zoom ~5
 - Tile source URL construction and refresh behavior
@@ -79,44 +82,49 @@ The only deep module in the MVP. Hides all MapLibre GL JS complexity behind a se
 
 ```ts
 const map = new maplibregl.Map({
-  container: 'map',
+  container: "map",
   style: {
     version: 8,
     sources: {
-      'osm-raster': {
-        type: 'raster',
-        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      "osm-raster": {
+        type: "raster",
+        tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
         tileSize: 256,
-        attribution: '© OpenStreetMap contributors',
+        attribution: "© OpenStreetMap contributors",
       },
-      'events-tiles': {
-        type: 'vector',
-        tiles: ['http://localhost:3002/tiles/{z}/{x}/{y}.pbf'],
+      "events-tiles": {
+        type: "vector",
+        tiles: ["http://localhost:3002/tiles/{z}/{x}/{y}.pbf"],
       },
     },
     layers: [
-      { id: 'osm-raster', type: 'raster', source: 'osm-raster', minzoom: 0 },
+      { id: "osm-raster", type: "raster", source: "osm-raster", minzoom: 0 },
       {
-        id: 'events-circle',
-        type: 'circle',
-        source: 'events-tiles',
-        'source-layer': 'events',
+        id: "events-circle",
+        type: "circle",
+        source: "events-tiles",
+        "source-layer": "events",
         paint: {
-          'circle-color': '#ff6b6b',
-          'circle-radius': [
-            'interpolate', ['exponential', 0.5], ['zoom'],
-            0, 2,
-            10, 6,
-            16, 12,
+          "circle-color": "#ff6b6b",
+          "circle-radius": [
+            "interpolate",
+            ["exponential", 0.5],
+            ["zoom"],
+            0,
+            2,
+            10,
+            6,
+            16,
+            12,
           ],
-          'circle-opacity': 0.8,
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 1.5,
+          "circle-opacity": 0.8,
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-width": 1.5,
         },
       },
     ],
   },
-  projection: 'globe',
+  projection: "globe",
   zoom: 2,
   center: [0, 20],
 });
@@ -127,16 +135,18 @@ const map = new maplibregl.Map({
 Simple overlay shown when a marker is clicked.
 
 **Interfaces:**
+
 - Props: `feature: { properties: EventProperties }`
 - Emits: `@close`
 
 **EventProperties shape (from tile feature):**
+
 ```ts
 interface EventProperties {
   id: number;
   title: string;
   source: string;
-  published_at: string;    // ISO 8601
+  published_at: string; // ISO 8601
   location_name: string | null;
   country: string | null;
 }
@@ -149,7 +159,7 @@ interface EventProperties {
 Trivial in MVP — just exports the tile URL base. Future: fetch helpers for non-tile endpoints.
 
 ```ts
-export const TILE_URL = 'http://localhost:3002/tiles/{z}/{x}/{y}.pbf';
+export const TILE_URL = "http://localhost:3002/tiles/{z}/{x}/{y}.pbf";
 ```
 
 ### `stores/events.ts`
@@ -174,11 +184,11 @@ MapLibre GL JS v3+ renders the OSM raster basemap wrapped on a 3D sphere when `p
 
 Behavior by zoom level:
 
-| Zoom | Projection  | User Experience               |
-| ---- | ----------- | ----------------------------- |
-| 0–3  | Globe       | Full sphere view, events as dots |
-| 3–5  | Globe→Mercator | Smooth transition           |
-| 5+   | Mercator    | Flat map, events as dots      |
+| Zoom | Projection     | User Experience                  |
+| ---- | -------------- | -------------------------------- |
+| 0–3  | Globe          | Full sphere view, events as dots |
+| 3–5  | Globe→Mercator | Smooth transition                |
+| 5+   | Mercator       | Flat map, events as dots         |
 
 The circle layer uses `['interpolate', ['exponential', 0.5], ['zoom'], ...]` to scale radius with zoom — tiny dots at global view, larger dots when zoomed in.
 
@@ -212,36 +222,36 @@ sequenceDiagram
 
 ## Key Design Decisions
 
-| Decision              | Choice                              | Rationale                                      |
-| --------------------- | ----------------------------------- | ---------------------------------------------- |
-| Tile-based rendering  | MVT source, no GeoJSON fetch        | MapLibre handles viewport culling natively     |
-| State in MapLibre     | Pinia holds only UI state           | Tile cache is MapLibre's responsibility        |
-| Globe projection      | MapLibre native `projection: 'globe'`  | Zero custom code, auto-transitions to flat  |
-| OSM raster tiles      | Free, no API key                    | Consistent with existing architecture plan     |
-| Uniform circle styling | Single color, no source-based colors | MVP — can add color coding per source later    |
-| Circle radius scaling | Exponential zoom interpolation      | Visible at global zoom, sized well when close  |
-| No polling            | Page refresh loads fresh tiles      | Tile server always queries live data           |
-| No routing            | Single page, no vue-router          | Can add filters/URL params in future           |
+| Decision               | Choice                                | Rationale                                     |
+| ---------------------- | ------------------------------------- | --------------------------------------------- |
+| Tile-based rendering   | MVT source, no GeoJSON fetch          | MapLibre handles viewport culling natively    |
+| State in MapLibre      | Pinia holds only UI state             | Tile cache is MapLibre's responsibility       |
+| Globe projection       | MapLibre native `projection: 'globe'` | Zero custom code, auto-transitions to flat    |
+| OSM raster tiles       | Free, no API key                      | Consistent with existing architecture plan    |
+| Uniform circle styling | Single color, no source-based colors  | MVP — can add color coding per source later   |
+| Circle radius scaling  | Exponential zoom interpolation        | Visible at global zoom, sized well when close |
+| No polling             | Page refresh loads fresh tiles        | Tile server always queries live data          |
+| No routing             | Single page, no vue-router            | Can add filters/URL params in future          |
 
 ## MVP Constraints & Scope
 
-| Dimension | Decision | Rationale |
-| --------- | -------- | --------- |
-| Views | 1 full-screen map | No sidebar, no list view, no detail panel |
-| Events | All events in viewport | No filter or search |
-| Interaction | Click → popup | No hover tooltip, no link to source |
-| Refresh | Manual page reload | No WebSocket, no polling |
-| Map controls | MapLibre defaults | Zoom +/- built-in, no custom controls |
-| Responsive | CSS full-screen, fills viewport | No dedicated mobile layout yet |
+| Dimension    | Decision                        | Rationale                                 |
+| ------------ | ------------------------------- | ----------------------------------------- |
+| Views        | 1 full-screen map               | No sidebar, no list view, no detail panel |
+| Events       | All events in viewport          | No filter or search                       |
+| Interaction  | Click → popup                   | No hover tooltip, no link to source       |
+| Refresh      | Manual page reload              | No WebSocket, no polling                  |
+| Map controls | MapLibre defaults               | Zoom +/- built-in, no custom controls     |
+| Responsive   | CSS full-screen, fills viewport | No dedicated mobile layout yet            |
 
 ## Performance
 
-| Metric      | Target     | Notes                                    |
-| ----------- | ---------- | ---------------------------------------- |
-| Initial load | <3s        | MapLibre + OSM tiles, MVT tile queries   |
-| Tile load   | <100ms     | Each tile request, parallel per viewport  |
-| Memory      | <100MB     | MapLibre + tile cache in browser memory  |
-| FPS         | 60fps      | MapLibre GL compositing, hardware-accelerated |
+| Metric       | Target | Notes                                         |
+| ------------ | ------ | --------------------------------------------- |
+| Initial load | <3s    | MapLibre + OSM tiles, MVT tile queries        |
+| Tile load    | <100ms | Each tile request, parallel per viewport      |
+| Memory       | <100MB | MapLibre + tile cache in browser memory       |
+| FPS          | 60fps  | MapLibre GL compositing, hardware-accelerated |
 
 ## Implementation Phases
 

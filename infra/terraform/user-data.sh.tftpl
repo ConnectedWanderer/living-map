@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euxo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+apt-get update
+apt-get install -y docker.io docker-compose-v2
+systemctl enable --now docker
+
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash /dev/stdin %{ if coolify_version != "latest" }-v ${coolify_version}%{ endif }
+
+touch /tmp/coolify-ready

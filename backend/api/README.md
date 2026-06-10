@@ -80,11 +80,11 @@ curl http://localhost:3002/health
 
 ## Configuration
 
-| Variable       | Default                                    | Description                     |
-| -------------- | ------------------------------------------ | ------------------------------- |
+| Variable       | Default                                                   | Description                  |
+| -------------- | --------------------------------------------------------- | ---------------------------- |
 | `DATABASE_URL` | `postgres://livingmap:livingmap@localhost:5432/livingmap` | PostgreSQL connection string |
-| `PORT`         | `3002`                                     | Server port                     |
-| `CORS_ORIGIN`  | `http://localhost:5173`                    | Allowed CORS origin             |
+| `PORT`         | `3002`                                                    | Server port                  |
+| `CORS_ORIGIN`  | `http://localhost:5173`                                   | Allowed CORS origin          |
 
 ## Code Quality
 
