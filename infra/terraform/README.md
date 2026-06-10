@@ -9,6 +9,7 @@ Provisions an Oracle Cloud Always-Free ARM instance (`VM.Standard.A1.Flex`) runn
 - An [Oracle Cloud](https://cloud.oracle.com) account with the Always-Free tier enabled
 - Python 3 (for post-deploy script JSON parsing and `oci` CLI dependency)
 - `curl`
+- OpenSSH (for `ssh-keygen` and `ssh` commands)
 
 ## One-time setup
 
