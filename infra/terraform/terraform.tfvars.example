@@ -20,5 +20,5 @@ tenancy_namespace    = "your-tenancy-namespace"
 # ─────────────────────────────────────────────
 # availability_domain_number = 2  # uncomment if AD-1 returns "out of capacity"
 # image_ocid                 = "ocid1.image.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # uncomment to pin a specific image
-# instance_ocpus             = 4   # default
-# instance_memory_gb         = 24  # default
+# instance_ocpus             = 1   # default (minimal free-tier, scale up if needed)
+# instance_memory_gb         = 6   # default (minimal free-tier, scale up if needed)

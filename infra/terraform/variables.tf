@@ -66,13 +66,13 @@ variable "instance_shape" {
 variable "instance_ocpus" {
   description = "Number of OCPUs for the instance"
   type        = number
-  default     = 4
+  default     = 1
 }
 
 variable "instance_memory_gb" {
   description = "Memory in GB for the instance"
   type        = number
-  default     = 24
+  default     = 6
 }
 
 variable "image_ocid" {
