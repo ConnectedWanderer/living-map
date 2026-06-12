@@ -31,6 +31,24 @@ terraform plan && terraform apply
 terraform destroy
 ```
 
+## Retry loop for "Out of capacity"
+
+When OCI returns "Out of capacity" for `VM.Standard.A1.Flex`, run the retry script:
+
+```bash
+# Run in foreground (Ctrl+C to stop)
+./scripts/retry-apply.sh
+
+# Or run in background
+nohup ./scripts/retry-apply.sh >> /tmp/retry.log 2>&1 &
+
+# Custom interval (default 60s)
+RETRY_INTERVAL=300 ./scripts/retry-apply.sh
+```
+
+The script cycles through ADs 1→2→3 per pass, sleeping 5 minutes after all 3 are exhausted.
+On success it runs `configure-coolify.sh` automatically.
+
 ## Key files
 
 | File | Purpose |
@@ -42,6 +60,7 @@ terraform destroy
 | `security.tf` | Security list rules: 22, 80, 443, 8000 |
 | `data.tf` | Availability domain + Ubuntu 24.04 Minimal image lookup |
 | `user-data.sh.tftpl` | Cloud-init: Docker Engine + Coolify installation |
+| `scripts/retry-apply.sh` | Retry loop across ADs until ARM capacity becomes available |
 
 ## Conventions
 
