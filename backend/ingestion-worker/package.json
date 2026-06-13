@@ -1,7 +1,7 @@
 {
   "name": "ingestion-worker",
   "version": "1.0.0",
-  "description": "Cron-triggered service that polls sources, normalizes, deduplicates, enriches, and persists events",
+  "description": "One-shot job that polls RSS sources and persists normalized events",
   "type": "module",
   "scripts": {
     "start": "node --experimental-strip-types src/index.ts",
@@ -9,8 +9,7 @@
     "test:all": "npm test && npm run test:int",
     "test:int": "node --experimental-strip-types tests/integration-runner.ts",
     "docker:build:mock-feed": "docker build -t living-map/mock-feed:latest ../mock-feed",
-    "docker:build:location-extraction-service": "docker build -t living-map/location-extraction-service:latest ../location-extraction-service",
-    "docker:build": "npm run docker:build:mock-feed && npm run docker:build:location-extraction-service",
+    "docker:build": "npm run docker:build:mock-feed",
     "typecheck": "tsc --noEmit",
     "lint": "biome lint src/ tests/",
     "format": "biome format --write src/ tests/",
@@ -20,7 +19,6 @@
   },
   "dependencies": {
     "fast-xml-parser": "^5.8.0",
-    "node-cron": "^4.2.1",
     "pg": "^8.20.0",
     "pino": "^10.3.1"
   },

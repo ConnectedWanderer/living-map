@@ -7,6 +7,4 @@ RUN npm ci --only=production --no-fund --no-audit && rm -rf /root/.npm
 
 COPY src/ ./src/
 
-EXPOSE 3000
-
 CMD ["node", "--experimental-strip-types", "src/index.ts"]

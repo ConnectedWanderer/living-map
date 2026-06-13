@@ -1,5 +1,4 @@
 import type pg from 'pg';
-import type { GeoJsonFeatureCollection } from './enrich.ts';
 import type { NormalizedArticle } from './normalizer.ts';
 
 /** Batch insert articles with ON CONFLICT deduplication. Returns inserted/skipped counts. */
@@ -34,22 +33,4 @@ export async function insertEvents(
   }
 
   return { inserted, skipped };
-}
-
-/** Update an event's location column with extracted GeoJSON coordinates. */
-export async function updateLocation(
-  pool: pg.Pool,
-  source: string,
-  sourceId: string,
-  geoJson: GeoJsonFeatureCollection,
-): Promise<void> {
-  const feature = geoJson.features[0];
-  if (!feature?.geometry?.coordinates) return;
-
-  const [lon, lat] = feature.geometry.coordinates as [number, number];
-  await pool.query(
-    `UPDATE events SET location = ST_SetSRID(ST_MakePoint($1, $2), 4326), updated_at = now()
-     WHERE source = $3 AND source_id = $4`,
-    [lon, lat, source, sourceId],
-  );
 }

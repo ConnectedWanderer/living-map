@@ -1,5 +1,7 @@
 # Context: Applying ADR-021 — Serverless Free-Tier Deployment
 
+> **Status:** Step 1 (Ingestion Worker → ingestion-job) **DONE**. Next: Step 2 (LES → les-job).
+
 ## Objective
 
 Migrate from Oracle ARM + Coolify to **Google Cloud Run + Supabase + GitHub Pages**. Transform the two long-running HTTP services (Ingestion Worker, LES) into one-shot Cloud Run Jobs, keep the Tile API as a scale-to-zero Cloud Run Service, and serve the frontend as a static site from GitHub Pages.
@@ -54,72 +56,44 @@ These are NOT automated and must be done before the CI/CD can work.
 
 ## Step-by-step file changes
 
-### Step 1: Refactor Ingestion Worker → `ingestion-job`
+### Step 1: Refactor Ingestion Worker → `ingestion-job` ✅ DONE
 
 **Goal:** Rewrite as a one-shot Cloud Run Job. Fetch all sources, insert articles, exit. No HTTP server, no cron, no enrichment.
 
-#### `backend/ingestion-worker/src/index.ts` — REWRITE
-- Remove HTTP server creation, `.listen()`, health/trigger handlers
-- Remove `node-cron` import and `startScheduler` call
-- Remove `extractLocation` import from `enrich.ts`
-- Replace `main()` to return `Promise<void>` (not `http.Server`)
-- `main()` should: create pool → load sources → run all sources → close pool → exit
-- Simplify `runSourceDeps` — remove `extractLocation`, `updateLocation`, `locationExtractionUrl`
-- Accept env vars: `DATABASE_URL`, `LOG_LEVEL` only
-- No longer needs `PORT`, `LOCATION_EXTRACTION_URL`
+**Approach:** TDD (red-green-refactor). Started with `runSource()` (fetch→insert→log, no enrich), then `main()` (one-shot orchestration), then refactor cleanup.
 
-#### `backend/ingestion-worker/src/runner.ts` — REWRITE
-- Remove `GeoJsonFeatureCollection` import
-- Remove `extractLocation` and `updateLocation` from `RunnerDeps`
-- Remove `locationExtractionUrl` from `RunnerDeps`
-- Simplify `runSource`: fetch → insert → log (no enrich loop)
-- Remove `newArticles` slicing (all articles are new as far as insertion goes)
+#### Changes made (actual vs plan)
 
-#### `backend/ingestion-worker/src/enrich.ts` — DELETE
-- The LES job now handles enrichment independently
+| File | What was done | Notes |
+|------|---------------|-------|
+| `src/index.ts` | `main()` returns `Promise<void>` — creates pool, loads sources, runs all, closes pool. Removed HTTP server, cron, enrich imports, `PORT`/`LOCATION_EXTRACTION_URL` env vars | `runSourceDeps` simplified — no enrich fields |
+| `src/runner.ts` | Removed `GeoJsonFeatureCollection` import, enrich fields from `RunnerDeps`, enrich loop, `newArticles` slicing | Now fetch → insert → log only |
+| `src/enrich.ts` | **Deleted** | LES job handles enrichment |
+| `src/scheduler.ts` | **Deleted** | Cloud Scheduler handles timing |
+| `src/db.ts` | Removed `updateLocation()` and `GeoJsonFeatureCollection` import | Dead code — was only used by enrich flow |
+| `package.json` | Removed `node-cron` dep, removed `docker:build:location-extraction-service` script, updated description | — |
+| `Dockerfile` | Removed `EXPOSE 3000` | CMD unchanged |
+| `tests/unit/index.test.ts` | **Deleted** instead of rewritten | Per decision: no unit test for `main()` — covered by integration test |
+| `tests/unit/runner.test.ts` | Rewrote — one test asserting `insertEvents` receives articles from `fetchArticles` | Dropped logger assertion (impl detail per TDD ref). No enrich assertions |
+| `tests/unit/enrich.test.ts` | **Deleted** | Module gone |
+| `tests/unit/scheduler.test.ts` | **Deleted** | Module gone |
+| `tests/integration/full-cycle.test.ts` | Rewrote — calls `main()` with real Postgres (Testcontainers) + mock-feed, verifies events in DB | Calls `main()` end-to-end (not just manual fetch→insert) |
+| `tests/integration/db.test.ts` | Removed `updateLocation` import + location-update test case | `updateLocation` removed from db.ts |
+| `tests/integration/enrich.test.ts` | **Deleted** | Module gone |
+| `tests/integration/helpers.ts` | Removed `LOCATION_EXTRACTION_SERVICE_URL` | Only `MOCK_FEED_URL` remains |
+| `tests/integration-runner.ts` | Removed LES container startup | Only mock-feed container started |
 
-#### `backend/ingestion-worker/src/scheduler.ts` — DELETE
-- Cloud Scheduler handles timing, not node-cron
+#### Current test results
+- **6 unit tests** — all pass ✅
+- **3 integration tests** — all pass ✅ (db inserts, dedup, full cycle via `main()`)
+- **TypeScript** — clean, no errors ✅
 
-#### `backend/ingestion-worker/package.json` — MODIFY
-- Remove `"node-cron"` from `dependencies`
-- Remove `"node-cron": "^4.2.1"` entry
-- Remove `"pino"` if not needed, or keep for logging
-- Remove `"docker:build:location-extraction-service"` from scripts
-- Update `description`
-
-#### `backend/ingestion-worker/Dockerfile` — MODIFY
-- Remove `EXPOSE 3000` (no HTTP port)
-- CMD stays same: `["node", "--experimental-strip-types", "src/index.ts"]`
-
-#### `backend/ingestion-worker/tests/unit/index.test.ts` — REWRITE
-- Current tests assert HTTP server responds to /health and 404
-- New tests assert `main()` runs all sources and resolves without error
-- Mock pool.query to return sources, mock fetchArticles
-- Assert no HTTP server is created
-
-#### `backend/ingestion-worker/tests/unit/runner.test.ts` — REWRITE
-- Remove enrichment assertions (`extractCalls`, `updateCalls`)
-- Test simplified cycle: fetch → insert → log
-- Only assert `insertEvents` was called and logger info was emitted
-
-#### `backend/ingestion-worker/tests/unit/enrich.test.ts` — DELETE
-- Module no longer exists
-
-#### `backend/ingestion-worker/tests/unit/scheduler.test.ts` — DELETE
-- Module no longer exists
-
-#### `backend/ingestion-worker/tests/integration/full-cycle.test.ts` — REWRITE
-- Remove LES health check (`LOCATION_EXTRACTION_SERVICE_URL`)
-- Remove enrich/update steps
-- Test only: fetch articles → insertEvents → verify rows in DB
-- Remove `extractLocation` and `updateLocation` imports
-
-#### `backend/ingestion-worker/tests/integration/enrich.test.ts` — DELETE or repurpose
-- Enrich integration no longer exists
-
-#### `backend/ingestion-worker/tests/integration/helpers.ts` — CHECK
-- Remove any LOCATION_EXTRACTION_SERVICE_URL references if present
+#### Key design decisions (TDD)
+1. **`runSource` test** — asserts `fetchArticles`→`insertEvents` orchestration through public interface (deps object). Logger assertion dropped (implementation detail, brittle).
+2. **No unit test for `main()`** — decided to rely on the integration test for end-to-end coverage.
+3. **`main()` doesn't close injected pool** — if `deps.pool` is provided, caller owns cleanup. Only closes pool it creates internally.
+4. **Minimal `RunnerDeps`** — removed 3 enrich-related fields. `FetchDeps` kept for adapter pattern.
+5. **No "0 inserted" test** — after removing enrich loop, `runSource` doesn't branch on `inserted`. Test would add no value.
 
 ---
 
