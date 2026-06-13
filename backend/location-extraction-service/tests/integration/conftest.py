@@ -9,7 +9,7 @@ _SPACY_MODELS = {
 }
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def small_nlp_models():
     os.environ["SPACY_EN_MODEL"] = "en_core_web_sm"
     os.environ["SPACY_FR_MODEL"] = "fr_core_news_sm"

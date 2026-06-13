@@ -26,6 +26,5 @@ RUN pip install --no-cache-dir uv && \
 
 COPY src/ ./src/
 
-EXPOSE 8000
-
-CMD [".venv/bin/python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
+# DATABASE_URL must be set at runtime
+CMD [".venv/bin/python", "-c", "from src.app import main; main()"]

@@ -1,6 +1,6 @@
 # Context: Applying ADR-021 — Serverless Free-Tier Deployment
 
-> **Status:** Step 1 (Ingestion Worker → ingestion-job) **DONE**. Next: Step 2 (LES → les-job).
+> **Status:** Step 1 (Ingestion Worker → ingestion-job) **DONE**. Step 2 (LES → les-job) **DONE**. Next: Step 3 (Tile API → Cloud Run Service).
 
 ## Objective
 
@@ -97,51 +97,37 @@ These are NOT automated and must be done before the CI/CD can work.
 
 ---
 
-### Step 2: Refactor LES → `les-job`
+### Step 2: Refactor LES → `les-job` ✅ DONE
 
 **Goal:** Rewrite as a one-shot Cloud Run Job. Load spaCy model once, query unprocessed events from Supabase, batch process, update locations, exit.
 
-#### `backend/location-extraction-service/pyproject.toml` — MODIFY
-- Add `psycopg2-binary>=2.9.0` to `dependencies`
-- Remove `fastapi`, `uvicorn[standard]`, `pydantic` if no longer needed locally (or keep for dev flexibility)
+**Approach:** TDD (red-green-refactor). 4 cycles: `run_batch()` core logic (DB interaction with canned pipeline, no spaCy), then `main()` orchestration (injected deps + env var), then real pipeline test.
 
-#### `backend/location-extraction-service/src/app.py` — REWRITE
-- Replace FastAPI app + uvicorn start with a batch script `main()`
-- New flow:
-  1. Read `DATABASE_URL`, `SPACY_EN_MODEL`, `SPACY_FR_MODEL` from env
-  2. Load `LocationPipeline` (loads spaCy model once)
-  3. Connect to Supabase via `psycopg2.connect()`
-  4. Query: `SELECT id, title, description FROM events WHERE location IS NULL LIMIT 500`
-  5. For each row: combine title + description, run pipeline, extract coordinates
-  6. `UPDATE events SET location = ST_SetSRID(ST_MakePoint(%s, %s), 4326), updated_at = now() WHERE id = %s`
-  7. Commit batch, close, exit
-- Keep `_build_response` and `_build_all_entities` functions if still useful (for logging/metrics)
-- Remove FastAPI-specific: `FastAPI`, `Depends`, `get_pipeline`, `@app.get`, `@app.post`, `uvicorn`
+#### Changes made (actual vs plan)
 
-#### `backend/location-extraction-service/src/schemas.py` — KEEP for reference (or DELETE if not imported elsewhere)
-- Check if any other module imports from `schemas.py`
-- If only used by `app.py`, can be deleted
+| File | What was done | Notes |
+|------|---------------|-------|
+| `src/app.py` | Rewritten: removed FastAPI, uvicorn, `get_pipeline()`, route handlers, `_build_response()`, `_build_all_entities()`, `start()`. Added `run_batch(connection, pipeline) -> int` and `main(database_url, connection, pipeline)` | `main()` accepts optional connection/pipeline injection for testing. `run_batch()` returns count of processed events |
+| `src/schemas.py` | **Deleted** | Only used by FastAPI endpoint — dead code |
+| `pyproject.toml` | Added `psycopg2-binary>=2.9.0`; removed `fastapi`, `uvicorn[standard]`, `pydantic`; added `testcontainers[postgres]>=4.0.0` to dev | — |
+| `Dockerfile` | Removed `EXPOSE 8000`. CMD changed to `["python", "-c", "from src.app import main; main()"]`. Removed uvicorn docs | DATABASE_URL passed at runtime |
+| `.env.example` | Replaced `HOST`/`PORT` env vars with `DATABASE_URL`, `SPACY_EN_MODEL`, `SPACY_FR_MODEL` | — |
+| `tests/integration/test_api.py` | **Deleted** | Was testing FastAPI endpoints via httpx ASGI client |
+| `tests/integration/test_batch_job.py` | **New** — 6 tests: `run_batch()` (no unprocessed, 1 event, 3 events) + `main()` (injected deps, real pipeline, env var URL) | Uses Testcontainer PostGIS. Canned pipeline for non-model-dependent tests; real `LocationPipeline` for model_dependent test |
+| `tests/integration/conftest.py` | Removed `autouse=True` from `small_nlp_models` fixture | New batch job tests don't need spaCy |
 
-#### `backend/location-extraction-service/Dockerfile` — MODIFY
-- CMD changes from uvicorn server to batch script:
-  ```
-  CMD [".venv/bin/python", "-c", "from src.app import main; main()"]
-  ```
-  Or add a `__main__.py` entry point
-- Add `DATABASE_URL` to build-time docs (not baked in, passed at runtime)
+#### Current test results
+- **76 unit/integration tests** — all pass (non-model-dependent) ✅
+- **6 new batch job tests** — all pass (5 non-model-dependent + 1 model_dependent) ✅
+- **Ruff** — clean, no errors ✅
+- **TypeScript** — not applicable (Python project)
 
-#### `backend/location-extraction-service/tests/integration/test_api.py` — REWRITE or DELETE
-- Current tests test FastAPI endpoints via httpx ASGI client
-- Replace with tests for the batch job logic:
-  - Test that `main()` queries DB, processes articles, updates locations
-  - Mock psycopg2 connection and pipeline
-  - Test with mock DB rows
-
-#### `backend/location-extraction-service/tests/conftest.py` — CHECK
-- May need updates if it references FastAPI app or httpx fixtures
-
-#### Other tests (test_pipeline_integration.py, test_extractor.py, etc.) — KEEP mostly as-is
-- Pipeline logic tests should still work since pipeline modules stay the same
+#### Key design decisions (TDD)
+1. **`run_batch()` returns int** — caller (`main()`) can log count
+2. **No mocking at DB boundary** — tests use real Postgres (Testcontainer); only spaCy pipeline is canned for non-model-dependent tests
+3. **`main()` doesn't close injected connection** — if `connection` is provided, caller owns cleanup
+4. **No unit tests for `run_batch()`** — covered by integration tests with real DB
+5. **`_build_response` / `_build_all_entities` deleted** — were only used by FastAPI response layer
 
 ---
 
