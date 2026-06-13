@@ -1,8 +1,52 @@
-# Living Map - Deployment & Hosting Architecture
+# Living Map — Deployment & Hosting Architecture
+
+**Status:** This document now describes the production deployment on Google Cloud Run + Supabase (per
+[ADR-021](../decisions/ADR-021-serverless-free-tier-deployment.md)). The previous Oracle ARM + Coolify
+target (the original version of this document) is superseded and kept below for reference.
+
+> **TL;DR:** The project was originally targeting an Oracle Cloud ARM VM managed by Coolify, but ARM
+> instances are persistently unavailable (`Out of capacity` across all regions). The strategy changed to
+> serverless: GitHub Pages (frontend), Cloud Run Services/Jobs (backend), and Supabase (database).
+> See [ADR-021](../decisions/ADR-021-serverless-free-tier-deployment.md) for full rationale.
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Local Development](#current-state-local-development)
+3. [Production Architecture (Cloud Run + Supabase)](#production-architecture-cloud-run--supabase)
+4. [Container Strategy](#container-strategy)
+5. [Environment Configuration](#environment-configuration)
+6. [CI/CD Pipeline](#cicd-pipeline)
+7. [Database & Backup](#database--backup)
+8. [Monitoring](#monitoring)
+9. [Cost Breakdown](#cost-breakdown)
+10. [Key Design Decisions](#key-design-decisions)
+11. [Constraints & Assumptions](#constraints--assumptions)
+12. [Runbook](#runbook)
+13. [Superseded: Oracle ARM + Coolify Target](#superseded-oracle-arm--coolify-target)
+
+---
 
 ## Overview
 
-This document describes the deployment and hosting architecture for the Living Map application. It covers the current local development setup, the production target infrastructure, container strategy, and operational runbook.
+This document describes the deployment and hosting architecture for the Living Map application. It covers
+the local development setup (Docker Compose), the production serverless target infrastructure on Google
+Cloud Run + Supabase, the CI/CD pipeline, and operational runbook.
+
+The system runs at **$0/month** using only always-free tiers:
+
+| Component | Platform | Type | Cost |
+|---|---|---|---|
+| Frontend | GitHub Pages | Static site (Vite build) | $0 |
+| Tile API | Cloud Run Service | HTTP, scale-to-zero | $0 |
+| Ingestion | Cloud Run Job | One-shot daily cron | $0 |
+| LES | Cloud Run Job | One-shot daily cron | $0 |
+| Scheduling | Cloud Scheduler | 2 cron triggers | $0 |
+| Database | Supabase | Managed PostGIS, 500 MB | $0 |
+
+---
 
 ## Current State: Local Development
 
@@ -12,235 +56,352 @@ All services run via Docker Compose on a single host. The compose file at `backe
 | --------------------- | -------------------------------------------------------- | ---- | ------------------- |
 | `postgres`            | `postgis/postgis:16-3.4`                                 | 5432 | —                   |
 | `migrate`             | `node:22-alpine` (ephemeral)                             | —    | postgres (healthy)  |
-| `ingestion-worker`    | `./ingestion-worker/Dockerfile`                          | 3000 | migrate (completed) |
+| `ingestion-worker`    | `./ingestion-worker/Dockerfile`                          | —    | migrate (completed) |
 | `api`                 | `./api/Dockerfile`                                       | 3002 | migrate (completed) |
-| `location-extraction` | `./location-extraction-service/Dockerfile` (via include) | 8000 | —                   |
 | `frontend`            | `../frontend/Dockerfile`                                 | 8080 | api                 |
+
+The Location Extraction Service (LES) runs outside Docker Compose for local dev — invoke the batch script
+directly: `uv run python -m src.app` from `backend/location-extraction-service/`.
 
 `mock-feed` runs outside compose — started manually for testing or via Testcontainers in integration tests.
 
-The frontend nginx (`frontend/nginx.conf`) proxies `/tiles/` requests to the api service over the Docker internal network.
+The frontend nginx (`frontend/nginx.conf`) proxies `/tiles/` requests to the api service over the Docker
+internal network (local dev only — production uses `VITE_API_URL` pointing to Cloud Run).
 
-## Target Infrastructure
+---
 
-| Layer             | Choice                                              | Rationale                                                 |
-| ----------------- | --------------------------------------------------- | --------------------------------------------------------- |
-| Compute           | Oracle Cloud Always Free (VM.Standard.A1.Flex)      | 4 OCPUs, 24 GB RAM, 200 GB storage — $0/mo                |
-| Platform          | Coolify (self-hosted)                               | Git-push deploys, auto SSL, web UI, Docker Compose native |
-| Container Runtime | Docker Engine + Docker Compose                      | Consistent with local dev, well-supported on ARM          |
-| Reverse Proxy     | Traefik (managed by Coolify)                        | Auto Let's Encrypt SSL, docker-aware routing              |
-| Domain            | User-provided domain (e.g., living-map.example.com) | Subdomain per service via Coolify                         |
-
-### Why Oracle ARM + Coolify
-
-The Oracle Always Free tier is the only cloud provider offering sufficient free compute (24 GB RAM) to run the full stack — including spaCy model weights and PostGIS — without artificial constraints. Coolify adds a Heroku-like deployment layer: connect a GitHub repo, push, and Coolify builds the Docker image, deploys, and provisions SSL.
-
-The trade-off is ARM CPU architecture. Most images used (Node, Python, PostgreSQL, nginx) have native ARM64 variants, but occasional x86-only dependencies may require multi-arch builds or alternatives.
-
-## Production Architecture
+## Production Architecture (Cloud Run + Supabase)
 
 ```mermaid
 flowchart TD
-    subgraph Internet["Internet"]
-        User[User Browser]
-        GitHub
+    subgraph GitHub["GitHub"]
+        Repo[Repository]
+        Actions[GitHub Actions]
     end
 
-    subgraph Coolify["Coolify (on Oracle ARM VM)"]
-        subgraph Proxy["Traefik Reverse Proxy"]
-            TLS[Let's Encrypt SSL]
+    subgraph GCP["Google Cloud Platform"]
+        subgraph ArtifactRegistry["Artifact Registry"]
+            TI[ tile-api container]
+            IJ[ ingestion-job container]
+            LJ[ les-job container]
         end
 
-        subgraph Services["Application Services"]
-            FE[Frontend<br/>nginx:alpine]
-            API[Serving API<br/>Node.js + Express]
-            IW[Ingestion Worker<br/>Node.js + cron]
-            LE[Location Extraction<br/>Python + FastAPI]
+        subgraph CloudRun["Cloud Run"]
+            Svc[Tile API Service<br/>scale-to-zero]
+            J1[Ingestion Job<br/>one-shot]
+            J2[LES Job<br/>one-shot]
         end
 
-        DB[(PostgreSQL<br/>+ PostGIS)]
+        CS[Cloud Scheduler<br/>06:00 / 07:00 UTC]
     end
 
-    User -->|HTTPS| TLS
-    TLS -->|living-map.example.com| FE
-    TLS -->|api.example.com| API
+    subgraph Supabase["Supabase (free tier)"]
+        DB[(PostGIS<br/>500 MB)]
+    end
 
-    FE -->|proxy /tiles/| API
-    API -->|SELECT| DB
-    IW -->|INSERT| DB
-    IW -->|POST /api/extract-location| LE
-    IW -->|poll| RSS[External RSS Feeds]
+    subgraph Pages["GitHub Pages"]
+        FE[Frontend<br/>static Vite build]
+    end
 
-    GitHub -->|git push| Coolify
+    User[User Browser] -->|HTTPS| FE
+    FE -->|VITE_API_URL| Svc
+
+    Svc -->|MVT tile queries| DB
+    CS -->|triggers 06:00| J1
+    CS -->|triggers 07:00| J2
+    J1 -->|INSERT events| DB
+    J1 -->|poll| RSS[External RSS Feeds]
+    J2 -->|SELECT unprocessed<br/>UPDATE locations| DB
+
+    Repo -->|git push main| Actions
+    Actions -->|build & push| ArtifactRegistry
+    Actions -->|gcloud run deploy| CloudRun
+    Actions -->|deploy static site| Pages
 ```
 
-### Service-to-domain mapping (Coolify)
+### Data Flow
 
-| Service             | Coolify Resource       | Domain                             |
-| ------------------- | ---------------------- | ---------------------------------- |
-| Frontend            | Docker Compose service | `living-map.example.com` (public)  |
-| API                 | Docker Compose service | Internal (Coolify private network) |
-| Ingestion Worker    | Docker Compose service | Internal (no public port)          |
-| Location Extraction | Docker Compose service | Internal (Coolify private network) |
-| PostgreSQL          | Docker Compose service | Internal (no public port)          |
+**Tile requests:** User browser → GitHub Pages (HTML/JS) → Tile API (Cloud Run Service) → Supabase PostGIS → MVT tiles → MapLibre GL JS render
 
-The frontend is the only service exposed publicly. The API, worker, and location extraction communicate over Coolify's internal Docker network.
+**Daily ingestion (06:00 UTC):** Cloud Scheduler → triggers `ingestion-job` (Cloud Run Job) → fetch RSS feeds → normalize → INSERT into events table → exit
+
+**Daily NER processing (07:00 UTC):** Cloud Scheduler → triggers `les-job` (Cloud Run Job) → SELECT events WHERE location IS NULL → load spaCy model (once) → batch NER + geocoding → UPDATE locations → exit
+
+### Job Design
+
+| Job | Trigger | Duration | Memory | Env Vars |
+|---|---|---|---|---|
+| `ingestion-job` | Cloud Scheduler `0 6 * * *` | ~3 min | 512 MB | `DATABASE_URL` |
+| `les-job` | Cloud Scheduler `0 7 * * *` | ~5 min | 2 GB (for trf model) | `DATABASE_URL`, `SPACY_EN_MODEL` |
+
+Both jobs are **decoupled** — they communicate only through the database. Ingestion can run without LES
+(articles won't have locations), and LES can run without ingestion (no new articles to process).
+
+### Supabase Idle-Pause Mitigation
+
+Supabase free-tier projects auto-pause after 7 days of inactivity. Mitigated by:
+
+1. Daily scheduled jobs generate database activity, naturally resetting the timer
+2. If no visitors and jobs are dormant for 7+ days → project pauses → click "Restore" in Supabase dashboard (data is preserved)
+3. Optional: external uptime monitor (e.g., cron-job.org free) pinging `/rest/v1/rpc/health` every 6h
+
+---
 
 ## Container Strategy
 
 | Service             | Base Image                                           | Build Context               | Notes                                         |
 | ------------------- | ---------------------------------------------------- | --------------------------- | --------------------------------------------- |
-| Frontend            | `node:22-alpine` (build) / `nginx:alpine` (serve)    | `frontend/`                 | Multi-stage: Vite build, then copy to nginx   |
-| API                 | `node:22-alpine`                                     | `backend/api/`              | Compiles TS with `--experimental-strip-types` |
-| Ingestion Worker    | `node:22-alpine`                                     | `backend/ingestion-worker/` | TypeScript via `--experimental-strip-types`   |
-| Location Extraction | Dockerfile in `backend/location-extraction-service/` | Python 3.14 + spaCy models  | Largest image (~500 MB with models)           |
-| PostgreSQL          | `postgis/postgis:16-3.4`                             | —                           | Official image, no custom build               |
+| Frontend            | `node:22-alpine` (build)                             | `frontend/`                 | Vite build only (no nginx for production)     |
+| Tile API            | `node:22-alpine`                                     | `backend/api/`              | Express server, Cloud Run Service             |
+| Ingestion Job       | `node:22-alpine`                                     | `backend/ingestion-worker/` | One-shot job entry point                      |
+| LES Job             | Python 3.14-slim                                     | `backend/location-extraction-service/` | spaCy models, ~500 MB with `en_core_web_trf` |
 
-### ARM Compatibility
+### Key Container Notes
 
-| Image                    | ARM64 Support | Notes                      |
-| ------------------------ | ------------- | -------------------------- |
-| `node:22-alpine`         | ✅ Native     | Works out of the box       |
-| `python:3.14-slim`       | ✅ Native     | Works out of the box       |
-| `nginx:alpine`           | ✅ Native     | Works out of the box       |
-| `postgis/postgis:16-3.4` | ✅ Native     | ARM64 image published      |
-| spaCy models             | ✅ Native     | Installable on ARM via pip |
+- **Ingestion Job:** No HTTP server, no node-cron, no enrichment. Entry point runs all sources once and exits.
+- **LES Job:** No FastAPI/uvicorn. Entry point is a batch script: load model → query DB → process → update → exit.
+- **Tile API:** Standard Express server. Deployed as Cloud Run Service with `minScale=0`, `startupCpuBoost=true`.
+- **Frontend:** Built via `npm run build` in CI, deployed as static files to GitHub Pages. No nginx needed in production.
 
-No ARM-specific issues expected for the current stack. If an x86-only Python dependency arises, use `--platform=linux/arm64` or build from source.
+---
 
 ## Environment Configuration
 
-Coolify manages environment variables per service via its UI. The required variables:
+Variables are set per Cloud Run service/job at deploy time (via `--set-env-vars` in CI/CD).
 
-### Frontend
+### Frontend (GitHub Pages)
 
-- `VITE_API_URL` (not used directly — uses nginx proxy `/tiles/ → api:3002`)
+| Variable | Set via | Description |
+|---|---|---|
+| `VITE_API_URL` | CI build step | Cloud Run tile API URL (e.g., `https://tile-api-xxxxx-uc.a.run.app`) |
 
-### API
+### Tile API (Cloud Run Service)
 
-- `DATABASE_URL` — `postgres://user:password@host:5432/livingmap`
-- `CORS_ORIGIN` — set to frontend domain
+| Variable | Source | Description |
+|---|---|---|
+| `DATABASE_URL` | GitHub secret | Supabase connection string with `?sslmode=require` |
+| `CORS_ORIGIN` | GitHub secret | GitHub Pages URL (e.g., `https://user.github.io`) |
+| `PORT` | Cloud Run (auto) | Injected by Cloud Run runtime |
 
-### Ingestion Worker
+### Ingestion Job (Cloud Run Job)
 
-- `DATABASE_URL` — same as API
-- `LOCATION_EXTRACTION_URL` — `http://location-extraction:8000`
-- `PORT` — `3000`
-- `LOG_LEVEL` — `info`
+| Variable | Source | Description |
+|---|---|---|
+| `DATABASE_URL` | GitHub secret | Supabase connection string with `?sslmode=require` |
+| `LOG_LEVEL` | Hardcoded | `info` |
 
-### Location Extraction
+### LES Job (Cloud Run Job)
 
-- `HOST` — `0.0.0.0`
-- `PORT` — `8000`
-- `LOG_LEVEL` — `INFO`
-- `SPACY_EN_MODEL` — `en_core_web_sm`
-- `SPACY_FR_MODEL` — `fr_core_news_sm`
+| Variable | Source | Description |
+|---|---|---|
+| `DATABASE_URL` | GitHub secret | Supabase connection string with `?sslmode=require` |
+| `SPACY_EN_MODEL` | Hardcoded | `en_core_web_sm` (or `en_core_web_trf` for transformer) |
+| `SPACY_FR_MODEL` | Hardcoded | `fr_core_news_sm` |
 
-## Deployment Workflow
+---
 
-1. Develop locally, commit, push to GitHub
-2. Coolify detects push to linked branch
-3. Coolify pulls repo, builds Docker images from each service's Dockerfile
-4. Coolify deploys containers, runs health checks
-5. Traefik auto-provisions/renews Let's Encrypt certificates
-6. Rolling restart — no downtime for frontend
+## CI/CD Pipeline
 
-No manual SSH or `docker compose up` needed after initial Coolify setup.
+Deployment is automated via **GitHub Actions** (`.github/workflows/deploy.yml`).
+
+### Pipeline Jobs
+
+```mermaid
+flowchart LR
+    subgraph Test["Test (parallel)"]
+        TI[test-ingestion]
+        TA[test-api]
+        TL[test-les]
+        TF[test-frontend]
+    end
+
+    BP[build-and-push<br/>→ Artifact Registry]
+    DT[deploy-tile-api<br/>→ Cloud Run Service]
+    DI[deploy-ingestion-job<br/>→ Cloud Run Job]
+    DL[deploy-les-job<br/>→ Cloud Run Job]
+    DF[deploy-frontend<br/>→ GitHub Pages]
+    SS[setup-scheduler<br/>→ Cloud Scheduler]
+
+    TI & TA & TL & TF --> BP
+    BP --> DT
+    BP --> DI
+    BP --> DL
+    DT --> DF
+    DI & DL --> SS
+```
+
+### Trigger
+
+On every push to `main` branch.
+
+### Breakdown
+
+| Job | Description |
+|---|---|
+| `test-ingestion` | `npm ci && npm test` in `backend/ingestion-worker/` |
+| `test-api` | `npm ci && npm test` in `backend/api/` |
+| `test-les` | `uv sync --frozen && uv run pytest -m "not model_dependent"` in `backend/location-extraction-service/` |
+| `test-frontend` | `npm ci && npm test && npm run build` in `frontend/` |
+| `build-and-push` | Build 3 container images → push to Artifact Registry with `latest` + `${{ github.sha }}` tags |
+| `deploy-tile-api` | `gcloud run deploy tile-api ... --min-instances=0 --cpu-boost` |
+| `deploy-ingestion-job` | `gcloud run jobs deploy ingestion-job ...` |
+| `deploy-les-job` | `gcloud run jobs deploy les-job ... --memory=2Gi` |
+| `deploy-frontend` | Build with VITE_API_URL → `peaceiris/actions-gh-pages` |
+| `setup-scheduler` | Create/update Cloud Scheduler jobs for 06:00 and 07:00 UTC triggers |
+
+---
 
 ## Database & Backup
 
-**Database**: PostgreSQL with PostGIS runs as a Docker container managed by Coolify. Data lives on a Coolify persistent volume mapped to the host's attached block storage volume.
+**Database:** Supabase (managed PostgreSQL + PostGIS). Free tier: 500 MB database, 5 GB bandwidth/month.
 
-**Backup strategy**: Coolify supports scheduled S3-compatible backups (Cloudflare R2, AWS S3, etc.). For the free-tier setup:
+**Backup strategy:**
+1. Supabase provides automated daily backups on all plans (including free tier)
+2. Deletion of Supabase project is the only data loss vector — no local backup needed
+3. Application data is reproducible: all events come from external RSS feeds
 
-1. **Application data**: Events in PostGIS have no hard state beyond what external RSS feeds produce. Losing DB means re-ingesting from sources.
-2. **Recommended**: Configure Coolify weekly backups to Cloudflare R2 (free tier: 10 GB storage, no egress cost).
-3. **Cold backup**: `pg_dump` via cron script on the host.
+**Capacity:** At ~1 KB/article, 500 MB holds ~500K events. Monitor growth in Supabase dashboard.
+
+---
 
 ## Monitoring
 
-| Capability        | Tool               | Notes                              |
-| ----------------- | ------------------ | ---------------------------------- |
-| Container logs    | Coolify dashboard  | Built-in log viewer per service    |
-| Container metrics | Coolify Sentinel   | CPU, RAM per container             |
-| Service health    | Docker HEALTHCHECK | Defined in each Dockerfile/compose |
-| Host monitoring   | Coolify dashboard  | Disk usage, uptime, load           |
+| Capability | Tool | Notes |
+|---|---|---|
+| Cloud Run logs | Google Cloud Logging | Built-in, per-request structured logs |
+| Cloud Run metrics | Google Cloud Monitoring | Request count, latency, CPU, memory |
+| Job execution logs | `gcloud run jobs executions list` | Per-execution logs for ingestion and LES |
+| Supabase status | Supabase dashboard | DB size, active connections, query performance |
+| Service health | Tile API `/health` endpoint | Returns `{"status":"ok"}` when DB is reachable |
 
-No external monitoring service required at this scale. Coolify's built-in dashboards are sufficient for a portfolio/demo app.
+No external monitoring service required at this scale. Google Cloud's free-tier observability is sufficient.
+
+---
 
 ## Cost Breakdown
 
-| Resource              | Cost         | Notes                                                   |
-| --------------------- | ------------ | ------------------------------------------------------- |
-| Oracle Cloud ARM VM   | $0/mo        | 4 OCPUs, 24 GB RAM, 200 GB storage                      |
-| Domain name           | $0–$12/yr    | Free subdomain via nip.io, or ~$12/yr for a real domain |
-| Cloudflare (optional) | $0/mo        | DNS, optional CDN caching                               |
-| S3 backups (optional) | $0/mo        | Cloudflare R2 free tier or Backblaze B2                 |
-| **Total**             | **$0–$1/mo** | Domain registration is the only potential cost          |
+| Resource | Cost | Notes |
+|---|---|---|
+| GitHub Pages | $0/mo | Unlimited static hosting with CDN |
+| Cloud Run | $0/mo | 2M req/mo, 360K GB-s, 180K vCPU-s — usage is well under limits |
+| Artifact Registry | $0/mo | 500 MB free storage |
+| Cloud Scheduler | $0/mo | 3 free jobs, using 2 |
+| Supabase | $0/mo | 500 MB database, 5 GB bandwidth |
+| Domain name | $0–$12/yr | Free subdomain or ~$12/yr for custom domain |
+| **Total** | **$0–$1/mo** | Domain registration is the only potential cost |
+
+### Free-Tier Headroom
+
+| Resource | Monthly Usage | Free Limit | Headroom |
+|---|---|---|---|
+| Cloud Run GB-seconds | ~21,600 | 360,000 | 94% free |
+| Cloud Run vCPU-seconds | ~12,000 | 180,000 | 93% free |
+| Cloud Run requests | ~1,500 | 2,000,000 | 99.9% free |
+| Supabase storage | < 500 MB | 500 MB | Monitor growth |
+| Supabase bandwidth | < 1 GB | 5 GB | 80% free |
+
+---
 
 ## Key Design Decisions
 
-| Decision          | Choice                        | Rationale                                              |
-| ----------------- | ----------------------------- | ------------------------------------------------------ |
-| Compute provider  | Oracle Cloud Always Free      | 24 GB RAM free, sufficient for full stack              |
-| Platform layer    | Coolify                       | Git-push deploys, auto SSL, web UI — near-Heroku DX    |
-| Frontend serving  | nginx container               | Production build, SPA routing, proxy to API            |
-| Database location | Docker container on same host | Low latency, no cross-network costs, simple ops        |
-| Public exposure   | Frontend only                 | API, worker, location-extraction are internal services |
-| Backup target     | S3-compatible (optional)      | Coolify-native, cheap, off-server redundancy           |
+| Decision | Choice | Rationale |
+|---|---|---|
+| Compute provider | Google Cloud Run | Always-free tier with 8 GB RAM (supports spaCy transformer model) |
+| Database | Supabase | Managed PostGIS, pre-installed, 500 MB free tier, auto-pauses after 7d idle |
+| Frontend hosting | GitHub Pages | Global CDN, automatic HTTPS, git-push deploy, $0 |
+| Scheduling | Cloud Scheduler | 3 free jobs, direct Cloud Run Job trigger via OAuth |
+| Inter-service comm | Database (shared PostGIS) | Decoupled jobs, independent failure domains, no HTTP calls between jobs |
+| CI/CD | GitHub Actions | Native integration, free for public repos, gcloud auth via Workload Identity |
+
+---
 
 ## Constraints & Assumptions
 
-- Oracle ARM instance stays active (Oracle may reclaim idle Always Free instances — mitigate by keeping traffic or setting a health-ping every hour)
-- ARM compatibility holds for all dependencies (unlikely to break, but possible with niche Python packages)
-- Single-node deployment (Coolify can scale to multi-server, but not needed at this scale)
-- No CDN or edge caching — nginx serves directly; acceptable for portfolio/demo traffic
-- No automated CI/CD pipeline — Coolify's git-push deploy is sufficient
+- Cloud Run may cold-start for the tile API after idle (1-3s) — acceptable for portfolio traffic
+- Supabase pauses after 7 days of inactivity — mitigated by daily cron jobs; manual restore if needed
+- 500 MB database limit — hold events to ~500K articles; purge old events if necessary
+- Batch processing is not real-time — new articles wait for the next daily run
+- Cloud Run free tier limits are sufficient for current traffic (single user, portfolio traffic)
+- Cloud Run-to-Supabase traffic goes over public internet (~10-30ms added latency)
+
+---
 
 ## Runbook
 
 ### Initial Setup (one-time)
 
 ```bash
-# 1. Provision Oracle Cloud ARM instance (VM.Standard.A1.Flex, Ubuntu 24.04)
-# 2. SSH in, install Docker
-sudo apt update && sudo apt install -y docker.io docker-compose-v2
-# 3. Install Coolify
-curl -fsSL https://cdn.coollabs.io/coolify/install.sh | sudo bash
-# 4. Open ports in Oracle Cloud firewall (80, 443, 8000 for Coolify UI)
-# 5. Access Coolify UI at http://<ip>:8000, configure admin account
-# 6. Connect GitHub repo, configure domain, deploy
+# 1. Create Supabase project at https://supabase.com
+# 2. Create GCP project, enable APIs:
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudscheduler.googleapis.com
+# 3. Create Artifact Registry repository:
+gcloud artifacts repositories create living-map --repository-format=docker --location=us-central1
+# 4. Create service account with roles run.admin, cloudscheduler.admin, artifactregistry.writer
+# 5. Add GitHub secrets (GCP_SA_KEY, GCP_PROJECT_ID, GCP_REGION, SUPABASE_DATABASE_URL, etc.)
+# 6. Push to main — GitHub Actions handles the rest
 ```
 
-### Common Operations
+### Daily Operations
 
-| Task                 | Command                                                                 |
-| -------------------- | ----------------------------------------------------------------------- |
-| SSH into host        | `ssh ubuntu@<oracle-ip>`                                                |
-| View Coolify logs    | `docker logs coolify -f`                                                |
-| Restart all services | Via Coolify UI — Restart project                                        |
-| Force rebuild        | Via Coolify UI — Redeploy with force rebuild                            |
-| Manual DB backup     | `docker exec postgres pg_dump -U livingmap livingmap > backup.sql`      |
-| Restore DB           | `cat backup.sql \| docker exec -i postgres psql -U livingmap livingmap` |
-| Check disk usage     | `df -h` on host                                                         |
+| Task | How |
+|---|---|
+| Check ingestion ran | `gcloud run jobs executions list --job=ingestion-job --region=REGION` |
+| Check LES ran | `gcloud run jobs executions list --job=les-job --region=REGION` |
+| View job logs | `gcloud beta run jobs logs read --job=ingestion-job --region=REGION` |
+| Manually trigger ingestion | `gcloud run jobs execute ingestion-job --region=REGION` |
+| Manually trigger LES | `gcloud run jobs execute les-job --region=REGION` |
+| Force re-process events | Connect to Supabase: `UPDATE events SET location = NULL WHERE ...`, then trigger LES |
+| Check DB size | Supabase dashboard → Database → Database size |
 
 ### Recovery
 
-If the Oracle instance is reclaimed:
+| Scenario | Recovery |
+|---|---|
+| Cloud Run job fails | Check logs in Google Cloud Logging. Fix and re-deploy. |
+| Supabase project paused | Click "Restore project" in Supabase dashboard. Data is preserved. |
+| Supabase DB full | Purge old events or upgrade to Pro ($25/mo, 8 GB). |
+| Corrupted data | Events are reproducible from RSS feeds. Delete and re-ingest. |
+| Service account key rotated | Update `GCP_SA_KEY` GitHub secret. |
 
-1. Provision a new ARM instance (same region or different)
-2. Install Docker + Coolify
-3. Connect the same GitHub repo
-4. Re-deploy — Coolify rebuilds all images from source
-5. Restore latest DB backup
-6. Point DNS to new IP
+---
 
-Total downtime: ~30 minutes. The application is stateless on the frontend; only the database needs restoration.
+## Superseded: Oracle ARM + Coolify Target
 
-## Future Considerations
+> The following section documents the **original** deployment strategy, superseded by ADR-021 due to
+> persistent unavailability of Oracle Cloud ARM instances. The OCI Terraform configs in `infra/terraform/`
+> are kept for reference.
 
-- **CI/CD pipeline**: Add GitHub Actions to run tests on PR, then auto-deploy via Coolify webhook on merge to main
-- **CDN caching**: Put Cloudflare CDN in front of the nginx container to reduce load and improve global latency
-- **Managed database**: Migrate to Neon or Supabase for managed PostGIS with automated backups, branching, and higher durability
-- **Multi-server**: Coolify supports adding additional VPS nodes for load balancing
-- **Monitoring upgrade**: Add Uptime Kuma or Grafana for deeper observability
+### Original Target Infrastructure
+
+| Layer | Choice | Rationale |
+|---|---|---|
+| Compute | Oracle Cloud Always Free (VM.Standard.A1.Flex) | 4 OCPUs, 24 GB RAM — $0/mo |
+| Platform | Coolify (self-hosted) | Git-push deploys, auto SSL |
+| Container Runtime | Docker Engine + Docker Compose | Consistent with local dev |
+| Reverse Proxy | Traefik (managed by Coolify) | Auto Let's Encrypt SSL |
+
+### Why It Was Abandoned
+
+Oracle Cloud's ARM instances (`VM.Standard.A1.Flex`) are **never available** — the `Out of capacity` error
+persists across all regions. The always-free AMD instances (1 OCPU, 1 GB RAM) are insufficient for the
+full stack, especially the Location Extraction Service with spaCy models (~500 MB on disk, ~2 GB RAM
+for the transformer model).
+
+### Superseded Docs
+
+- `infra/terraform/` — OCI Terraform provisioning (kept for reference)
+- `infra/terraform/scripts/configure-coolify.sh` — Coolify post-provisioning
+- `infra/terraform/scripts/retry-apply.sh` — OCI ARM retry loop across availability domains
+
+---
+
+## Related Documentation
+
+- [ADR-021: Serverless Free-Tier Deployment](../decisions/ADR-021-serverless-free-tier-deployment.md) — full rationale and options considered
+- [Architecture Overview](overview.md) — system architecture and data flow
+- [Serving API](serving-api.md) — Express + PostGIS MVT tile generation
+- [Ingestion Worker](ingestion-worker.md) — RSS feed ingestion pipeline
+- [Location Extraction](location-extraction.md) — spaCy NER + geocoding pipeline
+- [Frontend](frontend.md) — Vue 3 + MapLibre GL JS application
+- [Ingestion Worker DB Schema](ingestion-worker-db-schema.md) — events and sources tables
+- [CONTEXT.md](../../CONTEXT.md) — step-by-step plan for applying ADR-021 changes
