@@ -486,7 +486,6 @@ Scripts for local job execution:
   User browser → GitHub Pages (CDN) → tile-api (Cloud Run) → Supabase PostGIS
   ```
 
-#### `infra/terraform/AGENTS.md` — UPDATE
 - Mark the OCI Terraform as superseded by ADR-021
 
 ---

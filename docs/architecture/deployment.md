@@ -368,8 +368,7 @@ gcloud artifacts repositories create living-map --repository-format=docker --loc
 ## Superseded: Oracle ARM + Coolify Target
 
 > The following section documents the **original** deployment strategy, superseded by ADR-021 due to
-> persistent unavailability of Oracle Cloud ARM instances. The OCI Terraform configs in `infra/terraform/`
-> are kept for reference.
+> persistent unavailability of Oracle Cloud ARM instances.
 
 ### Original Target Infrastructure
 
@@ -387,11 +386,7 @@ persists across all regions. The always-free AMD instances (1 OCPU, 1 GB RAM) ar
 full stack, especially the Location Extraction Service with spaCy models (~500 MB on disk, ~2 GB RAM
 for the transformer model).
 
-### Superseded Docs
 
-- `infra/terraform/` — OCI Terraform provisioning (kept for reference)
-- `infra/terraform/scripts/configure-coolify.sh` — Coolify post-provisioning
-- `infra/terraform/scripts/retry-apply.sh` — OCI ARM retry loop across availability domains
 
 ---
 

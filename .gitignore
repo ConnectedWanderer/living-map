@@ -6,12 +6,3 @@ node_modules/
 dist/
 .vite/
 .ruff_cache/
-
-# Terraform
-infra/terraform/.terraform/
-infra/terraform/*.tfstate
-infra/terraform/*.tfstate.backup
-infra/terraform/terraform.tfvars
-
-# Coolify post-deploy script environment
-infra/terraform/scripts/.env

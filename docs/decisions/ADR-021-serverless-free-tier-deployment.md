@@ -210,6 +210,5 @@ For a demo/portfolio app, the 7-day pause is acceptable. If it becomes a blocker
 - [ADR-010: PostgreSQL + PostGIS for Event Persistence](ADR-010-postgresql-postgis-for-persistence.md) — database schema and PostGIS decisions
 - [ADR-011: Separate Ingestion and Serving Services](ADR-011-separate-ingestion-and-serving-services.md) — service boundary rationale
 - [ADR-001: Location Extraction Approach](ADR-001-location-extraction-approach.md) — spaCy NER approach
-- [Infra Terraform](../../infra/terraform/) — existing IaC (to be adapted or replaced)
 - [Google Cloud Run Pricing](https://cloud.google.com/run/pricing) — always free tier details
 - [Supabase Free Tier](https://supabase.com/pricing) — database limits
