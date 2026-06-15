@@ -34,10 +34,11 @@ fi
 # --- Format / Check ---
 
 echo "--- Markdown ---"
+npm install --no-save --silent prettier@3.8
 if [ "$CHECK" ]; then
-  npx --yes prettier@3.8 --check "**/*.md"
+  npx --no-install prettier@3.8 --check "**/*.md"
 else
-  npx --yes prettier@3.8 --write "**/*.md"
+  npx --no-install prettier@3.8 --write "**/*.md"
 fi
 
 echo "--- Python ---"

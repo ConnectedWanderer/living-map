@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { after, before, describe, it, mock } from 'node:test';
+import { after, afterEach, before, describe, it, mock } from 'node:test';
 import express from 'express';
 import pg from 'pg';
 
@@ -44,6 +44,10 @@ describe('routes/tiles', () => {
     app = express();
     const { tilesRouter } = await import('../../src/routes/tiles.ts');
     app.use('/tiles', tilesRouter);
+  });
+
+  afterEach(() => {
+    mock.restoreAll();
   });
 
   after(() => {

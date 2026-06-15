@@ -69,7 +69,7 @@ Ruff is configured in `pyproject.toml`:
 
 Python syntax:
 
-- **Exception handling**: Use modern Python syntax for multiple exceptions (Python 3.14+), e.g., `except Exception1, Exception2:`
+- **Exception handling**: Use modern Python syntax for multiple exceptions (Python 3.14+), e.g., `except (Exception1, Exception2):`
 - **Docstrings**: Google-style on all public classes and methods. Module-level docstrings describe the file's purpose. Private functions (`_`-prefixed) do not require docstrings (ruff rule `D`).
 
 ## Structure
