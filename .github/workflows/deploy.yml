@@ -77,14 +77,35 @@ jobs:
         run: |
           docker build -t rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/tile-api:latest backend/api
           docker push --all-tags rg.fr-par.scw.cloud/living-map/tile-api
+      - name: Prune old tags for tile-api
+        run: |
+          IMAGE_ID=$(scw registry image list name=tile-api -o json | jq -r '.[0].id')
+          if [ -n "$IMAGE_ID" ] && [ "$IMAGE_ID" != "null" ]; then
+            scw registry tag list image-id="$IMAGE_ID" order-by=created_at_desc -o json | \
+              jq -r '.[].id' | tail -n +11 | xargs -r -I{} scw registry tag delete {} region=fr-par
+          fi
       - name: Build & push ingestion-job
         run: |
           docker build -t rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/ingestion-job:latest backend/ingestion-worker
           docker push --all-tags rg.fr-par.scw.cloud/living-map/ingestion-job
+      - name: Prune old tags for ingestion-job
+        run: |
+          IMAGE_ID=$(scw registry image list name=ingestion-job -o json | jq -r '.[0].id')
+          if [ -n "$IMAGE_ID" ] && [ "$IMAGE_ID" != "null" ]; then
+            scw registry tag list image-id="$IMAGE_ID" order-by=created_at_desc -o json | \
+              jq -r '.[].id' | tail -n +11 | xargs -r -I{} scw registry tag delete {} region=fr-par
+          fi
       - name: Build & push les-job
         run: |
           docker build -t rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/les-job:latest backend/location-extraction-service
           docker push --all-tags rg.fr-par.scw.cloud/living-map/les-job
+      - name: Prune old tags for les-job
+        run: |
+          IMAGE_ID=$(scw registry image list name=les-job -o json | jq -r '.[0].id')
+          if [ -n "$IMAGE_ID" ] && [ "$IMAGE_ID" != "null" ]; then
+            scw registry tag list image-id="$IMAGE_ID" order-by=created_at_desc -o json | \
+              jq -r '.[].id' | tail -n +11 | xargs -r -I{} scw registry tag delete {} region=fr-par
+          fi
 
   # IMPORTANT: SUPABASE_POOLER_URL and SUPABASE_DATABASE_URL secrets must
   # include ?options=-c%20search_path=living_map,public so that the dedicated
