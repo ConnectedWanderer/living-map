@@ -481,9 +481,9 @@ chmod +x scw && sudo mv scw /usr/local/bin/scw
 # 5. Initialize scw:
 scw init access-key=<ACCESS_KEY> secret-key=<SECRET_KEY> organization-id=<ORGANIZATION_ID> project-id=<PROJECT_ID>
 # 6. Create Container Registry namespace:
-scw registry namespace create name=living-map
+scw registry namespace create name=living-map project-id=<PROJECT_ID> is-public=true
 # 7. Create Serverless Container namespace:
-scw container namespace create name=living-map
+scw container namespace create name=living-map project-id=<PROJECT_ID>
 # 8. Add GitHub secrets (SCW_ACCESS_KEY, SCW_SECRET_KEY, SCW_PROJECT_ID, SCW_ORGANIZATION_ID, SCW_NAMESPACE_ID, SUPABASE_DATABASE_URL, SUPABASE_POOLER_URL, etc.)
 # 9. Push to main — GitHub Actions handles the rest
 ```

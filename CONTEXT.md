@@ -42,8 +42,8 @@ These are NOT automated and must be done before the CI/CD can work.
    ```bash
    sudo pacman -S scaleway-cli
    scw init access-key=<ACCESS_KEY> secret-key=<SECRET_KEY> organization-id=<ORGANIZATION_ID> project-id=<PROJECT_ID> send-telemetry=false
-   scw registry namespace create name=living-map
-   scw container namespace create name=living-map
+   scw registry namespace create name=living-map project-id=<PROJECT_ID> is-public=true
+   scw container namespace create name=living-map project-id=<PROJECT_ID>
    ```
    - Note the namespace IDs for GitHub secrets
 
