@@ -174,8 +174,9 @@ jobs:
             name=tile-api \
             image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
             min-scale=0 max-scale=1 \
-            memory-limit-bytes=1G \
+            memory-limit-bytes=128M \
             privacy=public \
+            env.NODE_OPTIONS=--max-old-space-size=64 \
             secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
             secret-environment-variables.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} 2>"$CREATE_ERR"; then
             echo "Created tile-api container"
@@ -183,6 +184,7 @@ jobs:
             echo "Container already exists, updating..."
             scw container container update ${{ secrets.SCW_CONTAINER_NAMESPACE_ID }}/tile-api \
               image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
+              env.NODE_OPTIONS=--max-old-space-size=64 \
               secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
               secret-environment-variables.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
           else
@@ -220,8 +222,9 @@ jobs:
             scw jobs definition create -o json \
               name=ingestion-job \
               image-uri=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
-              cpu-limit=280 \
-              memory-limit=512 \
+              cpu-limit=150 \
+              memory-limit=128 \
+              environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
               environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
               cron-schedule.schedule="0 6 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
@@ -265,8 +268,8 @@ jobs:
             scw jobs definition create -o json \
               name=les-job \
               image-uri=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
-              cpu-limit=1120 \
-              memory-limit=2048 \
+              cpu-limit=750 \
+              memory-limit=1024 \
               environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
               cron-schedule.schedule="0 7 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"

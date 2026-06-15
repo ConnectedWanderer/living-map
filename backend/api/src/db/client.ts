@@ -9,7 +9,7 @@ export function getPool(): pg.Pool {
       ssl: { rejectUnauthorized: false },
       connectionTimeoutMillis: 5_000,
       idleTimeoutMillis: 30_000,
-      max: 10,
+      max: 5,
     });
     pool.on('error', (err) => {
       console.error('Unexpected pool error:', err);

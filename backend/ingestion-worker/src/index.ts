@@ -33,7 +33,7 @@ export async function main(env: Env, deps?: { pool?: pg.Pool }): Promise<void> {
     ssl: { rejectUnauthorized: false },
     connectionTimeoutMillis: 5_000,
     idleTimeoutMillis: 30_000,
-    max: 10,
+    max: 5,
   });
   pool.on('error', (err) => {
     logger.error({ err }, 'Unexpected pool error');
