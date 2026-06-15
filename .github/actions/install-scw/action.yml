@@ -12,8 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: |
-        curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
-        chmod +x scw && sudo mv scw /usr/local/bin/scw
-        scw init access-key=${{ inputs.scw-access-key }} secret-key=${{ inputs.scw-secret-key }} organization-id=${{ inputs.scw-organization-id }} project-id=${{ inputs.scw-project-id }} send-telemetry=false
+    - run: curl -sL https://raw.githubusercontent.com/scaleway/scaleway-cli/master/scripts/get.sh | sh
+      shell: bash
+    - run: scw init access-key=${{ inputs.scw-access-key }} secret-key=${{ inputs.scw-secret-key }} organization-id=${{ inputs.scw-organization-id }} project-id=${{ inputs.scw-project-id }} send-telemetry=false
       shell: bash

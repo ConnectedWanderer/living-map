@@ -15,8 +15,8 @@ jobs:
       run:
         working-directory: backend/ingestion-worker
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
       - run: npm ci
@@ -28,8 +28,8 @@ jobs:
       run:
         working-directory: backend/api
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
       - run: npm ci
@@ -41,8 +41,8 @@ jobs:
       run:
         working-directory: backend/location-extraction-service
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v8.2.0
       - run: uv sync --frozen
       - run: uv run python -m pytest -m "not model_dependent"
 
@@ -52,8 +52,8 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
       - run: npm ci
@@ -63,7 +63,7 @@ jobs:
     needs: [test-ingestion, test-api, test-les, test-frontend]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install & configure scw
         uses: ./.github/actions/install-scw
         with:
@@ -95,7 +95,7 @@ jobs:
     outputs:
       url: ${{ steps.deploy.outputs.url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install & configure scw
         uses: ./.github/actions/install-scw
         with:
@@ -114,15 +114,15 @@ jobs:
             min-scale=0 max-scale=1 \
             memory-limit=256 \
             privacy=public \
-            env.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
-            env.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} 2>"$CREATE_ERR"; then
+            secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
+            secret-environment-variables.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} 2>"$CREATE_ERR"; then
             echo "Created tile-api container"
           elif grep -q "already exists" "$CREATE_ERR"; then
             echo "Container already exists, updating..."
             scw container container update ${{ secrets.SCW_NAMESPACE_ID }}/tile-api \
               registry-image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
-              env.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
-              env.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+              secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
+              secret-environment-variables.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
           else
             echo "Failed to create container:"
             cat "$CREATE_ERR"
@@ -134,8 +134,10 @@ jobs:
   deploy-ingestion-job:
     needs: [build-and-push]
     runs-on: ubuntu-latest
+    outputs:
+      job-id: ${{ steps.create-ingestion-job.outputs.id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install & configure scw
         uses: ./.github/actions/install-scw
         with:
@@ -144,33 +146,43 @@ jobs:
           scw-organization-id: ${{ secrets.SCW_ORGANIZATION_ID }}
           scw-project-id: ${{ secrets.SCW_PROJECT_ID }}
       - name: Create or update ingestion-job
+        id: create-ingestion-job
         run: |
           CREATE_ERR=$(mktemp)
-          trap 'rm -f "$CREATE_ERR"' EXIT
-          if scw container job create \
+          JOB_OUT=$(mktemp)
+          trap 'rm -f "$CREATE_ERR" "$JOB_OUT"' EXIT
+          if scw container job create -o json \
             namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
             name=ingestion-job \
             registry-image=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
             memory-limit=512 \
-            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} 2>"$CREATE_ERR"; then
-            echo "Created ingestion-job container"
+            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} 2>"$CREATE_ERR" >"$JOB_OUT"; then
+            echo "Created ingestion-job"
           elif grep -q "already exists" "$CREATE_ERR"; then
-            echo "Container already exists, updating..."
-            scw container job update ${{ secrets.SCW_NAMESPACE_ID }}/ingestion-job \
+            echo "Job already exists, updating..."
+            scw container job update -o json ${{ secrets.SCW_NAMESPACE_ID }}/ingestion-job \
               registry-image=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
-              env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }}
+              env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} >"$JOB_OUT"
           else
-            echo "Failed to create container:"
+            echo "Failed to create job:"
             cat "$CREATE_ERR"
             exit 1
           fi
-          rm -f "$CREATE_ERR"
+          JOB_ID=$(jq -r '.id' "$JOB_OUT")
+          if [ -z "$JOB_ID" ] || [ "$JOB_ID" = "null" ]; then
+            echo "Failed to extract job ID:"
+            cat "$JOB_OUT"
+            exit 1
+          fi
+          echo "id=$JOB_ID" >> $GITHUB_OUTPUT
 
   deploy-les-job:
     needs: [build-and-push]
     runs-on: ubuntu-latest
+    outputs:
+      job-id: ${{ steps.create-les-job.outputs.id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install & configure scw
         uses: ./.github/actions/install-scw
         with:
@@ -179,34 +191,42 @@ jobs:
           scw-organization-id: ${{ secrets.SCW_ORGANIZATION_ID }}
           scw-project-id: ${{ secrets.SCW_PROJECT_ID }}
       - name: Create or update les-job
+        id: create-les-job
         run: |
           CREATE_ERR=$(mktemp)
-          trap 'rm -f "$CREATE_ERR"' EXIT
-          if scw container job create \
+          JOB_OUT=$(mktemp)
+          trap 'rm -f "$CREATE_ERR" "$JOB_OUT"' EXIT
+          if scw container job create -o json \
             namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
             name=les-job \
             registry-image=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
             memory-limit=2048 \
-            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} 2>"$CREATE_ERR"; then
-            echo "Created les-job container"
+            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} 2>"$CREATE_ERR" >"$JOB_OUT"; then
+            echo "Created les-job"
           elif grep -q "already exists" "$CREATE_ERR"; then
-            echo "Container already exists, updating..."
-            scw container job update ${{ secrets.SCW_NAMESPACE_ID }}/les-job \
+            echo "Job already exists, updating..."
+            scw container job update -o json ${{ secrets.SCW_NAMESPACE_ID }}/les-job \
               registry-image=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
-              env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }}
+              env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} >"$JOB_OUT"
           else
-            echo "Failed to create container:"
+            echo "Failed to create job:"
             cat "$CREATE_ERR"
             exit 1
           fi
-          rm -f "$CREATE_ERR"
+          JOB_ID=$(jq -r '.id' "$JOB_OUT")
+          if [ -z "$JOB_ID" ] || [ "$JOB_ID" = "null" ]; then
+            echo "Failed to extract job ID:"
+            cat "$JOB_OUT"
+            exit 1
+          fi
+          echo "id=$JOB_ID" >> $GITHUB_OUTPUT
 
   deploy-frontend:
     needs: [deploy-tile-api]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
       - run: npm ci
@@ -215,7 +235,7 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_URL: ${{ needs.deploy-tile-api.outputs.url || secrets.VITE_API_URL }}
-      - uses: peaceiris/actions-gh-pages@v4
+      - uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./frontend/dist
@@ -224,7 +244,7 @@ jobs:
     needs: [deploy-ingestion-job, deploy-les-job]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install & configure scw
         uses: ./.github/actions/install-scw
         with:
@@ -232,25 +252,29 @@ jobs:
           scw-secret-key: ${{ secrets.SCW_SECRET_KEY }}
           scw-organization-id: ${{ secrets.SCW_ORGANIZATION_ID }}
           scw-project-id: ${{ secrets.SCW_PROJECT_ID }}
-      - name: Get ingestion job ID
-        id: ingestion-job-id
-        run: echo "id=$(scw container job list -o json | jq -r '.jobs[] | select(.name == "ingestion-job") | .id')" >> $GITHUB_OUTPUT
-      - name: Get LES job ID
-        id: les-job-id
-        run: echo "id=$(scw container job list -o json | jq -r '.jobs[] | select(.name == "les-job") | .id')" >> $GITHUB_OUTPUT
+      - name: Validate job IDs from upstream
+        run: |
+          if [ -z "${{ needs.deploy-ingestion-job.outputs.job-id }}" ]; then
+            echo "No ingestion job ID — deploy-ingestion-job must have failed"
+            exit 1
+          fi
+          if [ -z "${{ needs.deploy-les-job.outputs.job-id }}" ]; then
+            echo "No LES job ID — deploy-les-job must have failed"
+            exit 1
+          fi
       - name: Create or update ingestion cron (06:00 UTC)
         run: |
-          CRON_ID=$(scw container cron list -o json | jq -r --arg CID "${{ steps.ingestion-job-id.outputs.id }}" '.crons[] | select(.container_id == $CID) | .id' | head -1)
+          CRON_ID=$(scw container cron list -o json | jq -r --arg CID "${{ needs.deploy-ingestion-job.outputs.job-id }}" '.crons[] | select(.container_id == $CID) | .id' | head -1)
           if [ -z "$CRON_ID" ]; then
-            scw container cron create container-id=${{ steps.ingestion-job-id.outputs.id }} schedule="0 6 * * *" args="{}"
+            scw container cron create container-id=${{ needs.deploy-ingestion-job.outputs.job-id }} schedule="0 6 * * *" args="{}"
           else
             scw container cron update $CRON_ID schedule="0 6 * * *"
           fi
       - name: Create or update LES cron (07:00 UTC)
         run: |
-          CRON_ID=$(scw container cron list -o json | jq -r --arg CID "${{ steps.les-job-id.outputs.id }}" '.crons[] | select(.container_id == $CID) | .id' | head -1)
+          CRON_ID=$(scw container cron list -o json | jq -r --arg CID "${{ needs.deploy-les-job.outputs.job-id }}" '.crons[] | select(.container_id == $CID) | .id' | head -1)
           if [ -z "$CRON_ID" ]; then
-            scw container cron create container-id=${{ steps.les-job-id.outputs.id }} schedule="0 7 * * *" args="{}"
+            scw container cron create container-id=${{ needs.deploy-les-job.outputs.job-id }} schedule="0 7 * * *" args="{}"
           else
             scw container cron update $CRON_ID schedule="0 7 * * *"
           fi
