@@ -6,12 +6,16 @@ Manual one-time setup steps. Must be done before the CI/CD pipeline can work.
 
 1. Go to https://supabase.com → New project → select region close to Scaleway (e.g., `fr-par`)
 2. Note connection string: `postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres`
-3. Enable PostGIS in the SQL editor: `CREATE EXTENSION IF NOT EXISTS postgis;`
+3. If your password contains special characters URL-encode it first:
+   ```bash
+   node -p "encodeURIComponent('<PASSWORD>')"
+   ```
+   Replace `<PASSWORD>` in the connection string with the encoded result.
 4. Run the migration against Supabase (creates tables in the `living_map` schema):
 
 ```bash
 DATABASE_URL="postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres?options=-c%20search_path=living_map,public" \
-npx node-pg-migrate up --migration-file-language js --migration-dir backend/migrations --schema living_map
+npx node-pg-migrate up --migration-file-language js --migrations-dir backend/migrations --schema living_map --create-schema
 ```
 
 > **Note:** If you previously ran the migration without `--schema living_map`, the `pgmigrations` table lives in `public`. Reset the database or run `UPDATE pgmigrations SET schema = 'living_map'` after creating the new schema to avoid re-running migrations on first deploy.
@@ -33,6 +37,8 @@ scw registry namespace create name=living-map is-public=true
 Note the namespace IDs for GitHub secrets.
 
 ## 4. Add GitHub secrets
+
+URL-encode any special characters in the password before storing these secrets — see step 1.3.
 
 Add these secrets in the repository Settings → Secrets and variables → Actions:
 
