@@ -1,4 +1,5 @@
 FROM python:3.14-slim
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
@@ -15,8 +16,7 @@ RUN pip install --no-cache-dir uv && \
     uv run --no-sync python -m spacy download ${SPACY_EN_MODEL} && \
     uv run --no-sync python -m spacy download ${SPACY_FR_MODEL} && \
     uv cache clean && \
-    uv pip uninstall pip -y && \
-    pip uninstall uv -y && \
+    uv pip uninstall uv pip -y && \
     rm -f /app/.venv/lib/python3.14/site-packages/geonamescache/data/cities1000.json \
           /app/.venv/lib/python3.14/site-packages/geonamescache/data/cities15000.json \
           /app/.venv/lib/python3.14/site-packages/geonamescache/data/cities5000.json && \
@@ -26,5 +26,6 @@ RUN pip install --no-cache-dir uv && \
 
 COPY src/ ./src/
 
+USER appuser
 # DATABASE_URL must be set at runtime
 CMD [".venv/bin/python", "-c", "from src.app import main; main()"]

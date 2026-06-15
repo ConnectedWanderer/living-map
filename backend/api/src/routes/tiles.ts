@@ -4,7 +4,7 @@ import { getTile } from '../services/tiles.ts';
 
 export const tilesRouter = Router();
 
-tilesRouter.get('/:z/:x/:y.pbf', async (req, res) => {
+tilesRouter.get('/:z/:x/:y.pbf', async (req, res, next) => {
   const z = Number(req.params.z);
   const x = Number(req.params.x);
   const y = Number(req.params.y);
@@ -24,13 +24,17 @@ tilesRouter.get('/:z/:x/:y.pbf', async (req, res) => {
     return;
   }
 
-  const pool = getPool();
-  const tile = await getTile(pool, z, x, y);
+  try {
+    const pool = getPool();
+    const tile = await getTile(pool, z, x, y);
 
-  if (!tile) {
-    res.status(204).end();
-    return;
+    if (!tile) {
+      res.status(204).end();
+      return;
+    }
+
+    res.type('application/vnd.mapbox-vector-tile').send(tile);
+  } catch (err) {
+    next(err);
   }
-
-  res.type('application/vnd.mapbox-vector-tile').send(tile);
 });

@@ -14,7 +14,7 @@ export async function getTile(
           id, title, source, published_at, location_name
         FROM events
         WHERE location IS NOT NULL
-          AND ST_Transform(location, 3857) && ST_TileEnvelope($1, $2, $3)
+          AND location && ST_Transform(ST_TileEnvelope($1, $2, $3), 4326)
      ) AS tile`,
     [z, x, y],
   );

@@ -23,13 +23,33 @@ function runSourceDeps(type: string, pool: pg.Pool, logger: ReturnType<typeof cr
 /** Run all enabled sources once, then exit. */
 export async function main(env: Env, deps?: { pool?: pg.Pool }): Promise<void> {
   const logger = createLogger(env.LOG_LEVEL);
-  const pool = deps?.pool ?? new pg.Pool({ connectionString: env.DATABASE_URL });
+
+  if (!env.DATABASE_URL) {
+    throw new Error('DATABASE_URL environment variable is required');
+  }
+
+  const pool = deps?.pool ?? new pg.Pool({
+    connectionString: env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 5_000,
+    idleTimeoutMillis: 30_000,
+    max: 10,
+  });
+  pool.on('error', (err) => {
+    logger.error({ err }, 'Unexpected pool error');
+  });
 
   const sources = await loadSources(pool);
 
-  await Promise.all(
+  const results = await Promise.allSettled(
     sources.map((source) => runSource(source, runSourceDeps(source.type, pool, logger))),
   );
+
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      logger.error({ err: result.reason }, 'Source cycle failed');
+    }
+  }
 
   if (!deps?.pool) {
     await pool.end();

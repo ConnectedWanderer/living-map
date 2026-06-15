@@ -22,6 +22,7 @@ exports.up = (pgm) => {
     published_at: { type: "timestamptz" },
     location: { type: "geometry(Point, 4326)" },
     location_name: { type: "text" },
+    country: { type: "text" },
     created_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
     updated_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
   });
@@ -31,6 +32,7 @@ exports.up = (pgm) => {
   });
 
   pgm.createIndex("events", "location", { method: "gist" });
+  pgm.createIndex("events", "published_at");
 
   pgm.sql(`
     INSERT INTO sources (name, type, config, schedule, enabled)
@@ -45,7 +47,6 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable("events");
-  pgm.dropTable("sources");
-  pgm.dropExtension("postgis", { ifExists: true });
+  pgm.dropTable("events", { ifExists: true, cascade: true });
+  pgm.dropTable("sources", { ifExists: true, cascade: true });
 };

@@ -21,20 +21,28 @@ interface RssRoot {
   };
 }
 
+const FETCH_TIMEOUT_MS = 15_000;
+
 /** Fetch and parse an RSS feed from the configured URL. */
 export async function fetchArticles(
   config: SourceConfig,
   deps?: FetchDeps,
 ): Promise<NormalizedArticle[]> {
   const fetchFn = deps?.fetch || global.fetch;
-  const response = await fetchFn(config.url);
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), FETCH_TIMEOUT_MS);
+  const response = await fetchFn(config.url, { signal: abort.signal });
+  clearTimeout(timer);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch RSS feed: ${response.status} ${response.statusText}`);
   }
 
   const xml = await response.text();
-  const parser = new XMLParser();
+  const parser = new XMLParser({
+    processEntities: false,
+    stopNodes: ['*'],
+  });
   const parsed = parser.parse(xml) as RssRoot;
 
   const channel = parsed?.rss?.channel;
@@ -51,7 +59,7 @@ export async function fetchArticles(
         title: item.title || '',
         description: item.description,
         link: item.link || '',
-        pubDate: item.pubDate || new Date().toISOString(),
+        pubDate: item.pubDate || '1970-01-01T00:00:00.000Z',
       },
       config.source,
     ),

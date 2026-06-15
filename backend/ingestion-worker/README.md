@@ -1,14 +1,12 @@
 # Ingestion Worker
 
-A cron-triggered Node.js service that polls external sources, normalizes articles, deduplicates against PostgreSQL, enriches via the Location Extraction service, and persists enriched events.
+A one-shot CLI job that polls external sources, normalizes articles, deduplicates against PostgreSQL, and persists events. Designed to be triggered on a schedule (e.g., via container orchestrator cron) or run manually.
 
 ## Features
 
-- Poll multiple RSS/mock-feed sources on configurable cron schedules
+- Poll mock-feed sources and normalize articles
 - Deduplicate articles via `INSERT ON CONFLICT` (source + source_id unique constraint)
-- Enrich articles with geographic location data via the Location Extraction service
 - Structured JSON logging with pino
-- Health check endpoint for container orchestration
 - Type-safe with TypeScript (run directly via `--experimental-strip-types`)
 
 ## Prerequisites
@@ -33,9 +31,8 @@ npm install
 # Run migrations (from project root)
 npx node-pg-migrate up --migration-file-language js --migration-dir backend/migrations
 
-# Start the service
+# Run the ingestion cycle once
 DATABASE_URL=postgres://livingmap:livingmap@localhost:5432/livingmap \
-LOCATION_EXTRACTION_URL=http://localhost:8000 \
 npm start
 ```
 
@@ -49,53 +46,23 @@ docker compose up -d
 ## Architecture
 
 ```
-SourceAdapter → Normalizer → Dedup (INSERT ON CONFLICT) → Location Extraction → DB UPDATE
+SourceAdapter → Normalizer → Dedup (INSERT ON CONFLICT)
 ```
 
-The service runs on a cron schedule defined per source in the `sources` PostgreSQL table. Each cycle:
+The service runs all enabled sources once per invocation and exits. Each cycle:
 
-1. **Fetch** — Source adapter pulls raw articles (RSS, mock-feed, etc.)
+1. **Fetch** — Source adapter pulls raw articles (mock-feed)
 2. **Normalize** — Map to `{source_id, title, description, url, published_at, source}`
 3. **Dedup** — Batch insert with `ON CONFLICT DO NOTHING`
-4. **Enrich** — For newly inserted articles, POST to Location Extraction service
-5. **Persist** — Update enriched rows with GeoJSON location data
 
 ## Configuration
 
-| Variable                  | Default                                                   | Description                     |
-| ------------------------- | --------------------------------------------------------- | ------------------------------- |
-| `DATABASE_URL`            | `postgres://livingmap:livingmap@localhost:5432/livingmap` | PostgreSQL connection string    |
-| `LOCATION_EXTRACTION_URL` | `http://localhost:8000`                                   | Location Extraction service URL |
-| `PORT`                    | `3000`                                                    | Health endpoint port            |
-| `LOG_LEVEL`               | `info`                                                    | Pino log level                  |
+| Variable       | Default                                                   | Description                  |
+| -------------- | --------------------------------------------------------- | ---------------------------- |
+| `DATABASE_URL` | `postgres://livingmap:livingmap@localhost:5432/livingmap` | PostgreSQL connection string |
+| `LOG_LEVEL`    | `info`                                                    | Pino log level               |
 
 Sources are configured via the `sources` PostgreSQL table — see [`backend/migrations/001_schema.js`](../../migrations/001_schema.js) for the schema.
-
-## API
-
-### Health Check
-
-```bash
-curl http://localhost:3000/health
-```
-
-```json
-{ "status": "ok" }
-```
-
-### Manual Trigger
-
-Trigger an immediate ingestion cycle for all enabled sources:
-
-```bash
-curl -X POST http://localhost:3000/trigger
-```
-
-```json
-{ "status": "ok" }
-```
-
-Runs each source's fetch → normalize → dedup → enrich → persist cycle once, independent of the cron schedule. Returns after all sources complete.
 
 ## Code Quality
 

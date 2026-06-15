@@ -6,17 +6,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     environment:
       - HOST=0.0.0.0
       - PORT=8000
       - LOG_LEVEL=INFO
+      - DATABASE_URL=postgres://livingmap:livingmap@postgres:5432/livingmap
       - SPACY_EN_MODEL=en_core_web_sm
       - SPACY_FR_MODEL=fr_core_news_sm
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s

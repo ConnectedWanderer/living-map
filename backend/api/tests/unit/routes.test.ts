@@ -35,9 +35,11 @@ async function request(
 describe('routes/tiles', () => {
   let app: express.Express;
   let originalQuery: typeof pg.Pool.prototype.query;
+  let originalDbUrl: string | undefined;
 
   before(async () => {
     originalQuery = pg.Pool.prototype.query;
+    originalDbUrl = process.env.DATABASE_URL;
     process.env.DATABASE_URL = 'postgres://user:pass@localhost:5432/testdb';
     app = express();
     const { tilesRouter } = await import('../../src/routes/tiles.ts');
@@ -46,6 +48,11 @@ describe('routes/tiles', () => {
 
   after(() => {
     pg.Pool.prototype.query = originalQuery;
+    if (originalDbUrl === undefined) {
+      delete process.env.DATABASE_URL;
+    } else {
+      process.env.DATABASE_URL = originalDbUrl;
+    }
   });
 
   it('returns 400 when z is not a number', async () => {

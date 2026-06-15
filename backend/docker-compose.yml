@@ -4,6 +4,8 @@ services:
     ports:
       - "5432:5432"
     environment:
+      # WARNING: These credentials are for local development only.
+      # Override with secure values in production deployments.
       POSTGRES_USER: livingmap
       POSTGRES_PASSWORD: livingmap
       POSTGRES_DB: livingmap
@@ -33,6 +35,7 @@ services:
       - "3002:3002"
     environment:
       DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap
+      # WARNING: Wildcard CORS for local dev only. Set a specific origin in production.
       CORS_ORIGIN: "*"
     depends_on:
       migrate:

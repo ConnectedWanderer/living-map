@@ -12,6 +12,8 @@ from .models import EntityMention
 
 DetectorFactory.seed = 0
 
+_MAX_INPUT_CHARS = 100_000
+
 _DEFAULT_LANGUAGE = "en"
 
 _MODEL_MAP = {
@@ -104,6 +106,8 @@ class NerPipeline:
             NerResult containing detected language and extracted entities.
 
         """
+        if len(text) > _MAX_INPUT_CHARS:
+            text = text[:_MAX_INPUT_CHARS]
         lang = _detect_language(text)
         ents = _extract_location_mentions(text, lang)
         model_name = _MODEL_MAP.get(lang)

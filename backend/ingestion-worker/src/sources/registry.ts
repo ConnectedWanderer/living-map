@@ -1,5 +1,5 @@
 import type { NormalizedArticle } from '../normalizer.ts';
-import type { FetchDeps } from './adapter.ts';
+import type { FetchDeps, SourceConfig } from './adapter.ts';
 import { fetchArticles as mockFeedFetch } from './mock-feed.ts';
 
 type FetchArticlesFn = (
@@ -23,5 +23,9 @@ export function getAdapter(type: string): FetchArticlesFn {
   return fn;
 }
 
-registerAdapter('mock-feed', (config, deps) => mockFeedFetch(config as never, deps));
-registerAdapter('rss', (config, deps) => mockFeedFetch(config as never, deps));
+function wrapAdapter(fn: (config: SourceConfig, deps?: FetchDeps) => Promise<NormalizedArticle[]>): FetchArticlesFn {
+  return (config, deps) => fn(config as SourceConfig, deps);
+}
+
+registerAdapter('mock-feed', wrapAdapter(mockFeedFetch));
+registerAdapter('rss', wrapAdapter(mockFeedFetch));
