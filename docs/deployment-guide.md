@@ -30,9 +30,10 @@ npx node-pg-migrate up --migration-file-language js --migrations-dir backend/mig
 sudo pacman -S scaleway-cli
 scw init access-key=<ACCESS_KEY> secret-key=<SECRET_KEY> organization-id=<ORGANIZATION_ID> project-id=<PROJECT_ID> send-telemetry=false
 scw registry namespace create name=living-map is-public=true
+scw container namespace create name=living-map
 ```
 
-Note the namespace IDs for GitHub secrets.
+Note the container namespace ID for GitHub secrets (`SCW_CONTAINER_NAMESPACE_ID`).
 
 ## 4. Add GitHub secrets
 
@@ -46,7 +47,7 @@ Add these secrets in the repository Settings → Secrets and variables → Actio
 | `SCW_SECRET_KEY`        | Scaleway IAM secret key                                              |
 | `SCW_PROJECT_ID`        | Scaleway project ID                                                  |
 | `SCW_ORGANIZATION_ID`   | Scaleway organization ID                                             |
-| `SCW_NAMESPACE_ID`      | Scaleway container namespace UUID                                    |
+| `SCW_CONTAINER_NAMESPACE_ID` | Scaleway container namespace UUID (from `scw container namespace create`) |
 | `SUPABASE_DATABASE_URL` | Supabase direct connection (IPv6) for jobs; append `?options=-c%20search_path=living_map,public` |
 | `SUPABASE_POOLER_URL`   | Supabase Supavisor transaction pooler (IPv4, port 6543) for Tile API; append `?options=-c%20search_path=living_map,public` |
 | `CORS_ORIGIN`           | GitHub Pages URL (e.g., `https://<user>.github.io`)                  |
