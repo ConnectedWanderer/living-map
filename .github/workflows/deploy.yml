@@ -67,7 +67,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install & configure scw
-        uses: scaleway/action-scw@v1
+        uses: scaleway/action-scw@v0.0.3
         with:
           access-key: ${{ secrets.SCW_ACCESS_KEY }}
           secret-key: ${{ secrets.SCW_SECRET_KEY }}
@@ -158,7 +158,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install & configure scw
-        uses: scaleway/action-scw@v1
+        uses: scaleway/action-scw@v0.0.3
         with:
           access-key: ${{ secrets.SCW_ACCESS_KEY }}
           secret-key: ${{ secrets.SCW_SECRET_KEY }}
@@ -201,7 +201,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install & configure scw
-        uses: scaleway/action-scw@v1
+        uses: scaleway/action-scw@v0.0.3
         with:
           access-key: ${{ secrets.SCW_ACCESS_KEY }}
           secret-key: ${{ secrets.SCW_SECRET_KEY }}
@@ -246,7 +246,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install & configure scw
-        uses: scaleway/action-scw@v1
+        uses: scaleway/action-scw@v0.0.3
         with:
           access-key: ${{ secrets.SCW_ACCESS_KEY }}
           secret-key: ${{ secrets.SCW_SECRET_KEY }}
