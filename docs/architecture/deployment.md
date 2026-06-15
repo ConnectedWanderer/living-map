@@ -183,7 +183,7 @@ Variables are set per Scaleway container/job at deploy time (via `env.KEY=VALUE`
 
 | Variable | Source | Description |
 |---|---|---|---|
-| `DATABASE_URL` | GitHub secret `SUPABASE_POOLER_URL` | Supavisor session pooler (IPv4) — recommended for serverless |
+| `DATABASE_URL` | GitHub secret `SUPABASE_POOLER_URL` | Supavisor transaction pooler (IPv4, port 6543) — recommended for serverless |
 | `CORS_ORIGIN` | GitHub secret | GitHub Pages URL (e.g., `https://user.github.io`) |
 | `PORT` | Scaleway (auto) | Injected by Scaleway runtime |
 

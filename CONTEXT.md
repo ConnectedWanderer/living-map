@@ -57,7 +57,7 @@ These are NOT automated and must be done before the CI/CD can work.
     | `SCW_ORGANIZATION_ID` | Scaleway organization ID |
     | `SCW_NAMESPACE_ID` | Scaleway container namespace UUID |
    | `SUPABASE_DATABASE_URL` | Supabase direct connection (IPv6) for jobs |
-   | `SUPABASE_POOLER_URL` | Supabase Supavisor session pooler (IPv4) for Tile API |
+   | `SUPABASE_POOLER_URL` | Supabase Supavisor transaction pooler (IPv4, port 6543) for Tile API |
    | `CORS_ORIGIN` | GitHub Pages URL (e.g., `https://<user>.github.io`) |
    | `VITE_API_URL` | Scaleway container URL (set after first deploy) |
 
