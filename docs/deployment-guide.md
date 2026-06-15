@@ -18,8 +18,6 @@ DATABASE_URL="postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432
 npx node-pg-migrate up --migration-file-language js --migrations-dir backend/migrations --schema living_map --create-schema
 ```
 
-> **Note:** If you previously ran the migration without `--schema living_map`, the `pgmigrations` table lives in `public`. Reset the database or run `UPDATE pgmigrations SET schema = 'living_map'` after creating the new schema to avoid re-running migrations on first deploy.
-
 ## 2. Create Scaleway account
 
 1. Go to https://console.scaleway.com → Sign up (credit card for verification, no prepayment)
