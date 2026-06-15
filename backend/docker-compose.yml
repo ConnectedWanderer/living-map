@@ -1,6 +1,3 @@
-include:
-  - path: ./location-extraction-service/docker-compose.yml
-
 services:
   postgres:
     image: postgis/postgis:16-3.4
@@ -29,19 +26,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
-  ingestion-worker:
-    build: ./ingestion-worker
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap
-      LOCATION_EXTRACTION_URL: http://location-extraction:8000
-      PORT: "3000"
-      LOG_LEVEL: info
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
 
   api:
     build: ./api

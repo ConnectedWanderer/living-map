@@ -1,0 +1,205 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-ingestion:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/ingestion-worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+
+  test-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+
+  test-les:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/location-extraction-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run python -m pytest -m "not model_dependent"
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  build-and-push:
+    needs: [test-ingestion, test-api, test-les, test-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install scw CLI
+        run: |
+          curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
+          chmod +x scw && sudo mv scw /usr/local/bin/scw
+      - name: Configure scw
+        run: scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+      - name: Login to Container Registry
+        run: scw registry login
+      - name: Build & push tile-api
+        run: |
+          docker build -t rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/tile-api:latest backend/api
+          docker push --all-tags rg.fr-par.scw.cloud/living-map/tile-api
+      - name: Build & push ingestion-job
+        run: |
+          docker build -t rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/ingestion-job:latest backend/ingestion-worker
+          docker push --all-tags rg.fr-par.scw.cloud/living-map/ingestion-job
+      - name: Build & push les-job
+        run: |
+          docker build -t rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/les-job:latest backend/location-extraction-service
+          docker push --all-tags rg.fr-par.scw.cloud/living-map/les-job
+
+  deploy-tile-api:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Install & configure scw
+        run: |
+          curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
+          chmod +x scw && sudo mv scw /usr/local/bin/scw
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+      - id: deploy
+        run: |
+          scw container container create \
+            namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
+            name=tile-api \
+            registry-image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
+            min-scale=0 max-scale=1 \
+            memory-limit=256 \
+            privacy=public \
+            env.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
+            env.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
+            2>/dev/null || \
+          scw container container update ${{ secrets.SCW_NAMESPACE_ID }}/tile-api \
+            registry-image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
+            env.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
+            env.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          echo "url=$(scw container container get ${{ secrets.SCW_NAMESPACE_ID }}/tile-api -o json | jq -r '.status.url')" >> $GITHUB_OUTPUT
+
+  deploy-ingestion-job:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install & configure scw
+        run: |
+          curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
+          chmod +x scw && sudo mv scw /usr/local/bin/scw
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+      - run: |
+          scw container job create \
+            namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
+            name=ingestion-job \
+            registry-image=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
+            memory-limit=512 \
+            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+            2>/dev/null || \
+          scw container job update ${{ secrets.SCW_NAMESPACE_ID }}/ingestion-job \
+            registry-image=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
+            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }}
+
+  deploy-les-job:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install & configure scw
+        run: |
+          curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
+          chmod +x scw && sudo mv scw /usr/local/bin/scw
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+      - run: |
+          scw container job create \
+            namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
+            name=les-job \
+            registry-image=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
+            memory-limit=2048 \
+            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+            2>/dev/null || \
+          scw container job update ${{ secrets.SCW_NAMESPACE_ID }}/les-job \
+            registry-image=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
+            env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }}
+
+  deploy-frontend:
+    needs: [deploy-tile-api]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+        env:
+          VITE_API_URL: ${{ needs.deploy-tile-api.outputs.url || secrets.VITE_API_URL }}
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist
+
+  setup-cron-triggers:
+    needs: [deploy-ingestion-job, deploy-les-job]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install & configure scw
+        run: |
+          curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
+          chmod +x scw && sudo mv scw /usr/local/bin/scw
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+      - name: Get ingestion job ID
+        id: ingestion-job-id
+        run: echo "id=$(scw container job list -o json | jq -r '.jobs[] | select(.name == "ingestion-job") | .id')" >> $GITHUB_OUTPUT
+      - name: Get LES job ID
+        id: les-job-id
+        run: echo "id=$(scw container job list -o json | jq -r '.jobs[] | select(.name == "les-job") | .id')" >> $GITHUB_OUTPUT
+      - name: Create or update ingestion cron (06:00 UTC)
+        run: |
+          CRON_ID=$(scw container cron list -o json | jq -r --arg CID "${{ steps.ingestion-job-id.outputs.id }}" '.crons[] | select(.container_id == $CID) | .id' | head -1)
+          if [ -z "$CRON_ID" ]; then
+            scw container cron create container-id=${{ steps.ingestion-job-id.outputs.id }} schedule="0 6 * * *" args="{}"
+          else
+            scw container cron update $CRON_ID schedule="0 6 * * *"
+          fi
+      - name: Create or update LES cron (07:00 UTC)
+        run: |
+          CRON_ID=$(scw container cron list -o json | jq -r --arg CID "${{ steps.les-job-id.outputs.id }}" '.crons[] | select(.container_id == $CID) | .id' | head -1)
+          if [ -z "$CRON_ID" ]; then
+            scw container cron create container-id=${{ steps.les-job-id.outputs.id }} schedule="0 7 * * *" args="{}"
+          else
+            scw container cron update $CRON_ID schedule="0 7 * * *"
+          fi
