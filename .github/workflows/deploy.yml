@@ -288,6 +288,8 @@ jobs:
 
   deploy-frontend:
     needs: [deploy-tile-api]
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
