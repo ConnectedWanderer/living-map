@@ -1,6 +1,8 @@
 exports.up = (pgm) => {
   pgm.createExtension("postgis", { ifNotExists: true });
 
+  pgm.createSchema("living_map", { ifNotExists: true });
+
   pgm.createTable("sources", {
     id: { type: "serial", primaryKey: true },
     name: { type: "text", notNull: true, unique: true },
@@ -10,7 +12,7 @@ exports.up = (pgm) => {
     enabled: { type: "boolean", notNull: true, default: true },
     created_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
     updated_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
-  });
+  }, { schema: "living_map" });
 
   pgm.createTable("events", {
     id: { type: "serial", primaryKey: true },
@@ -25,17 +27,18 @@ exports.up = (pgm) => {
     country: { type: "text" },
     created_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
     updated_at: { type: "timestamptz", notNull: true, default: pgm.func("now()") },
-  });
+  }, { schema: "living_map" });
 
   pgm.addConstraint("events", "uq_events_source_source_id", {
     unique: ["source", "source_id"],
+    schema: "living_map",
   });
 
-  pgm.createIndex("events", "location", { method: "gist" });
-  pgm.createIndex("events", "published_at");
+  pgm.createIndex("events", "location", { method: "gist", schema: "living_map" });
+  pgm.createIndex("events", "published_at", { schema: "living_map" });
 
   pgm.sql(`
-    INSERT INTO sources (name, type, config, schedule, enabled)
+    INSERT INTO living_map.sources (name, type, config, schedule, enabled)
     VALUES (
       'nyt-world',
       'rss',
@@ -47,6 +50,7 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable("events", { ifExists: true, cascade: true });
-  pgm.dropTable("sources", { ifExists: true, cascade: true });
+  pgm.dropTable({ schema: "living_map", name: "events" }, { ifExists: true, cascade: true });
+  pgm.dropTable({ schema: "living_map", name: "sources" }, { ifExists: true, cascade: true });
+  pgm.dropSchema("living_map", { ifExists: true, cascade: true });
 };

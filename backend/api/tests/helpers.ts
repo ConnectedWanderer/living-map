@@ -7,7 +7,7 @@ const migrationsDir = path.resolve(__dirname, '..', '..', 'migrations');
 
 export async function runMigrations(connectionString: string): Promise<void> {
   execSync(
-    `npx node-pg-migrate up --migration-file-language js --migrations-dir ${migrationsDir}`,
+    `npx node-pg-migrate up --migration-file-language js --migrations-dir ${migrationsDir} --schema living_map`,
     {
       cwd: path.resolve(__dirname, '..'),
       env: { ...process.env, DATABASE_URL: connectionString },

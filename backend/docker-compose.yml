@@ -18,13 +18,13 @@ services:
   migrate:
     image: node:22-alpine
     environment:
-      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap
+      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap?options=-c%20search_path=living_map,public
     volumes:
       - ./migrations:/migrations
     command:
       - sh
       - -c
-      - "npx --yes node-pg-migrate@8.0.4 up --migration-file-language js --migration-dir /migrations"
+      - "npx --yes node-pg-migrate@8.0.4 up --migration-file-language js --migration-dir /migrations --schema living_map"
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,7 +34,7 @@ services:
     ports:
       - "3002:3002"
     environment:
-      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap
+      DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap?options=-c%20search_path=living_map,public
       # WARNING: Wildcard CORS for local dev only. Set a specific origin in production.
       CORS_ORIGIN: "*"
     depends_on:

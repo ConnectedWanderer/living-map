@@ -52,6 +52,9 @@ def main(
     if connection is None:
         url = database_url or os.environ["DATABASE_URL"]
         conn = psycopg2.connect(url)
+        with conn.cursor() as cur:
+            cur.execute("SET search_path TO living_map, public")
+        conn.commit()
         own_connection = True
     else:
         conn = connection

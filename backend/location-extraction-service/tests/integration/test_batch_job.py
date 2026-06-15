@@ -56,6 +56,8 @@ def _setup_db(conn):
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+    cur.execute("CREATE SCHEMA IF NOT EXISTS living_map")
+    cur.execute("SET search_path TO living_map, public")
     cur.execute(_EVENTS_TABLE_DDL)
     cur.execute("""
         CREATE UNIQUE INDEX IF NOT EXISTS uq_events_source_source_id
@@ -225,6 +227,7 @@ class TestMain:
 
             conn2 = psycopg2.connect(url)
             cur2 = conn2.cursor()
+            cur2.execute("SET search_path TO living_map, public")
             cur2.execute(
                 "SELECT ST_X(location::geometry), ST_Y(location::geometry) FROM events WHERE id = %s",
                 (event_id,),

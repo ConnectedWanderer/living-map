@@ -26,7 +26,7 @@ export async function withPostgres(): Promise<PostgresContext> {
     .withPassword('livingmap')
     .start();
 
-  const connectionUri = container.getConnectionUri();
+  const connectionUri = container.getConnectionUri() + '?options=-c%20search_path=living_map,public';
   const pool = new pg.Pool({ connectionString: connectionUri });
 
   await runMigrations(connectionUri);

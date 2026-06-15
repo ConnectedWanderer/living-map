@@ -10,6 +10,6 @@ services:
       - HOST=0.0.0.0
       - PORT=8000
       - LOG_LEVEL=INFO
-      - DATABASE_URL=postgres://livingmap:livingmap@postgres:5432/livingmap
+      - DATABASE_URL=postgres://livingmap:livingmap@postgres:5432/livingmap?options=-c%20search_path=living_map,public
       - SPACY_EN_MODEL=en_core_web_sm
       - SPACY_FR_MODEL=fr_core_news_sm

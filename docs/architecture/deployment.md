@@ -183,7 +183,7 @@ Variables are set per Scaleway container/job at deploy time (via `env.KEY=VALUE`
 
 | Variable | Source | Description |
 |---|---|---|---|
-| `DATABASE_URL` | GitHub secret `SUPABASE_POOLER_URL` | Supavisor transaction pooler (IPv4, port 6543) — recommended for serverless |
+| `DATABASE_URL` | GitHub secret `SUPABASE_POOLER_URL` | Supavisor transaction pooler (IPv4, port 6543) — recommended for serverless. Append `?options=-c%20search_path=living_map,public` |
 | `CORS_ORIGIN` | GitHub secret | GitHub Pages URL (e.g., `https://user.github.io`) |
 | `PORT` | Scaleway (auto) | Injected by Scaleway runtime |
 
@@ -191,14 +191,14 @@ Variables are set per Scaleway container/job at deploy time (via `env.KEY=VALUE`
 
 | Variable | Source | Description |
 |---|---|---|
-| `DATABASE_URL` | GitHub secret `SUPABASE_DATABASE_URL` | Direct connection (IPv6) — one-shot batch job |
+| `DATABASE_URL` | GitHub secret `SUPABASE_DATABASE_URL` | Direct connection (IPv6) — one-shot batch job. Append `?options=-c%20search_path=living_map,public` |
 | `LOG_LEVEL` | Hardcoded | `info` |
 
 ### LES Job (Scaleway Serverless Job)
 
 | Variable | Source | Description |
 |---|---|---|
-| `DATABASE_URL` | GitHub secret `SUPABASE_DATABASE_URL` | Direct connection (IPv6) — one-shot batch job |
+| `DATABASE_URL` | GitHub secret `SUPABASE_DATABASE_URL` | Direct connection (IPv6) — one-shot batch job. Append `?options=-c%20search_path=living_map,public` |
 | `SPACY_EN_MODEL` | Hardcoded | `en_core_web_sm` (or `en_core_web_trf` for transformer) |
 | `SPACY_FR_MODEL` | Hardcoded | `fr_core_news_sm` |
 

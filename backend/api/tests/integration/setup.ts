@@ -17,7 +17,7 @@ export async function withPostgres(): Promise<PostgresContext> {
     .withWaitStrategy(Wait.forListeningPorts())
     .start();
 
-  const connectionUri = container.getConnectionUri();
+  const connectionUri = container.getConnectionUri() + '?options=-c%20search_path=living_map,public';
   const pool = new pg.Pool({ connectionString: connectionUri });
   pool.on('error', () => {});
 

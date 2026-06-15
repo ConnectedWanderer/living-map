@@ -7,12 +7,14 @@ Manual one-time setup steps. Must be done before the CI/CD pipeline can work.
 1. Go to https://supabase.com → New project → select region close to Scaleway (e.g., `fr-par`)
 2. Note connection string: `postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres`
 3. Enable PostGIS in the SQL editor: `CREATE EXTENSION IF NOT EXISTS postgis;`
-4. Run the migration against Supabase:
+4. Run the migration against Supabase (creates tables in the `living_map` schema):
 
 ```bash
-DATABASE_URL="postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres" \
-npx node-pg-migrate up --migration-file-language js --migration-dir backend/migrations
+DATABASE_URL="postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres?options=-c%20search_path=living_map,public" \
+npx node-pg-migrate up --migration-file-language js --migration-dir backend/migrations --schema living_map
 ```
+
+> **Note:** If you previously ran the migration without `--schema living_map`, the `pgmigrations` table lives in `public`. Reset the database or run `UPDATE pgmigrations SET schema = 'living_map'` after creating the new schema to avoid re-running migrations on first deploy.
 
 ## 2. Create Scaleway account
 
@@ -41,7 +43,7 @@ Add these secrets in the repository Settings → Secrets and variables → Actio
 | `SCW_PROJECT_ID`        | Scaleway project ID                                                  |
 | `SCW_ORGANIZATION_ID`   | Scaleway organization ID                                             |
 | `SCW_NAMESPACE_ID`      | Scaleway container namespace UUID                                    |
-| `SUPABASE_DATABASE_URL` | Supabase direct connection (IPv6) for jobs                           |
-| `SUPABASE_POOLER_URL`   | Supabase Supavisor transaction pooler (IPv4, port 6543) for Tile API |
+| `SUPABASE_DATABASE_URL` | Supabase direct connection (IPv6) for jobs; append `?options=-c%20search_path=living_map,public` |
+| `SUPABASE_POOLER_URL`   | Supabase Supavisor transaction pooler (IPv4, port 6543) for Tile API; append `?options=-c%20search_path=living_map,public` |
 | `CORS_ORIGIN`           | GitHub Pages URL (e.g., `https://<user>.github.io`)                  |
 | `VITE_API_URL`          | Scaleway container URL (set after first deploy)                      |
