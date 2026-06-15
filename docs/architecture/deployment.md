@@ -182,8 +182,8 @@ Variables are set per Scaleway container/job at deploy time (via `env.KEY=VALUE`
 ### Tile API (Scaleway Serverless Container)
 
 | Variable | Source | Description |
-|---|---|---|
-| `DATABASE_URL` | GitHub secret | Supabase connection string with `?sslmode=require` |
+|---|---|---|---|
+| `DATABASE_URL` | GitHub secret `SUPABASE_POOLER_URL` | Supavisor session pooler (IPv4) — recommended for serverless |
 | `CORS_ORIGIN` | GitHub secret | GitHub Pages URL (e.g., `https://user.github.io`) |
 | `PORT` | Scaleway (auto) | Injected by Scaleway runtime |
 
@@ -191,14 +191,14 @@ Variables are set per Scaleway container/job at deploy time (via `env.KEY=VALUE`
 
 | Variable | Source | Description |
 |---|---|---|
-| `DATABASE_URL` | GitHub secret | Supabase connection string with `?sslmode=require` |
+| `DATABASE_URL` | GitHub secret `SUPABASE_DATABASE_URL` | Direct connection (IPv6) — one-shot batch job |
 | `LOG_LEVEL` | Hardcoded | `info` |
 
 ### LES Job (Scaleway Serverless Job)
 
 | Variable | Source | Description |
 |---|---|---|
-| `DATABASE_URL` | GitHub secret | Supabase connection string with `?sslmode=require` |
+| `DATABASE_URL` | GitHub secret `SUPABASE_DATABASE_URL` | Direct connection (IPv6) — one-shot batch job |
 | `SPACY_EN_MODEL` | Hardcoded | `en_core_web_sm` (or `en_core_web_trf` for transformer) |
 | `SPACY_FR_MODEL` | Hardcoded | `fr_core_news_sm` |
 
@@ -304,12 +304,12 @@ deploy-tile-api:
           min-scale=0 max-scale=1 \
           memory-limit=256 \
           privacy=public \
-          env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+          env.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
           env.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
           2>/dev/null || \
         scw container container update ${{ secrets.SCW_NAMESPACE_ID }}/tile-api \
           registry-image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
-          env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+          env.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
           env.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
         echo "url=$(scw container container get ${{ secrets.SCW_NAMESPACE_ID }}/tile-api -o json | jq -r '.status.url')" >> $GITHUB_OUTPUT
 
@@ -484,7 +484,7 @@ scw init access-key=<ACCESS_KEY> secret-key=<SECRET_KEY> organization-id=<ORGANI
 scw registry namespace create name=living-map
 # 7. Create Serverless Container namespace:
 scw container namespace create name=living-map
-# 8. Add GitHub secrets (SCW_ACCESS_KEY, SCW_SECRET_KEY, SCW_PROJECT_ID, SCW_ORGANIZATION_ID, SCW_NAMESPACE_ID, SUPABASE_DATABASE_URL, etc.)
+# 8. Add GitHub secrets (SCW_ACCESS_KEY, SCW_SECRET_KEY, SCW_PROJECT_ID, SCW_ORGANIZATION_ID, SCW_NAMESPACE_ID, SUPABASE_DATABASE_URL, SUPABASE_POOLER_URL, etc.)
 # 9. Push to main — GitHub Actions handles the rest
 ```
 
