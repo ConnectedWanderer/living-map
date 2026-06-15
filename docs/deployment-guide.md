@@ -7,8 +7,12 @@ Manual one-time setup steps. Must be done before the CI/CD pipeline can work.
 1. Go to https://supabase.com → New project → select region close to Scaleway (e.g., `fr-par`)
 2. Note connection string: `postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres`
 3. Enable PostGIS in the SQL editor: `CREATE EXTENSION IF NOT EXISTS postgis;`
-4. Run existing migration (`backend/migrations/001_schema.js`) against Supabase (manually or via `node-pg-migrate`)
-   - **Caution:** Remove or guard the `pgm.createExtension("postgis")` line — Supabase may already have it
+4. Run the migration against Supabase:
+
+```bash
+DATABASE_URL="postgresql://postgres:<PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres" \
+npx node-pg-migrate up --migration-file-language js --migration-dir backend/migrations
+```
 
 ## 2. Create Scaleway account
 
