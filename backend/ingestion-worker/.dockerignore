@@ -1,0 +1,9 @@
+.git
+.gitignore
+node_modules
+tests/
+scripts/
+*.md
+.env*
+CONTEXT.md
+AGENTS.md

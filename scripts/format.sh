@@ -34,11 +34,17 @@ fi
 # --- Format / Check ---
 
 echo "--- Markdown ---"
-npm install --no-save --silent prettier@3.8
+PRETTIER_DIR=$(mktemp -d)
+trap 'rm -rf "$PRETTIER_DIR"' EXIT
+(
+  cd "$PRETTIER_DIR"
+  npm init -y > /dev/null 2>&1
+  npm install --no-save --silent prettier@3.8
+)
 if [ "$CHECK" ]; then
-  npx --no-install prettier@3.8 --check "**/*.md"
+  "$PRETTIER_DIR/node_modules/.bin/prettier" --check "**/*.md"
 else
-  npx --no-install prettier@3.8 --write "**/*.md"
+  "$PRETTIER_DIR/node_modules/.bin/prettier" --write "**/*.md"
 fi
 
 echo "--- Python ---"

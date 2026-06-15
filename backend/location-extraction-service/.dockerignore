@@ -3,6 +3,9 @@
 .venv
 .ruff_cache
 .python-version
+.coverage
+__pycache__/
+.pytest_cache/
 CONTEXT.md
 AGENTS.md
 README.md
