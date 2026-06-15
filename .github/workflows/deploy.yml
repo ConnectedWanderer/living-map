@@ -174,7 +174,7 @@ jobs:
             name=tile-api \
             image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
             min-scale=0 max-scale=1 \
-            memory-limit-bytes=128M \
+            memory-limit-bytes=0.128GB \
             privacy=public \
             env.NODE_OPTIONS=--max-old-space-size=64 \
             secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
