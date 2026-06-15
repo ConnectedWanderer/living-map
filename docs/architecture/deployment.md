@@ -302,7 +302,7 @@ deploy-tile-api:
           name=tile-api \
           registry-image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
           min-scale=0 max-scale=1 \
-           memory-limit=128 \
+           memory-limit-bytes=0.128GB \
            privacy=public \
            env.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
            env.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
