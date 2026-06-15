@@ -41,7 +41,7 @@ These are NOT automated and must be done before the CI/CD can work.
 3. **Create Scaleway namespaces (via `scw` CLI)**
    ```bash
    sudo pacman -S scaleway-cli
-   scw init access-key=<ACCESS_KEY> secret-key=<SECRET_KEY> project-id=<PROJECT_ID> send-telemetry=false
+   scw init access-key=<ACCESS_KEY> secret-key=<SECRET_KEY> organization-id=<ORGANIZATION_ID> project-id=<PROJECT_ID> send-telemetry=false
    scw registry namespace create name=living-map
    scw container namespace create name=living-map
    ```
@@ -53,8 +53,9 @@ These are NOT automated and must be done before the CI/CD can work.
    |---|---|
    | `SCW_ACCESS_KEY` | Scaleway IAM access key |
    | `SCW_SECRET_KEY` | Scaleway IAM secret key |
-   | `SCW_PROJECT_ID` | Scaleway project ID |
-   | `SCW_NAMESPACE_ID` | Scaleway container namespace UUID |
+    | `SCW_PROJECT_ID` | Scaleway project ID |
+    | `SCW_ORGANIZATION_ID` | Scaleway organization ID |
+    | `SCW_NAMESPACE_ID` | Scaleway container namespace UUID |
    | `SUPABASE_DATABASE_URL` | Supabase connection string with `?sslmode=require` |
    | `CORS_ORIGIN` | GitHub Pages URL (e.g., `https://<user>.github.io`) |
    | `VITE_API_URL` | Scaleway container URL (set after first deploy) |
@@ -255,7 +256,7 @@ jobs:
           curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
           chmod +x scw && sudo mv scw /usr/local/bin/scw
       - name: Configure scw
-        run: scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+        run: scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
       - name: Login to Container Registry
         run: scw registry login
       - name: Build & push tile-api
@@ -281,7 +282,7 @@ jobs:
         run: |
           curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
           chmod +x scw && sudo mv scw /usr/local/bin/scw
-          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
       - id: deploy
         run: |
           scw container container create \
@@ -308,7 +309,7 @@ jobs:
         run: |
           curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
           chmod +x scw && sudo mv scw /usr/local/bin/scw
-          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
       - run: |
           scw container job create \
             namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
@@ -329,7 +330,7 @@ jobs:
         run: |
           curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
           chmod +x scw && sudo mv scw /usr/local/bin/scw
-          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
       - run: |
           scw container job create \
             namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
@@ -369,7 +370,7 @@ jobs:
         run: |
           curl -o scw -sL "https://github.com/scaleway/scaleway-cli/releases/latest/download/scw-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
           chmod +x scw && sudo mv scw /usr/local/bin/scw
-          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
+          scw init access-key=${{ secrets.SCW_ACCESS_KEY }} secret-key=${{ secrets.SCW_SECRET_KEY }} organization-id=${{ secrets.SCW_ORGANIZATION_ID }} project-id=${{ secrets.SCW_PROJECT_ID }} send-telemetry=false
       - name: Get ingestion job ID
         id: ingestion-job-id
         run: echo "id=$(scw container job list -o json | jq -r '.jobs[] | select(.name == "ingestion-job") | .id')" >> $GITHUB_OUTPUT
