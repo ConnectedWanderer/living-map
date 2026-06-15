@@ -166,6 +166,7 @@ Supabase free-tier projects auto-pause after 7 days of inactivity. Mitigated by:
 - **LES Job:** No FastAPI/uvicorn. Entry point is a batch script: load model → query DB → process → update → exit.
 - **Tile API:** Standard Express server. Deployed as Scaleway Serverless Container with `min-scale=0`, `max-scale=1`, 128 MB memory, capped V8 heap at 64 MB.
 - **Frontend:** Built via `npm run build` in CI, deployed as static files to GitHub Pages. No nginx needed in production.
+- **Memory limit units differ between containers and jobs:** `scw container container` uses `memory-limit-bytes` (accepts G/GB suffix; use `0.128GB` for <1 GB because `128M` is rejected). `scw container job` / `scw jobs definition` uses `memory-limit` as an integer in MiB (e.g., `128` = 128 MiB ≈ 134 MB).
 
 ---
 

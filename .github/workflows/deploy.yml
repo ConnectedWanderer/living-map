@@ -230,8 +230,13 @@ jobs:
               cron-schedule.timezone=UTC > "$JOB_OUT"
           else
             scw jobs definition update "$EXISTING_ID" -o json \
+              cpu-limit=150 \
+              memory-limit=128 \
               image-uri=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} > "$JOB_OUT"
+              environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
+              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+              cron-schedule.schedule="0 6 * * *" \
+              cron-schedule.timezone=UTC > "$JOB_OUT"
           fi
           JOB_ID=$(jq -r '.id' "$JOB_OUT")
           if [ -z "$JOB_ID" ] || [ "$JOB_ID" = "null" ]; then
@@ -275,8 +280,12 @@ jobs:
               cron-schedule.timezone=UTC > "$JOB_OUT"
           else
             scw jobs definition update "$EXISTING_ID" -o json \
+              cpu-limit=750 \
+              memory-limit=1024 \
               image-uri=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} > "$JOB_OUT"
+              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+              cron-schedule.schedule="0 7 * * *" \
+              cron-schedule.timezone=UTC > "$JOB_OUT"
           fi
           JOB_ID=$(jq -r '.id' "$JOB_OUT")
           if [ -z "$JOB_ID" ] || [ "$JOB_ID" = "null" ]; then
@@ -306,4 +315,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./frontend/dist
-
