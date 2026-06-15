@@ -133,7 +133,7 @@ jobs:
             name=tile-api \
             image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
             min-scale=0 max-scale=1 \
-            memory-limit=256 \
+            memory-limit-bytes=256Mi \
             privacy=public \
             secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
             secret-environment-variables.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} 2>"$CREATE_ERR"; then
@@ -176,7 +176,7 @@ jobs:
             namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
             name=ingestion-job \
             image=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
-            memory-limit=512 \
+            memory-limit-bytes=512Mi \
             env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} 2>"$CREATE_ERR" >"$JOB_OUT"; then
             echo "Created ingestion-job"
           elif grep -q "already exists" "$CREATE_ERR"; then
@@ -221,7 +221,7 @@ jobs:
             namespace-id=${{ secrets.SCW_NAMESPACE_ID }} \
             name=les-job \
             image=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
-            memory-limit=2048 \
+            memory-limit-bytes=2048Mi \
             env.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} 2>"$CREATE_ERR" >"$JOB_OUT"; then
             echo "Created les-job"
           elif grep -q "already exists" "$CREATE_ERR"; then
