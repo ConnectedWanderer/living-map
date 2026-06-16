@@ -176,7 +176,7 @@ jobs:
             min-scale=0 max-scale=1 \
             memory-limit-bytes=0.128GB \
             privacy=public \
-            env.NODE_OPTIONS=--max-old-space-size=64 \
+            environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
             secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
             secret-environment-variables.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} 2>"$CREATE_ERR"; then
             echo "Created tile-api container"
@@ -184,7 +184,7 @@ jobs:
             echo "Container already exists, updating..."
             scw container container update ${{ secrets.SCW_CONTAINER_NAMESPACE_ID }}/tile-api \
               image=rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} \
-              env.NODE_OPTIONS=--max-old-space-size=64 \
+              environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
               secret-environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
               secret-environment-variables.CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
           else
