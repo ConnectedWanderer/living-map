@@ -224,7 +224,7 @@ jobs:
               image-uri=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
               cpu-limit=150 \
               memory-limit=128 \
-              local-storage-capacity=256 \
+              local-storage-capacity=128 \
               environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
               environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
               cron-schedule.schedule="0 6 * * *" \
@@ -233,7 +233,7 @@ jobs:
             scw jobs definition update "$EXISTING_ID" -o json \
               cpu-limit=150 \
               memory-limit=128 \
-              local-storage-capacity=256 \
+              local-storage-capacity=128 \
               image-uri=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
               environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
               environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
@@ -277,7 +277,7 @@ jobs:
               image-uri=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
               cpu-limit=750 \
               memory-limit=1024 \
-              local-storage-capacity=1024 \
+              local-storage-capacity=128 \
               environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
               cron-schedule.schedule="0 7 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
@@ -285,7 +285,7 @@ jobs:
             scw jobs definition update "$EXISTING_ID" -o json \
               cpu-limit=750 \
               memory-limit=1024 \
-              local-storage-capacity=1024 \
+              local-storage-capacity=128 \
               image-uri=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
               environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
               cron-schedule.schedule="0 7 * * *" \
