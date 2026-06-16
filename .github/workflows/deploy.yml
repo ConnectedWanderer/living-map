@@ -201,7 +201,14 @@ jobs:
             exit 1
           fi
           rm -f "$CREATE_ERR"
-          echo "url=$(scw container container get ${{ secrets.SCW_CONTAINER_NAMESPACE_ID }}/tile-api -o json | jq -r '.status.url')" >> $GITHUB_OUTPUT
+          CONTAINER_ID=$(scw container container list -o json | jq -r \
+            --arg NAME "tile-api" \
+            '.[] | select(.name == $NAME) | .id')
+          if [ -z "$CONTAINER_ID" ] || [ "$CONTAINER_ID" = "null" ]; then
+            echo "Failed to find container 'tile-api' after create/update"
+            exit 1
+          fi
+          echo "url=$(scw container container get "$CONTAINER_ID" -o json | jq -r '.status.url')" >> $GITHUB_OUTPUT
 
   deploy-ingestion-job:
     needs: [build-and-push]

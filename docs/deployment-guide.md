@@ -51,4 +51,4 @@ Add these secrets in the repository Settings → Secrets and variables → Actio
 | `SUPABASE_DATABASE_URL` | Supabase direct connection (IPv6) for jobs; append `?options=-c%20search_path=living_map,public` |
 | `SUPABASE_POOLER_URL`   | Supabase Supavisor transaction pooler (IPv4, port 6543) for Tile API; append `?options=-c%20search_path=living_map,public` |
 | `CORS_ORIGIN`           | GitHub Pages URL (e.g., `https://<user>.github.io`)                  |
-| `VITE_API_URL`          | Scaleway container URL (set after first deploy)                      |
+| `VITE_API_URL`          | (Optional) Override auto-detected container URL                      |
