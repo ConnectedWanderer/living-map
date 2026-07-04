@@ -2,7 +2,8 @@
 # Build and run the location-extraction-service as a one-shot batch job.
 set -euo pipefail
 
-cd "$(dirname "$0")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 IMAGE_TAG=${IMAGE_TAG:-living-map/location-extraction-service}
 NETWORK=${NETWORK:-backend_default}
@@ -11,7 +12,7 @@ DATABASE_URL=${DATABASE_URL:-postgres://livingmap:livingmap@postgres:5432/living
 CONTAINER_DB_URL=${DATABASE_URL%%\?options=*}
 
 echo "==> Building $IMAGE_TAG ..."
-docker build -t "$IMAGE_TAG" .
+docker build -t "$IMAGE_TAG" "$SERVICE_ROOT"
 
 echo "==> Running location extraction on network $NETWORK ..."
 exec docker run --rm -i \

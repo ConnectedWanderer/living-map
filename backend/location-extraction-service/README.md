@@ -52,7 +52,7 @@ Run the batch job as a one-off container on the `backend_default` network (requi
 
 ```bash
 cd backend/location-extraction-service
-./run-docker.sh
+bash scripts/run-docker.sh
 ```
 
 The script builds the image and processes events with `location IS NULL`.

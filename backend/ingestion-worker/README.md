@@ -48,11 +48,23 @@ docker compose up -d
 Run the ingestion worker as a one-off container on the `backend_default` network (requires `backend-postgres-1` to be running):
 
 ```bash
-cd backend/ingestion-worker
-./run-docker.sh
+npm run run:docker
 ```
 
 The script builds the image and runs the container.
+
+### Manual Run (Scaleway)
+
+Trigger a remote ingestion job run on Scaleway, wait for completion, and print status and errors:
+
+```bash
+bash scripts/run-remote.sh
+
+# Or via npm
+npm run run:remote
+```
+
+The script requires the `scw` CLI to be installed and authenticated. `jq` is installed automatically if missing.
 
 ## Architecture
 
