@@ -221,7 +221,7 @@ jobs:
             echo "Failed to find container 'tile-api' after create/update"
             exit 1
           fi
-          echo "url=$(scw container container get "$CONTAINER_ID" -o json | jq -r '.status.url')" >> $GITHUB_OUTPUT
+          echo "url=$(scw container container get "$CONTAINER_ID" -o json | jq -r '.public_endpoint')" >> $GITHUB_OUTPUT
 
   deploy-ingestion-job:
     needs: [build-and-push]
