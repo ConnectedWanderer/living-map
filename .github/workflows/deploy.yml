@@ -293,9 +293,13 @@ jobs:
           export-config: true
       - name: Create or update les-job
         id: create-les-job
+        env:
+          DB_URL: ${{ secrets.SUPABASE_POOLER_URL }}
         run: |
           JOB_OUT=$(mktemp)
           trap 'rm -f "$JOB_OUT"' EXIT
+          # psycopg2 doesn't support ?options= in connection URIs, strip it
+          CLEAN_DB_URL="${DB_URL%%\?options=*}"
           EXISTING_ID=$(scw jobs definition list -o json | jq -r \
             --arg NAME "les-job" \
             '.[] | select(.name == $NAME) | .id')
@@ -306,7 +310,8 @@ jobs:
               cpu-limit=750 \
               memory-limit=1024 \
               local-storage-capacity=1024 \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
+              environment-variables.DATABASE_URL="$CLEAN_DB_URL" \
+              environment-variables.PGOPTIONS="-c search_path=living_map,public" \
               cron-schedule.schedule="0 7 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
           else
@@ -315,7 +320,8 @@ jobs:
               memory-limit=1024 \
               local-storage-capacity=1024 \
               image-uri=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
+              environment-variables.DATABASE_URL="$CLEAN_DB_URL" \
+              environment-variables.PGOPTIONS="-c search_path=living_map,public" \
               cron-schedule.schedule="0 7 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
           fi
