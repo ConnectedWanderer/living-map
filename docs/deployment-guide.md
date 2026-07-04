@@ -41,14 +41,14 @@ URL-encode any special characters in the password before storing these secrets �
 
 Add these secrets in the repository Settings → Secrets and variables → Actions:
 
-| Secret                  | Value                                                                |
-| ----------------------- | -------------------------------------------------------------------- |
-| `SCW_ACCESS_KEY`        | Scaleway IAM access key                                              |
-| `SCW_SECRET_KEY`        | Scaleway IAM secret key                                              |
-| `SCW_PROJECT_ID`        | Scaleway project ID                                                  |
-| `SCW_ORGANIZATION_ID`   | Scaleway organization ID                                             |
-| `SCW_CONTAINER_NAMESPACE_ID` | Scaleway container namespace UUID (from `scw container namespace create`) |
-| `SUPABASE_DATABASE_URL` | Supabase direct connection (IPv6) for jobs; append `?options=-c%20search_path=living_map,public` |
-| `SUPABASE_POOLER_URL`   | Supabase Supavisor transaction pooler (IPv4, port 6543) for Tile API; append `?options=-c%20search_path=living_map,public` |
-| `CORS_ORIGIN`           | GitHub Pages URL (e.g., `https://<user>.github.io`)                  |
-| `VITE_API_URL`          | (Optional) Override auto-detected container URL                      |
+| Secret                       | Value                                                                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `SCW_ACCESS_KEY`             | Scaleway IAM access key                                                                                                    |
+| `SCW_SECRET_KEY`             | Scaleway IAM secret key                                                                                                    |
+| `SCW_PROJECT_ID`             | Scaleway project ID                                                                                                        |
+| `SCW_ORGANIZATION_ID`        | Scaleway organization ID                                                                                                   |
+| `SCW_CONTAINER_NAMESPACE_ID` | Scaleway container namespace UUID (from `scw container namespace create`)                                                  |
+| `SUPABASE_DATABASE_URL`      | Supabase direct connection (IPv6) for jobs; append `?options=-c%20search_path=living_map,public`                           |
+| `SUPABASE_POOLER_URL`        | Supabase Supavisor transaction pooler (IPv4, port 6543) for Tile API; append `?options=-c%20search_path=living_map,public` |
+| `CORS_ORIGIN`                | GitHub Pages URL (e.g., `https://<user>.github.io`)                                                                        |
+| `VITE_API_URL`               | (Optional) Override auto-detected container URL                                                                            |

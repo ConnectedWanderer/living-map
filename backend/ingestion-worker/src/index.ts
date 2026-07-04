@@ -28,13 +28,15 @@ export async function main(env: Env, deps?: { pool?: pg.Pool }): Promise<void> {
     throw new Error('DATABASE_URL environment variable is required');
   }
 
-  const pool = deps?.pool ?? new pg.Pool({
-    connectionString: env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 5_000,
-    idleTimeoutMillis: 30_000,
-    max: 5,
-  });
+  const pool =
+    deps?.pool ??
+    new pg.Pool({
+      connectionString: env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      connectionTimeoutMillis: 5_000,
+      idleTimeoutMillis: 30_000,
+      max: 5,
+    });
   pool.on('error', (err) => {
     logger.error({ err }, 'Unexpected pool error');
   });

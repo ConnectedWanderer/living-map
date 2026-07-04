@@ -2,13 +2,21 @@
 
 ## Overview
 
-A high-throughput, low-latency NLP service that extracts geographic locations from unstructured text (news articles). Designed for processing 1000+ articles/day with sub-second latency, global coverage, and zero API costs.
+A batch NLP job that extracts geographic locations from unprocessed event text (news articles). Runs as a one-shot Serverless Job triggered daily at 07:00 UTC. Designed for processing 500+ articles per run with sub-second latency per article, global coverage, and zero API costs.
 
-## Goals
+## How It Works
 
-Extract location mentions from text, disambiguate to correct coordinates, and return structured GeoJSON with a primary event location and all scored entities. Fully offline, multilingual (EN/FR MVP), deterministic, with injectable sub-pipelines for testability.
+```
+Cron 07:00 → triggers les-job → connect to DB → SELECT events WHERE location IS NULL LIMIT 500
+    → for each event: run NER pipeline → geocode entities → disambiguate → UPDATE location
+    → exit
+```
+
+The job is **stateless and idempotent** — it only processes events with `location = NULL`, so re-runs skip already-enriched events.
 
 ## Pipeline Architecture
+
+The core pipeline is unchanged from its original design as a FastAPI service. The pipeline stages were extracted into a reusable library that the batch entry point (`app.py`) imports directly.
 
 ```mermaid
 flowchart TD
@@ -34,43 +42,29 @@ flowchart TD
 | **DisambiguatePipeline** (stage 4)  | Geocoded locations + original text | `DisambiguateResult` (best event location, all scored)    | Position scoring (earlier = higher), entity type weighting (GPE 2.5× vs LOC 1.0×), preposition-context boost ("in/at/near"), confidence normalization |
 | **LocationPipeline** (orchestrator) | Raw text                           | `LocationResult` (merged result with timing diagnostics)  | Stage sequencing, merging geocoding results back to NER entities, performance timing; all sub-pipelines injectable for testing                        |
 
-## API Contract
+## Batch Entry Point
 
-`POST /api/extract-location` accepts `{"text": "...", "language": "auto"}` and returns a **GeoJSON FeatureCollection** where:
+`src/app.py` — the sole entry point (no HTTP server):
 
-- `features` — array containing the primary event location as a GeoJSON Point Feature (name, country, confidence)
-- `geocoding` — metadata block with query info, language, model name, entity counts, timing, and all entities (each with optional nested geocoding data if successfully resolved, `null` geometry otherwise)
-
-`GET /health` returns `{"status": "ok"}`.
-
-## Service Architecture
-
-```mermaid
-flowchart LR
-    subgraph LocationService["Location Extraction Service"]
-        A[FastAPI Server] --> B[LocationPipeline]
-        B --> C[NerPipeline]
-        B --> D[GeoPipeline]
-        B --> E[DisambiguatePipeline]
-        C --> F[(spaCy models)]
-        D --> G[(GeoNames data)]
-    end
-
-    style LocationService fill:#f3e5f5
-    style F fill:#fff3e0
-    style G fill:#fff3e0
 ```
+run_batch(connection, pipeline)
+  → SELECT id, title, description FROM events WHERE location IS NULL LIMIT 500
+  → for each row: pipeline.run(text) → UPDATE location = ST_SetSRID(ST_MakePoint(lon, lat), 4326)
+  → commit, return count
+```
+
+The batch size (500) prevents long-running transactions. The job can be safely re-run — already-processed events are skipped via the `location IS NULL` filter.
 
 ## Technology Stack
 
 | Component          | Technology                 | Rationale                                          |
 | ------------------ | -------------------------- | -------------------------------------------------- |
-| API Server         | FastAPI (Python 3.14)      | Fast, async, auto-docs                             |
+| Runtime            | Python 3.14                | spaCy ecosystem, psycopg2 DB driver                |
 | Language Detection | langdetect                 | Lightweight, seed=0 for determinism                |
 | NER                | spaCy + en/fr_core_news_sm | Industry standard, ~10MB models, good MVP accuracy |
 | Geocoder           | geonamescache (3.0.1)      | Offline, GeoNames data bundled with pip package    |
 | Country lookup     | pycountry                  | ISO code → country name resolution                 |
-| Container          | Docker                     | Isolated, reproducible                             |
+| DB Driver          | psycopg2                   | PostgreSQL adapter, production-ready               |
 
 ## Key Design Decisions
 
@@ -81,15 +75,16 @@ flowchart LR
 | Interface      | Typed dataclasses between stages | Not raw dicts — each pipeline stage has explicit input/output records (per ADR-006)                     |
 | Disambiguation | Weighted scoring (not ML)        | Simple heuristics — position, type, preposition context — sufficient for MVP, no training data required |
 | NER Models     | Small spaCy models (~10MB)       | Fast loading, low memory; trivially swapped for larger models if accuracy requires                      |
+| Job Design     | One-shot batch (no daemon)       | No HTTP server, no scheduler — exits after processing. Simpler, cheaper on serverless                   |
 
 ## Performance Targets
 
-| Metric        | Target         | Notes                               |
-| ------------- | -------------- | ----------------------------------- |
-| Throughput    | 1000+ docs/day | ~12 docs/minute sustained           |
-| Latency (p95) | <1 second      | Per document                        |
-| Memory        | ~2GB           | spaCy models + geocoder index       |
-| Accuracy      | >85%           | Correct location for clear mentions |
+| Metric        | Target        | Notes                               |
+| ------------- | ------------- | ----------------------------------- |
+| Throughput    | 500+ docs/run | LIMIT 500 per batch                 |
+| Latency (p95) | <1 second     | Per document                        |
+| Memory        | ~2GB          | spaCy models + geocoder index       |
+| Accuracy      | >85%          | Correct location for clear mentions |
 
 ## Constraints & Assumptions
 
@@ -97,6 +92,7 @@ flowchart LR
 - Population-based geocoding disambiguation assumes the most populous match is correct, which may fail for low-population places sharing names with famous cities
 - Language detection defaults to English on failure or empty input
 - spaCy small models trade NER accuracy for startup speed and memory; upgrade path to larger models exists
+- The ingestion worker and LES are decoupled — ingestion INSERTs events with `location = NULL`, LES picks them up on the next run
 
 ## Evaluation Module
 

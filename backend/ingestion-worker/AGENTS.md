@@ -27,14 +27,14 @@ Integration tests use Testcontainers (no Docker Compose in test code):
 
 ## Troubleshooting
 
-| Symptom                        | Fix                                                                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Dependencies not found         | `npm install`                                                                                                            |
-| Type errors                    | `tsc --noEmit` to check                                                                                                  |
-| Integration tests fail         | Run `npm run test:int` to auto-start Testcontainers. Debug logs: inspect container logs via `docker logs <container-id>` |
-| node-cron jobs not firing      | Check cron expressions in `sources` table                                                                                |
-| Location enrichment returns [] | Verify Location Extraction service is healthy on port 8000                                                               |
-| Want to test without waiting   | `curl -X POST http://localhost:3000/trigger` — runs all sources immediately                                              |
+| Symptom                      | Fix                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Dependencies not found       | `npm install`                                                                                                             |
+| Type errors                  | `tsc --noEmit` to check                                                                                                   |
+| Integration tests fail       | Run `npm run test:int` to auto-start Testcontainers. Debug logs: inspect container logs via `docker logs <container-id>`  |
+| node-cron jobs not firing    | Check cron expressions in `sources` table                                                                                 |
+| Events have NULL locations   | Wait for LES job to run (07:00 UTC), or run `uv run python -m src.app` manually in `backend/location-extraction-service/` |
+| Want to test without waiting | `node --experimental-strip-types src/index.ts` — runs all sources immediately                                             |
 
 ## Related Documentation
 

@@ -28,15 +28,15 @@ Oracle VM.Standard.A1.Flex (unavailable)
 
 ### Requirements
 
-| Requirement | Detail |
-|---|---|
-| Cost | $0/month (always-free, no temporary offers) |
+| Requirement | Detail                                                    |
+| ----------- | --------------------------------------------------------- |
+| Cost        | $0/month (always-free, no temporary offers)               |
 | spaCy model | Must support `en_core_web_trf` (~500 MB, 2 GB RAM needed) |
-| Execution | Daily scheduled batch processing |
-| Frontend | Static site, globally fast |
-| API / Tiles | Dedicated tile server, always reachable |
-| Database | Spatial queries (PostGIS or equivalent MVT-capable) |
-| Full-stack | Must cover frontend → API → ingestion → NLP → DB |
+| Execution   | Daily scheduled batch processing                          |
+| Frontend    | Static site, globally fast                                |
+| API / Tiles | Dedicated tile server, always reachable                   |
+| Database    | Spatial queries (PostGIS or equivalent MVT-capable)       |
+| Full-stack  | Must cover frontend → API → ingestion → NLP → DB          |
 
 ### Considerations
 
@@ -49,34 +49,34 @@ Oracle VM.Standard.A1.Flex (unavailable)
 
 ### Compute Platforms
 
-| Platform | Free Tier | Max Memory | trf Model | Notes |
-|---|---|---|---|---|
-| **Google Cloud Run** ⭐ | 2M req/mo, 360K GB-s, 180K vCPU-s, 1 GB egress | 8 GB | ✅ Yes | Serverless containers, startup CPU boost, Cloud Scheduler |
-| AWS Lambda | 1M req/mo, 400K GB-s | 10 GB (container) | ⚠️ Tight | Cold start slower, no CPU boost for init |
-| Koyeb | 1 x 512 MB / 1 vCPU | 512 MB | ❌ No | Pivoting to Mistral Compute, free tier insufficient |
-| Fly.io | No free tier for new orgs | — | ❌ No | Removed free tier 2025 |
-| Render | 512 MB / 0.1 CPU | 512 MB | ❌ No | Insufficient RAM |
-| Cloudflare Workers | 100k req/day | 128 MB | ❌ No | No Python spaCy support |
-| Railway | $5 credit (temporary) | 512 MB | ❌ No | Credit-based, insufficient |
-| Modal | $30/mo free credits | GPU | ⚠️ Credit | Temporary credits, not always-free |
+| Platform                | Free Tier                                      | Max Memory        | trf Model | Notes                                                     |
+| ----------------------- | ---------------------------------------------- | ----------------- | --------- | --------------------------------------------------------- |
+| **Google Cloud Run** ⭐ | 2M req/mo, 360K GB-s, 180K vCPU-s, 1 GB egress | 8 GB              | ✅ Yes    | Serverless containers, startup CPU boost, Cloud Scheduler |
+| AWS Lambda              | 1M req/mo, 400K GB-s                           | 10 GB (container) | ⚠️ Tight  | Cold start slower, no CPU boost for init                  |
+| Koyeb                   | 1 x 512 MB / 1 vCPU                            | 512 MB            | ❌ No     | Pivoting to Mistral Compute, free tier insufficient       |
+| Fly.io                  | No free tier for new orgs                      | —                 | ❌ No     | Removed free tier 2025                                    |
+| Render                  | 512 MB / 0.1 CPU                               | 512 MB            | ❌ No     | Insufficient RAM                                          |
+| Cloudflare Workers      | 100k req/day                                   | 128 MB            | ❌ No     | No Python spaCy support                                   |
+| Railway                 | $5 credit (temporary)                          | 512 MB            | ❌ No     | Credit-based, insufficient                                |
+| Modal                   | $30/mo free credits                            | GPU               | ⚠️ Credit | Temporary credits, not always-free                        |
 
 ### Database Platforms
 
-| Platform | Free Tier | PostGIS | 7d Pause | Notes |
-|---|---|---|---|---|
-| **Supabase** ⭐ | 500 MB DB, 5 GB bandwidth, 2 projects | ✅ Pre-installed | ✅ Yes | Best PostGIS integration, auto-pauses after 7d idle |
-| **Neon** | 0.5 GB/project (100 projects), 100 CU-hrs/mo | ✅ Extension | ❌ No | Scale-to-zero compute, storage persists |
-| CockroachDB | 10 GB storage | ⚠️ Limited | ❌ No | No PostGIS, basic spatial only |
-| PlanetScale | 1 GB storage | ❌ No | ❌ No | MySQL-only, no spatial |
-| Turso | 9 GB storage, 1 GB per DB | ❌ No | ❌ No | SQLite-based, no PostGIS |
+| Platform        | Free Tier                                    | PostGIS          | 7d Pause | Notes                                               |
+| --------------- | -------------------------------------------- | ---------------- | -------- | --------------------------------------------------- |
+| **Supabase** ⭐ | 500 MB DB, 5 GB bandwidth, 2 projects        | ✅ Pre-installed | ✅ Yes   | Best PostGIS integration, auto-pauses after 7d idle |
+| **Neon**        | 0.5 GB/project (100 projects), 100 CU-hrs/mo | ✅ Extension     | ❌ No    | Scale-to-zero compute, storage persists             |
+| CockroachDB     | 10 GB storage                                | ⚠️ Limited       | ❌ No    | No PostGIS, basic spatial only                      |
+| PlanetScale     | 1 GB storage                                 | ❌ No            | ❌ No    | MySQL-only, no spatial                              |
+| Turso           | 9 GB storage, 1 GB per DB                    | ❌ No            | ❌ No    | SQLite-based, no PostGIS                            |
 
 ### Execution Models
 
-| Option | Description | Cold Start Mitigation |
-|---|---|---|
-| **A: LES as Cloud Run Job** ⭐ | Both ingestion and LES run as scheduled jobs. LES loads model once per run, batch-processes all articles, exits. | Perfect — one cold start per daily run |
-| B: LES as Cloud Run Service | HTTP server, called per-article by ingestion job | Needs batch endpoint to avoid N cold starts per run |
-| C: Mono-job | Single container with Node + Python + spaCy | Eliminates inter-service calls but image is huge |
+| Option                         | Description                                                                                                      | Cold Start Mitigation                               |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **A: LES as Cloud Run Job** ⭐ | Both ingestion and LES run as scheduled jobs. LES loads model once per run, batch-processes all articles, exits. | Perfect — one cold start per daily run              |
+| B: LES as Cloud Run Service    | HTTP server, called per-article by ingestion job                                                                 | Needs batch endpoint to avoid N cold starts per run |
+| C: Mono-job                    | Single container with Node + Python + spaCy                                                                      | Eliminates inter-service calls but image is huge    |
 
 ## Decision
 
@@ -112,27 +112,27 @@ Supabase (free: 500 MB, PostGIS 3.3.7)
 
 ### Component Breakdown
 
-| Component | Platform | Type | Cost | Rationale |
-|---|---|---|---|---|
-| Frontend | GitHub Pages | Static site | $0 | Global CDN, automatic HTTPS, simple git-push deploy |
-| Tile API | Cloud Run Service | HTTP, scale-to-zero | $0 | Lightweight Express server, stays within 360K GB-s/mo |
-| Ingestion | Cloud Run Job | Daily cron | $0 | One-shot container, ~3 min run, well within free tier |
-| LES | Cloud Run Job | Daily cron | $0 | Batch processing with single model load per run |
-| Scheduling | Cloud Scheduler | 2 cron jobs | $0 | 3 free jobs per project |
-| Database | Supabase | PostGIS 500 MB | $0 | Pre-installed PostGIS, PostgREST, in-browser SQL editor |
+| Component  | Platform          | Type                | Cost | Rationale                                               |
+| ---------- | ----------------- | ------------------- | ---- | ------------------------------------------------------- |
+| Frontend   | GitHub Pages      | Static site         | $0   | Global CDN, automatic HTTPS, simple git-push deploy     |
+| Tile API   | Cloud Run Service | HTTP, scale-to-zero | $0   | Lightweight Express server, stays within 360K GB-s/mo   |
+| Ingestion  | Cloud Run Job     | Daily cron          | $0   | One-shot container, ~3 min run, well within free tier   |
+| LES        | Cloud Run Job     | Daily cron          | $0   | Batch processing with single model load per run         |
+| Scheduling | Cloud Scheduler   | 2 cron jobs         | $0   | 3 free jobs per project                                 |
+| Database   | Supabase          | PostGIS 500 MB      | $0   | Pre-installed PostGIS, PostgREST, in-browser SQL editor |
 
 ### Estimated Free-Tier Usage
 
-| Resource | Daily Need | Monthly Total | Free Limit | Headroom |
-|---|---|---|---|---|
-| Cloud Run GB-seconds (LES, 2 GB x 5 min) | 600 | 18,000 | 360,000 | 95% free |
-| Cloud Run GB-seconds (Ingestion, 512 MB x 3 min) | 90 | 2,700 | 360,000 | 99% free |
-| Cloud Run GB-seconds (Tile API, 256 MB x 2 min avg) | 30 | 900 | 360,000 | 99.7% free |
-| Cloud Run vCPU-seconds (total) | ~400 | 12,000 | 180,000 | 93% free |
-| Cloud Run requests | ~50 | 1,500 | 2,000,000 | 99.9% free |
-| Cloud Scheduler jobs | 2 | 60 | 3 free jobs | OK |
-| Supabase database storage | — | < 500 MB | 500 MB | Must monitor growth |
-| Supabase bandwidth | — | < 1 GB | 5 GB/month | OK |
+| Resource                                            | Daily Need | Monthly Total | Free Limit  | Headroom            |
+| --------------------------------------------------- | ---------- | ------------- | ----------- | ------------------- |
+| Cloud Run GB-seconds (LES, 2 GB x 5 min)            | 600        | 18,000        | 360,000     | 95% free            |
+| Cloud Run GB-seconds (Ingestion, 512 MB x 3 min)    | 90         | 2,700         | 360,000     | 99% free            |
+| Cloud Run GB-seconds (Tile API, 256 MB x 2 min avg) | 30         | 900           | 360,000     | 99.7% free          |
+| Cloud Run vCPU-seconds (total)                      | ~400       | 12,000        | 180,000     | 93% free            |
+| Cloud Run requests                                  | ~50        | 1,500         | 2,000,000   | 99.9% free          |
+| Cloud Scheduler jobs                                | 2          | 60            | 3 free jobs | OK                  |
+| Supabase database storage                           | —          | < 500 MB      | 500 MB      | Must monitor growth |
+| Supabase bandwidth                                  | —          | < 1 GB        | 5 GB/month  | OK                  |
 
 ### Batch LES Job Design
 

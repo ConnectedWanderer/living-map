@@ -23,7 +23,9 @@ export function getAdapter(type: string): FetchArticlesFn {
   return fn;
 }
 
-function wrapAdapter(fn: (config: SourceConfig, deps?: FetchDeps) => Promise<NormalizedArticle[]>): FetchArticlesFn {
+function wrapAdapter(
+  fn: (config: SourceConfig, deps?: FetchDeps) => Promise<NormalizedArticle[]>,
+): FetchArticlesFn {
   return (config, deps) => fn(config as SourceConfig, deps);
 }
 

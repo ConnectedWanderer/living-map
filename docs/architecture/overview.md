@@ -6,16 +6,16 @@ A real-time web application displaying geographical events on an interactive map
 
 ## Technology Stack
 
-| Layer               | Technology                     | Notes                                             |
-| ------------------- | ------------------------------ | ------------------------------------------------- |
-| Frontend            | Vue 3 + Vite                   | Lightweight, mobile-optimized                     |
-| Map                 | MapLibre GL JS                 | Open-source, OSM tiles                            |
-| State Management    | Pinia                          | Official Vue recommendation                       |
-| Serving API         | Node.js + TypeScript + Express | Read-only API, reads from PostgreSQL              |
-| Ingestion Worker    | Node.js + TypeScript           | Cron-triggered batch ingestion from external APIs |
-| Location Extraction | Python + FastAPI               | NLP service for extracting coordinates from text  |
-| Database            | PostgreSQL + PostGIS           | Geospatial persistence, spatial indexes           |
-| External Data       | External APIs                  | Real news/event feeds (mock-feed for testing)     |
+| Layer               | Technology                     | Notes                                                  |
+| ------------------- | ------------------------------ | ------------------------------------------------------ |
+| Frontend            | Vue 3 + Vite                   | Lightweight, mobile-optimized                          |
+| Map                 | MapLibre GL JS                 | Open-source, OSM tiles                                 |
+| State Management    | Pinia                          | Official Vue recommendation                            |
+| Serving API         | Node.js + TypeScript + Express | Read-only API, reads from PostgreSQL                   |
+| Ingestion Worker    | Node.js + TypeScript           | Cron-triggered batch ingestion from external APIs      |
+| Location Extraction | Python (batch script)          | NER + geocoding pipeline for enriching event locations |
+| Database            | PostgreSQL + PostGIS           | Geospatial persistence, spatial indexes                |
+| External Data       | External APIs                  | Real news/event feeds (mock-feed for testing)          |
 
 ## High-Level Architecture
 
@@ -23,8 +23,11 @@ A real-time web application displaying geographical events on an interactive map
 flowchart TD
     subgraph Ingestion["Batch Ingestion (cron)"]
         IW[Ingestion Worker] -->|poll| API[External APIs<br/>or mock-feed]
-        IW -->|POST /api/extract-location| LE[Location Extraction<br/>Python + FastAPI]
         IW -->|INSERT| DB[(PostgreSQL<br/>+ PostGIS)]
+    end
+
+    subgraph Enrichment["Location Extraction (cron)"]
+        LE[LES Batch] -->|SELECT unprocessed<br/>UPDATE location| DB
     end
 
     subgraph Serving["Request Serving"]
@@ -58,10 +61,13 @@ flowchart TD
 │   │   └── package.json
 │   ├── ingestion-worker/         # Node.js + TypeScript batch ingestion
 │   │   ├── src/
-│   │   │   ├── index.ts          # Entry point, cron scheduler
+│   │   │   ├── index.ts          # Entry point (one-shot, all sources)
 │   │   │   ├── sources/          # Source adapters (mock-feed, RSS, …)
-│   │   │   ├── dedup.ts          # source_id + content hash dedup
-│   │   │   └── config.ts         # Per-source schedule config
+│   │   │   ├── runner.ts         # Per-source fetch → insert cycle
+│   │   │   ├── normalizer.ts     # Article normalization
+│   │   │   ├── db.ts             # INSERT/UPDATE queries
+│   │   │   ├── config.ts         # Source config loader
+│   │   │   └── logger.ts         # Structured JSON logger
 │   │   ├── Dockerfile
 │   │   └── package.json
 │   ├── mock-feed/                # Mock RSS feed for testing (standalone)
@@ -70,13 +76,12 @@ flowchart TD
 │   │   │   └── utils/            # Generator, RSS builder
 │   │   ├── Dockerfile
 │   │   └── package.json
-│   ├── location-extraction-service/  # Python NLP microservice
-│   │   ├── src/                  # FastAPI application
+│   ├── location-extraction-service/  # Python NLP batch job
+│   │   ├── src/                  # NER + geocoding pipeline
 │   │   ├── Dockerfile
 │   │   └── pyproject.toml
 │   ├── migrations/               # DB schema migrations (node-pg-migrate)
-│   └── docker-compose.yml        # Services: postgres, migrate, api,
-│                                 #   ingestion-worker, location-extraction
+│   └── docker-compose.yml        # Services: postgres, migrate, api, frontend
 ├── docs/                         # Architecture docs, ADRs, glossary
 ├── scripts/                      # Formatting and CI scripts
 ├── AGENTS.md                     # AI agent instructions
@@ -87,32 +92,31 @@ flowchart TD
 
 The system has two independent cycles:
 
-### Ingestion Cycle (batch, cron-triggered)
+### Ingestion Cycle (two decoupled batch jobs)
 
 ```mermaid
 sequenceDiagram
-    participant C as Cron
+    participant C1 as Cron 06:00
     participant IW as Ingestion Worker
     participant API as External APIs
-    participant LE as Location Extraction
     participant DB as PostgreSQL
+    participant C2 as Cron 07:00
+    participant LE as Location Extraction
 
-    C->>IW: Trigger (per-source schedule)
+    C1->>IW: Trigger ingestion-job
     IW->>API: Fetch raw articles
     API-->>IW: Return articles
-    IW->>DB: Check dedup (source_id / content hash)
-    alt New article
-        IW->>LE: POST /api/extract-location
-        LE-->>IW: Return GeoJSON coordinates
-        IW->>DB: INSERT enriched event
-    end
+    IW->>DB: INSERT … ON CONFLICT DO NOTHING (location = NULL)
+
+    C2->>LE: Trigger les-job
+    LE->>DB: SELECT events WHERE location IS NULL
+    LE->>LE: NER + geocoding pipeline
+    LE->>DB: UPDATE location = ST_SetSRID(ST_MakePoint(...))
 ```
 
-1. Cron triggers Ingestion Worker per source schedule (configurable)
-2. Worker fetches raw articles from external API (or mock-feed)
-3. Worker checks dedup: primary key `source_id`, fallback content hash
-4. For new articles, Worker POSTs to Location Extraction service
-5. Worker INSERTs enriched event (text + coordinates) into PostgreSQL
+1. **06:00 UTC** — CRON triggers `ingestion-job`: fetches articles from external APIs/mock-feed, deduplicates via `ON CONFLICT DO NOTHING`, inserts new events with `location = NULL`
+2. **07:00 UTC** — CRON triggers `les-job`: queries unprocessed events, runs spaCy NER + geonamescache geocoding, updates event locations
+3. The two jobs are **decoupled** — they communicate only through the database
 
 ### Serving Cycle (request-response)
 

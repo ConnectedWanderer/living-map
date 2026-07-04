@@ -14,15 +14,15 @@ ADR-021 proposed deploying on **Google Cloud Run + Cloud Scheduler** with Supaba
 
 The system requirements remain unchanged:
 
-| Requirement | Detail |
-|---|---|
-| Cost | $0/month (always-free, no temporary offers) |
+| Requirement | Detail                                                    |
+| ----------- | --------------------------------------------------------- |
+| Cost        | $0/month (always-free, no temporary offers)               |
 | spaCy model | Must support `en_core_web_trf` (~500 MB, 2 GB RAM needed) |
-| Execution | Daily scheduled batch processing |
-| Frontend | Static site, globally fast |
-| API / Tiles | Dedicated tile server, always reachable |
-| Database | Spatial queries (PostGIS or equivalent MVT-capable) |
-| Full-stack | Must cover frontend → API → ingestion → NLP → DB |
+| Execution   | Daily scheduled batch processing                          |
+| Frontend    | Static site, globally fast                                |
+| API / Tiles | Dedicated tile server, always reachable                   |
+| Database    | Spatial queries (PostGIS or equivalent MVT-capable)       |
+| Full-stack  | Must cover frontend → API → ingestion → NLP → DB          |
 
 The compute requirements stay the same — only the cloud provider changes. Supabase remains the database (free PostGIS, no upfront payment needed), and GitHub Pages remains the frontend host.
 
@@ -30,20 +30,20 @@ The compute requirements stay the same — only the cloud provider changes. Supa
 
 ### Compute Platforms
 
-| Platform | Free Tier | Max Memory | trf Model | Setup Friction | Notes |
-|---|---|---|---|---|---|
-| **Scaleway Serverless** ⭐ | 400K GB-s, 200K vCPU-s, shared across containers+jobs+functions | 4 GB | ✅ Yes | Credit card (no prepayment) | European provider, container-native (Docker images), CRON triggers built-in |
-| AWS Lambda | 1M req/mo, 400K GB-s | 10 GB (container) | ✅ Yes | Credit card (no prepayment) | Needs Lambda handler wrapper, EventBridge Scheduler 14M free invocations |
-| Google Cloud Run | 2M req/mo, 360K GB-s, 180K vCPU-s | 8 GB | ✅ Yes | 10€ refundable prepayment | Original ADR-021 choice, rejected due to upfront payment |
-| Koyeb | Free DB only (no free compute) | 512 MB | ❌ No | — | Free compute tier removed |
-| Render | 512 MB / 0.1 CPU | 512 MB | ❌ No | — | Insufficient RAM for trf model |
-| Fly.io | No free tier for new orgs | — | ❌ No | — | Removed free tier 2025 |
-| Cloudflare Workers | 100K req/day | 128 MB | ❌ No | — | No Python, no containers |
+| Platform                   | Free Tier                                                       | Max Memory        | trf Model | Setup Friction              | Notes                                                                       |
+| -------------------------- | --------------------------------------------------------------- | ----------------- | --------- | --------------------------- | --------------------------------------------------------------------------- |
+| **Scaleway Serverless** ⭐ | 400K GB-s, 200K vCPU-s, shared across containers+jobs+functions | 4 GB              | ✅ Yes    | Credit card (no prepayment) | European provider, container-native (Docker images), CRON triggers built-in |
+| AWS Lambda                 | 1M req/mo, 400K GB-s                                            | 10 GB (container) | ✅ Yes    | Credit card (no prepayment) | Needs Lambda handler wrapper, EventBridge Scheduler 14M free invocations    |
+| Google Cloud Run           | 2M req/mo, 360K GB-s, 180K vCPU-s                               | 8 GB              | ✅ Yes    | 10€ refundable prepayment   | Original ADR-021 choice, rejected due to upfront payment                    |
+| Koyeb                      | Free DB only (no free compute)                                  | 512 MB            | ❌ No     | —                           | Free compute tier removed                                                   |
+| Render                     | 512 MB / 0.1 CPU                                                | 512 MB            | ❌ No     | —                           | Insufficient RAM for trf model                                              |
+| Fly.io                     | No free tier for new orgs                                       | —                 | ❌ No     | —                           | Removed free tier 2025                                                      |
+| Cloudflare Workers         | 100K req/day                                                    | 128 MB            | ❌ No     | —                           | No Python, no containers                                                    |
 
 ### Database
 
-| Platform | Free Tier | PostGIS | Setup Friction |
-|---|---|---|---|
+| Platform                    | Free Tier                 | PostGIS          | Setup Friction                  |
+| --------------------------- | ------------------------- | ---------------- | ------------------------------- |
 | **Supabase** ⭐ (unchanged) | 500 MB DB, 5 GB bandwidth | ✅ Pre-installed | Email signup, no payment needed |
 
 ## Decision
@@ -76,14 +76,14 @@ Supabase (free: 500 MB, PostGIS)
 
 ### Component Breakdown
 
-| Component | Platform | Type | Cost | Rationale |
-|---|---|---|---|---|
-| Frontend | GitHub Pages | Static site | $0 | Global CDN, automatic HTTPS, simple git-push deploy |
-| Tile API | Scaleway Serverless Container | HTTP, scale-to-zero | $0 | Container-native, Docker image deploys as-is, no code changes |
-| Ingestion | Scaleway Serverless Job | Daily cron | $0 | One-shot container, ~3 min run, well within free tier |
-| LES | Scaleway Serverless Job | Daily cron | $0 | Batch processing with single model load per run, up to 4 GB RAM |
-| Scheduling | Scaleway Container CRON triggers | 2 cron jobs | $0 | Native CRON triggers on containers/jobs |
-| Database | Supabase | PostGIS 500 MB | $0 | Pre-installed PostGIS, no payment needed to start |
+| Component  | Platform                         | Type                | Cost | Rationale                                                       |
+| ---------- | -------------------------------- | ------------------- | ---- | --------------------------------------------------------------- |
+| Frontend   | GitHub Pages                     | Static site         | $0   | Global CDN, automatic HTTPS, simple git-push deploy             |
+| Tile API   | Scaleway Serverless Container    | HTTP, scale-to-zero | $0   | Container-native, Docker image deploys as-is, no code changes   |
+| Ingestion  | Scaleway Serverless Job          | Daily cron          | $0   | One-shot container, ~3 min run, well within free tier           |
+| LES        | Scaleway Serverless Job          | Daily cron          | $0   | Batch processing with single model load per run, up to 4 GB RAM |
+| Scheduling | Scaleway Container CRON triggers | 2 cron jobs         | $0   | Native CRON triggers on containers/jobs                         |
+| Database   | Supabase                         | PostGIS 500 MB      | $0   | Pre-installed PostGIS, no payment needed to start               |
 
 ### Why Scaleway Over AWS Lambda
 
@@ -98,10 +98,10 @@ Both are viable, but Scaleway is the **path of least resistance** given the work
 
 Scaleway's free tier is pooled across all serverless products (containers, functions, jobs):
 
-| Resource | Monthly Limit | Estimated Usage | Headroom |
-|---|---|---|---|
-| GB-seconds | 400,000 | ~21,700 (LES 18K + ingestion 2.7K + tile API ~1K) | 94.6% free |
-| vCPU-seconds | 200,000 | ~20,000 (LES at 2 vCPU + ingestion + tile API) | 90% free |
+| Resource     | Monthly Limit | Estimated Usage                                   | Headroom   |
+| ------------ | ------------- | ------------------------------------------------- | ---------- |
+| GB-seconds   | 400,000       | ~21,700 (LES 18K + ingestion 2.7K + tile API ~1K) | 94.6% free |
+| vCPU-seconds | 200,000       | ~20,000 (LES at 2 vCPU + ingestion + tile API)    | 90% free   |
 
 ### Supabase Idle-Pause Mitigation
 

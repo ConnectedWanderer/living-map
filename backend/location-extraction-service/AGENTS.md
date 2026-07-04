@@ -77,8 +77,7 @@ Python syntax:
 ```
 src/
 ├── __init__.py            # Package init
-├── app.py               # FastAPI server + DI
-├── schemas.py           # Pydantic GeoJSON schemas
+├── app.py               # Batch entry point (no HTTP server)
 ├── models.py            # Typed dataclasses
 ├── pipeline.py          # NerPipeline (stages 1-2)
 ├── geocoding.py         # GeoPipeline (stage 3)

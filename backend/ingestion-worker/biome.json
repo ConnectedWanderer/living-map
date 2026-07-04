@@ -32,6 +32,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["tests/integration-runner.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
