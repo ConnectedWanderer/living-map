@@ -160,7 +160,7 @@ jobs:
               jq -r '.[].id' | tail -n +11 | xargs -r -I{} scw registry tag delete {} region=fr-par
           fi
 
-  # IMPORTANT: SUPABASE_POOLER_URL and SUPABASE_DATABASE_URL secrets must
+  # IMPORTANT: SUPABASE_POOLER_URL secret must
   # include ?options=-c%20search_path=living_map,public so that the dedicated
   # living_map schema is found by unqualified queries.
   deploy-tile-api:
@@ -254,7 +254,7 @@ jobs:
               memory-limit=128 \
               local-storage-capacity=1024 \
               environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
               cron-schedule.schedule="0 6 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
           else
@@ -264,7 +264,7 @@ jobs:
               local-storage-capacity=1024 \
               image-uri=rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} \
               environment-variables.NODE_OPTIONS=--max-old-space-size=64 \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
               cron-schedule.schedule="0 6 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
           fi
@@ -306,7 +306,7 @@ jobs:
               cpu-limit=750 \
               memory-limit=1024 \
               local-storage-capacity=1024 \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
               cron-schedule.schedule="0 7 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
           else
@@ -315,7 +315,7 @@ jobs:
               memory-limit=1024 \
               local-storage-capacity=1024 \
               image-uri=rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} \
-              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }} \
+              environment-variables.DATABASE_URL=${{ secrets.SUPABASE_POOLER_URL }} \
               cron-schedule.schedule="0 7 * * *" \
               cron-schedule.timezone=UTC > "$JOB_OUT"
           fi
