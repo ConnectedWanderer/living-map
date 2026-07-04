@@ -51,3 +51,7 @@ Development setup and code quality instructions are in [AGENTS.md](AGENTS.md).
 ### Project Glossary
 
 See [docs/glossary.md](docs/glossary.md) for project-specific abbreviations and domain terms.
+
+### Planned Improvements
+
+See [docs/next-steps.md](docs/next-steps.md) for planned improvements and future work.
