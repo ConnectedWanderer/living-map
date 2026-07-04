@@ -80,7 +80,7 @@ jobs:
       - name: Detect changed services
         id: changes
         run: |
-          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+          if [ -z "${{ github.event.before }}" ] || [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
             echo "api=true" >> $GITHUB_OUTPUT
             echo "ingestion=true" >> $GITHUB_OUTPUT
             echo "les=true" >> $GITHUB_OUTPUT
