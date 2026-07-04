@@ -19,6 +19,7 @@ _EVENTS_TABLE_DDL = """
         published_at TIMESTAMPTZ,
         location geometry(Point, 4326),
         location_name TEXT,
+        country TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
@@ -81,9 +82,9 @@ class TestRunBatch:
         conn = postgres
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO events (title, description, source, source_id, location) "
-            "VALUES (%s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326)) RETURNING id",
-            ("Paris is beautiful", "The city of lights", "test", "a0", 2.3522, 48.8566),
+            "INSERT INTO events (title, description, source, source_id, location, location_name) "
+            "VALUES (%s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s) RETURNING id",
+            ("Paris is beautiful", "The city of lights", "test", "a0", 2.3522, 48.8566, "Paris"),
         )
         event_id = cur.fetchone()[0]
         conn.commit()
