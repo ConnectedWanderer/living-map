@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build ingestion-worker image and run it as a one-shot execution.
+# Build and run the ingestion-worker as a one-shot batch job.
 set -euo pipefail
 
 cd "$(dirname "$0")"

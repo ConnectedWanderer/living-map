@@ -46,6 +46,23 @@ uv run python -m pytest
 docker compose up -d
 ```
 
+### Manual Run (Docker)
+
+Run the batch job as a one-off container on the `backend_default` network (requires `backend-postgres-1` to be running):
+
+```bash
+cd backend/location-extraction-service
+./run-docker.sh
+```
+
+The script builds the image and processes events with `location IS NULL`. Override via environment variables:
+
+| Variable       | Default                                                                                 | Description                     |
+| -------------- | --------------------------------------------------------------------------------------- | ------------------------------- |
+| `IMAGE_TAG`    | `living-map/location-extraction-service`                                                | Docker image tag                |
+| `NETWORK`      | `backend_default`                                                                       | Docker network name             |
+| `DATABASE_URL` | `postgres://livingmap:livingmap@postgres:5432/livingmap?options=-c%20search_path=…`     | PostgreSQL connection string    |
+
 ## API Usage
 
 ### Extract Location
