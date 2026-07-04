@@ -45,7 +45,7 @@ exports.up = (pgm) => {
       'nyt-world',
       'rss',
       '{"url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "source": "nyt-world"}',
-      '*/15 * * * *',
+      '0 6 * * *',
       true
     ) ON CONFLICT (name) DO NOTHING;
   `);
