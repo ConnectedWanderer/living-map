@@ -43,6 +43,17 @@ npm start
 docker compose up -d
 ```
 
+### Manual Run (Docker)
+
+Run the ingestion worker as a one-off container on the `backend_default` network (requires `backend-postgres-1` to be running):
+
+```bash
+cd backend/ingestion-worker
+./run-docker.sh
+```
+
+The script builds the image and runs the container.
+
 ## Architecture
 
 ```

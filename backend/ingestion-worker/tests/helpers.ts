@@ -14,11 +14,14 @@ export async function closePool(pool: pg.Pool): Promise<void> {
 }
 
 export async function runMigrations(connectionString: string): Promise<void> {
-  execSync('npx node-pg-migrate up --migrations-dir ../migrations --schema living_map --create-schema', {
-    cwd: path.resolve(__dirname, '..'),
-    env: { ...process.env, DATABASE_URL: connectionString },
-    stdio: 'pipe',
-  });
+  execSync(
+    'npx node-pg-migrate up --migrations-dir ../migrations --schema living_map --create-schema',
+    {
+      cwd: path.resolve(__dirname, '..'),
+      env: { ...process.env, DATABASE_URL: connectionString },
+      stdio: 'pipe',
+    },
+  );
 }
 
 export async function cleanTables(pool: pg.Pool): Promise<void> {

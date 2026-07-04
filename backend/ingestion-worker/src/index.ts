@@ -8,6 +8,7 @@ import { getAdapter } from './sources/registry.ts';
 interface Env {
   DATABASE_URL?: string;
   LOG_LEVEL?: string;
+  PGSSLMODE?: string;
 }
 
 function runSourceDeps(type: string, pool: pg.Pool, logger: ReturnType<typeof createLogger>) {
@@ -32,7 +33,7 @@ export async function main(env: Env, deps?: { pool?: pg.Pool }): Promise<void> {
     deps?.pool ??
     new pg.Pool({
       connectionString: env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      ssl: env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: false },
       connectionTimeoutMillis: 5_000,
       idleTimeoutMillis: 30_000,
       max: 5,

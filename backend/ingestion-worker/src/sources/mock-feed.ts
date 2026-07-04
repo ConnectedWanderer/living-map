@@ -41,7 +41,7 @@ export async function fetchArticles(
   const xml = await response.text();
   const parser = new XMLParser({
     processEntities: false,
-    stopNodes: ['*'],
+    stopNodes: ['rss.channel.item.description'],
   });
   const parsed = parser.parse(xml) as RssRoot;
 
