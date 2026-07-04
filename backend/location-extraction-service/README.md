@@ -57,6 +57,19 @@ bash scripts/run-docker.sh
 
 The script builds the image and processes events with `location IS NULL`.
 
+### Manual Run (Scaleway)
+
+Trigger a remote LES job run on Scaleway, wait for completion, and print status and errors:
+
+```bash
+bash scripts/run-remote.sh
+
+# Or pass a specific job definition ID
+bash scripts/run-remote.sh <job-definition-id>
+```
+
+The script requires the `scw` CLI to be installed and authenticated. `jq` is installed automatically if missing.
+
 ## API Usage
 
 ### Extract Location

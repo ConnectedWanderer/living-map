@@ -19,7 +19,9 @@ def run_batch(connection, pipeline: LocationPipeline) -> int:
 
     """
     cursor = connection.cursor()
-    cursor.execute("SELECT id, title, description FROM events WHERE location_name IS NULL LIMIT 500")
+    cursor.execute(
+        "SELECT id, title, description FROM events WHERE location_name IS NULL LIMIT 500"
+    )
     rows = cursor.fetchall()
 
     count = 0
@@ -29,7 +31,13 @@ def run_batch(connection, pipeline: LocationPipeline) -> int:
         if result.event_location:
             cursor.execute(
                 "UPDATE events SET location = ST_SetSRID(ST_MakePoint(%s, %s), 4326), location_name = %s, country = %s, updated_at = now() WHERE id = %s",
-                (result.event_location.lon, result.event_location.lat, result.event_location.text, result.event_location.country, event_id),
+                (
+                    result.event_location.lon,
+                    result.event_location.lat,
+                    result.event_location.text,
+                    result.event_location.country,
+                    event_id,
+                ),
             )
             count += 1
 
