@@ -6,7 +6,8 @@ import type { ErrorRequestHandler } from 'express';
 
 export const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173' }));
+const corsOrigin = (process.env.CORS_ORIGIN || 'http://localhost:5173').replace(/\/+$/, '');
+app.use(cors({ origin: corsOrigin }));
 app.use('/tiles', tilesRouter);
 
 app.get('/health', (_req, res) => {
