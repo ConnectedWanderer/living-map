@@ -3,6 +3,8 @@ exports.up = (pgm) => {
 
   pgm.createSchema("living_map", { ifNotExists: true });
 
+  pgm.sql("SET search_path TO living_map, public;");
+
   pgm.createTable("sources", {
     id: { type: "serial", primaryKey: true },
     name: { type: "text", notNull: true, unique: true },

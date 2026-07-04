@@ -24,7 +24,7 @@ services:
     command:
       - sh
       - -c
-      - "npx --yes node-pg-migrate@8.0.4 up --migration-file-language js --migration-dir /migrations --schema living_map"
+      - "npx --yes node-pg-migrate@8.0.4 up --migration-file-language js --migration-dir /migrations --schema living_map --create-schema"
     depends_on:
       postgres:
         condition: service_healthy
