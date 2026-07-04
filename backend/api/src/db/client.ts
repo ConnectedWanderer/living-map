@@ -6,7 +6,7 @@ export function getPool(): pg.Pool {
   if (!pool) {
     pool = new pg.Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: false },
       connectionTimeoutMillis: 5_000,
       idleTimeoutMillis: 30_000,
       max: 5,

@@ -35,6 +35,7 @@ services:
       - "3002:3002"
     environment:
       DATABASE_URL: postgres://livingmap:livingmap@postgres:5432/livingmap?options=-c%20search_path=living_map,public
+      PGSSLMODE: disable
       # WARNING: Wildcard CORS for local dev only. Set a specific origin in production.
       CORS_ORIGIN: "*"
     depends_on:
