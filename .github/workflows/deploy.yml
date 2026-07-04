@@ -98,12 +98,16 @@ jobs:
         run: |
           docker build -t rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/tile-api:latest backend/api
           docker push --all-tags rg.fr-par.scw.cloud/living-map/tile-api
-      - name: Retag tile-api (no build)
+      - name: Retag or build tile-api (no code change)
         if: steps.changes.outputs.api == 'false'
         run: |
-          docker pull rg.fr-par.scw.cloud/living-map/tile-api:latest
-          docker tag rg.fr-par.scw.cloud/living-map/tile-api:latest rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }}
-          docker push rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }}
+          if docker pull rg.fr-par.scw.cloud/living-map/tile-api:latest 2>/dev/null; then
+            docker tag rg.fr-par.scw.cloud/living-map/tile-api:latest rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }}
+            docker push rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }}
+          else
+            docker build -t rg.fr-par.scw.cloud/living-map/tile-api:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/tile-api:latest backend/api
+            docker push --all-tags rg.fr-par.scw.cloud/living-map/tile-api
+          fi
       - name: Prune old tags for tile-api
         run: |
           IMAGE_ID=$(scw registry image list name=tile-api -o json | jq -r '.[0].id')
@@ -116,12 +120,16 @@ jobs:
         run: |
           docker build -t rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/ingestion-job:latest backend/ingestion-worker
           docker push --all-tags rg.fr-par.scw.cloud/living-map/ingestion-job
-      - name: Retag ingestion-job (no build)
+      - name: Retag or build ingestion-job (no code change)
         if: steps.changes.outputs.ingestion == 'false'
         run: |
-          docker pull rg.fr-par.scw.cloud/living-map/ingestion-job:latest
-          docker tag rg.fr-par.scw.cloud/living-map/ingestion-job:latest rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }}
-          docker push rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }}
+          if docker pull rg.fr-par.scw.cloud/living-map/ingestion-job:latest 2>/dev/null; then
+            docker tag rg.fr-par.scw.cloud/living-map/ingestion-job:latest rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }}
+            docker push rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }}
+          else
+            docker build -t rg.fr-par.scw.cloud/living-map/ingestion-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/ingestion-job:latest backend/ingestion-worker
+            docker push --all-tags rg.fr-par.scw.cloud/living-map/ingestion-job
+          fi
       - name: Prune old tags for ingestion-job
         run: |
           IMAGE_ID=$(scw registry image list name=ingestion-job -o json | jq -r '.[0].id')
@@ -134,12 +142,16 @@ jobs:
         run: |
           docker build -t rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/les-job:latest backend/location-extraction-service
           docker push --all-tags rg.fr-par.scw.cloud/living-map/les-job
-      - name: Retag les-job (no build)
+      - name: Retag or build les-job (no code change)
         if: steps.changes.outputs.les == 'false'
         run: |
-          docker pull rg.fr-par.scw.cloud/living-map/les-job:latest
-          docker tag rg.fr-par.scw.cloud/living-map/les-job:latest rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }}
-          docker push rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }}
+          if docker pull rg.fr-par.scw.cloud/living-map/les-job:latest 2>/dev/null; then
+            docker tag rg.fr-par.scw.cloud/living-map/les-job:latest rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }}
+            docker push rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }}
+          else
+            docker build -t rg.fr-par.scw.cloud/living-map/les-job:${{ github.sha }} -t rg.fr-par.scw.cloud/living-map/les-job:latest backend/location-extraction-service
+            docker push --all-tags rg.fr-par.scw.cloud/living-map/les-job
+          fi
       - name: Prune old tags for les-job
         run: |
           IMAGE_ID=$(scw registry image list name=les-job -o json | jq -r '.[0].id')
