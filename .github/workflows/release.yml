@@ -42,7 +42,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           NEXT=$(git cliff --bumped-version)
-          CHANGELOG=$(git cliff --unreleased --tag "v$NEXT" --strip header)
-          gh release create "v$NEXT" \
+          CHANGELOG=$(git cliff --unreleased --tag "$NEXT" --strip header)
+          gh release create "$NEXT" \
             --notes "$CHANGELOG" \
             --target "${{ github.sha }}"
