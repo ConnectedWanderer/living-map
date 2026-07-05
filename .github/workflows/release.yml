@@ -1,0 +1,48 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install git-cliff
+        run: |
+          curl -LsSf https://github.com/orhun/git-cliff/releases/download/v2.8.0/git-cliff-2.8.0-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz -C /usr/local/bin --strip-components=2
+
+      - name: Check if release needed
+        id: check
+        run: |
+          PREV=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          if [ -z "$PREV" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          NON_TRIVIAL=$(git log "$PREV"..HEAD --oneline --no-decorate \
+            | grep -vE '^\w+(\(.+\))?:\s*(docs|chore|ci|deploy)\b' || true)
+          if [ -z "$NON_TRIVIAL" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Release
+        if: steps.check.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NEXT=$(git cliff --bumped-version)
+          CHANGELOG=$(git cliff --unreleased --tag "v$NEXT" --strip header)
+          gh release create "v$NEXT" \
+            --notes "$CHANGELOG" \
+            --target "${{ github.sha }}"

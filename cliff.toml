@@ -1,0 +1,24 @@
+[remote.github]
+owner = "ConnectedWanderer"
+repo = "living-map"
+
+[changelog]
+header = ""
+body = """
+{% for group in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits | filter(attribute="group", value=group) %}
+- {{ commit.message | upper_first }} ({{ commit.id | truncate(7, end="") }})
+{% endfor %}
+{% endfor %}
+
+{% if previous %}
+Full Changelog: [{{ previous }}...{{ version }}](https://github.com/ConnectedWanderer/living-map/compare/{{ previous }}...{{ version }})
+{% endif %}
+"""
+trim = true
+postprocessors = [{ pattern = "\\[skip ci\\]", replace = "" }]
+
+[git]
+conventional_commits = true
+filter_unconventional = false
