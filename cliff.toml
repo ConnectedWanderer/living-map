@@ -5,16 +5,12 @@ repo = "living-map"
 [changelog]
 header = ""
 body = """
-{% for group in commits | group_by(attribute="group") %}
+{% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
-{% for commit in group.commits %}
-- {{ commit.message | upper_first }} ({{ commit.short_id }})
+{% for commit in commits %}
+- {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7) }})
 {% endfor %}
 {% endfor %}
-
-{% if previous %}
-Full Changelog: [{{ previous }}...{{ version }}](https://github.com/ConnectedWanderer/living-map/compare/{{ previous }}...{{ version }})
-{% endif %}
 """
 trim = true
 postprocessors = [{ pattern = "\\[skip ci\\]", replace = "" }]
