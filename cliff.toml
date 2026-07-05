@@ -7,7 +7,7 @@ header = ""
 body = """
 {% for group in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
-{% for commit in commits | filter(attribute="group", value=group) %}
+{% for commit in group.commits %}
 - {{ commit.message | upper_first }} ({{ commit.short_id }})
 {% endfor %}
 {% endfor %}
