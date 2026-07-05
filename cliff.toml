@@ -8,7 +8,7 @@ body = """
 {% for group in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 {% for commit in commits | filter(attribute="group", value=group) %}
-- {{ commit.message | upper_first }} ({{ commit.id | truncate(7) | trim_end_matches(pat="...") }})
+- {{ commit.message | upper_first }} ({{ commit.short_id }})
 {% endfor %}
 {% endfor %}
 
