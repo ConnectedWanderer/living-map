@@ -44,5 +44,6 @@ jobs:
           NEXT=$(git cliff --bumped-version)
           CHANGELOG=$(git cliff --unreleased --tag "$NEXT" --strip header)
           gh release create "$NEXT" \
+            --title "$NEXT" \
             --notes "$CHANGELOG" \
             --target "${{ github.sha }}"

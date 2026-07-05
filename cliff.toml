@@ -18,3 +18,6 @@ postprocessors = [{ pattern = "\\[skip ci\\]", replace = "" }]
 [git]
 conventional_commits = true
 filter_unconventional = false
+commit_parsers = [
+  { message = ".*", group = "Other" },
+]
