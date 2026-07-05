@@ -7,6 +7,9 @@ Read-only Express server serving Mapbox Vector Tile (MVT) tiles from PostGIS for
 - Serve MVT tiles at `GET /tiles/{z}/{x}/{y}.pbf`
 - PostGIS `ST_AsMVT` rendering with spatial index filtering (`&& ST_TileEnvelope`)
 - CORS configured for frontend dev server
+- Security headers via Helmet
+- Rate limiting (100 req / 15s per IP)
+- Referer/Origin validation to block non-browser clients
 - Health check endpoint for container orchestration
 - Type-safe with TypeScript (run directly via `--experimental-strip-types`)
 
@@ -80,11 +83,19 @@ curl http://localhost:3002/health
 
 ## Configuration
 
-| Variable       | Default                                                   | Description                  |
-| -------------- | --------------------------------------------------------- | ---------------------------- |
-| `DATABASE_URL` | `postgres://livingmap:livingmap@localhost:5432/livingmap` | PostgreSQL connection string |
-| `PORT`         | `3002`                                                    | Server port                  |
-| `CORS_ORIGIN`  | `http://localhost:5173`                                   | Allowed CORS origin          |
+| Variable       | Default                                                   | Description                           |
+| -------------- | --------------------------------------------------------- | ------------------------------------- |
+| `DATABASE_URL` | `postgres://livingmap:livingmap@localhost:5432/livingmap` | PostgreSQL connection string          |
+| `PORT`         | `3002`                                                    | Server port                           |
+| `CORS_ORIGIN`  | `http://localhost:5173`                                   | Allowed CORS origin (use `*` for all) |
+
+### Rate Limiting
+
+By default, 100 requests per 15-second window per IP. Configure via `RATE_LIMIT_WINDOW_MS` and `RATE_LIMIT_MAX` environment variables (if extended).
+
+### Referer Validation
+
+When `CORS_ORIGIN` is set to a specific origin (not `*`), tile endpoints validate the `Origin` or `Referer` header against the allowed origin. Requests without either header receive a `403 Forbidden`. Set to `*` for local development to bypass this check.
 
 ## Code Quality
 
